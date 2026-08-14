@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alumni Mentoring Portal - Authentication & Roles</title>
+  <meta name="description" content="Alumni Mentoring Portal Module 1 - Register, Login, Role-Based Access Control (Student, Alumni, Admin), and Session/Token Auth.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Animated Background Blobs -->
+  <div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- Header Header -->
+  <header class="header-container">
+    <div class="brand-badge">
+      <span>🎓</span> Alumni Mentoring Portal — Module 1
+    </div>
+    <h1 class="portal-title">Auth & Role Access System</h1>
+    <p class="portal-subtitle">Secure Register / Login, Role Polymorphism & Bearer Token Authentication</p>
+  </header>
+
+  <!-- Main App Card -->
+  <main class="app-card">
+    <!-- Alert Notification Box -->
+    <div id="alert-box" class="alert-box hidden"></div>
+
+    <!-- VIEW 1: AUTHENTICATION (Login / Register) -->
+    <section id="auth-view" class="fade-in">
+      <!-- Navigation Tabs -->
+      <div class="auth-tabs">
+        <button type="button" id="tab-login" class="tab-btn active" onclick="switchAuthTab('login')">Sign In</button>
+        <button type="button" id="tab-register" class="tab-btn" onclick="switchAuthTab('register')">Register Account</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="login-email">Email Address</label>
+          <div class="input-wrapper">
+            <input type="email" id="login-email" placeholder="e.g., student@example.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="login-password" placeholder="••••••••••••" required autocomplete="current-password">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary">
+          <span>Sign In to Portal</span>
+          <span>→</span>
+        </button>
+      </form>
+
+      <!-- REGISTER FORM -->
+      <form id="register-form" class="auth-form hidden" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label for="reg-name">Full Name</label>
+          <div class="input-wrapper">
+            <input type="text" id="reg-name" placeholder="John Doe" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-email">Email Address</label>
+          <div class="input-wrapper">
+            <input type="email" id="reg-email" placeholder="john@university.edu" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-password">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="reg-password" placeholder="At least 6 characters" required minlength="6">
+          </div>
+        </div>
+
+        <!-- Role Selector Radios -->
+        <div class="form-group">
+          <label>Select Portal Role</label>
+          <div class="role-selector">
+            <label class="role-option">
+              <input type="radio" name="reg-role" value="student" checked onchange="updateDynamicRoleFields('student')">
+              <div class="role-card">
+                <span class="role-icon">🎓</span>
+                <span class="role-name">Student</span>
+              </div>
+            </label>
+
+            <label class="role-option">
+              <input type="radio" name="reg-role" value="alumni" onchange="updateDynamicRoleFields('alumni')">
+              <div class="role-card">
+                <span class="role-icon">💼</span>
+                <span class="role-name">Alumni</span>
+              </div>
+            </label>
+
+            <label class="role-option">
+              <input type="radio" name="reg-role" value="admin" onchange="updateDynamicRoleFields('admin')">
+              <div class="role-card">
+                <span class="role-icon">⚡</span>
+                <span class="role-name">Admin</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Dynamic Role Fields Container -->
+        <div id="dynamic-fields" class="dynamic-fields">
+          <!-- Populated by JavaScript according to chosen role -->
+        </div>
+
+        <button type="submit" class="btn-primary">
+          <span>Create Account</span>
+          <span>✓</span>
+        </button>
+      </form>
+
+
+    </section>
+
+    <!-- VIEW 2: LOGGED-IN DASHBOARD (Protected Session State) -->
+    <section id="dashboard-view" class="dashboard-view hidden">
+      <!-- Profile Header -->
+      <div class="profile-card">
+        <div id="user-avatar" class="avatar">U</div>
+        <div class="profile-info">
+          <div id="user-name" class="profile-name">User Name</div>
+          <div id="user-email" class="profile-email">user@example.com</div>
+          <div id="user-badge" class="badge">Role Badge</div>
+        </div>
+      </div>
+
+      <!-- Role-Specific Attributes Grid -->
+      <div class="form-group">
+        <label>Role Attributes & OOP Class Details</label>
+        <div id="user-details-grid" class="details-grid">
+          <!-- Populated dynamically via user.getRoleDetails() -->
+        </div>
+      </div>
+
+      <!-- Token & Session Inspector -->
+      <div class="token-inspector">
+        <div class="inspector-header">
+          <div class="inspector-title">
+            <span class="status-dot"></span>
+            <span>Active Bearer Token & Session</span>
+          </div>
+          <span id="session-exp-badge" class="badge" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc;">Valid</span>
+        </div>
+
+        <label style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.4rem; display: block;">Session Token (Header.Payload.Signature):</label>
+        <div id="token-box" class="token-box">Loading token...</div>
+
+        <label style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.75rem; margin-bottom: 0.4rem; display: block;">Decoded JWT Payload Claims:</label>
+        <pre id="token-claims" class="token-claims"></pre>
+      </div>
+
+      <!-- Dashboard Controls -->
+      <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
+        <button type="button" class="btn-primary" style="flex: 1;" onclick="handleLogout()">
+          <span>Sign Out</span>
+          <span>🚪</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Alumni Mentoring Portal &bull; Object-Oriented JS Architecture
+  </footer>
+
+  <!-- OOP Models -->
+  <script src="js/models/User.js"></script>
+  <script src="js/models/Student.js"></script>
+  <script src="js/models/Alumni.js"></script>
+  <script src="js/models/Admin.js"></script>
+
+  <!-- Auth & Token Services -->
+  <script src="js/services/TokenManager.js"></script>
+  <script src="js/services/AuthService.js"></script>
+
+  <!-- App Controller -->
+  <script src="js/app.js"></script>
+</body>
+</html>
