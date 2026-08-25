@@ -1,4 +1,5 @@
 const { getDatabasePool } = require('../config/database');
+const { syncRegistrationToSupabase } = require('../services/supabaseSyncService');
 
 async function createRegistration(registration) {
   const connection = await getDatabasePool().getConnection();
@@ -36,6 +37,12 @@ async function createRegistration(registration) {
       );
     }
     await connection.commit();
+
+    // Dual Sync: Persist to Supabase asynchronously
+    syncRegistrationToSupabase(registration).catch((err) => {
+      console.warn('Asynchronous Supabase sync note:', err.message);
+    });
+
     return { id: userResult.insertId, ...registration };
   } catch (error) {
     await connection.rollback();
