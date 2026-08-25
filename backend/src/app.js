@@ -16,6 +16,16 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Root API endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'Alumni Mentoring Portal Backend API is running',
+    status: 'OK',
+    frontendUrl: 'http://localhost:5173',
+    healthCheck: '/api/health'
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });

@@ -18,9 +18,21 @@ async function createRegistration(registration) {
       );
     } else {
       await connection.execute(
-        `INSERT INTO alumni (user_id, department, graduation_year, company, designation, linkedin_profile)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [userResult.insertId, registration.department, registration.graduationYear, registration.company, registration.designation, registration.linkedInProfile]
+        `INSERT INTO alumni (user_id, department, graduation_year, company, designation, linkedin_profile, experience_years, industry, skills, bio, max_mentees)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          userResult.insertId,
+          registration.department,
+          registration.graduationYear,
+          registration.company,
+          registration.designation,
+          registration.linkedInProfile,
+          registration.experienceYears,
+          registration.industry,
+          registration.skills,
+          registration.bio,
+          registration.maxMentees
+        ]
       );
     }
     await connection.commit();
@@ -38,7 +50,8 @@ async function findRegistrationByEmail(email) {
     `SELECT u.id, u.full_name AS fullName, u.email, u.mobile_number AS mobileNumber, u.role,
             s.student_id AS studentId, COALESCE(s.department, a.department) AS department,
             COALESCE(s.graduation_year, a.graduation_year) AS graduationYear,
-            a.company, a.designation, a.linkedin_profile AS linkedInProfile
+            a.company, a.designation, a.linkedin_profile AS linkedInProfile,
+            a.experience_years AS experienceYears, a.industry, a.skills, a.bio, a.max_mentees AS maxMentees
        FROM users u
        LEFT JOIN students s ON s.user_id = u.id
        LEFT JOIN alumni a ON a.user_id = u.id

@@ -31,11 +31,20 @@ function normalizeStudent(data) {
 
 function normalizeAlumni(data) {
   return {
-    fullName: (data.fullName || data.name).trim(), email: data.email.trim().toLowerCase(),
-    mobileNumber: (data.mobileNumber || data.phone).trim(), role: 'alumni',
-    graduationYear: Number(data.graduationYear || data.passoutYear), department: (data.department || data.branch).trim(),
-    company: (data.company || data.currentCompany).trim(), designation: (data.designation || data.jobTitle).trim(),
-    linkedInProfile: data.linkedInProfile || data.linkedin || null
+    fullName: (data.fullName || data.name).trim(),
+    email: data.email.trim().toLowerCase(),
+    mobileNumber: (data.mobileNumber || data.phone).trim(),
+    role: 'alumni',
+    graduationYear: Number(data.graduationYear || data.passoutYear),
+    department: (data.department || data.branch).trim(),
+    company: (data.company || data.currentCompany).trim(),
+    designation: (data.designation || data.jobTitle).trim(),
+    linkedInProfile: data.linkedInProfile || data.linkedin || null,
+    experienceYears: data.experienceYears !== undefined && data.experienceYears !== '' ? Number(data.experienceYears) : (data.experience ? Number(data.experience) : null),
+    industry: data.industry ? String(data.industry).trim() : null,
+    skills: data.skills ? String(data.skills).trim() : null,
+    bio: data.bio ? String(data.bio).trim() : null,
+    maxMentees: data.maxMentees !== undefined && data.maxMentees !== '' ? Number(data.maxMentees) : (data.mentees ? Number(data.mentees) : null)
   };
 }
 

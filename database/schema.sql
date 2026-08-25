@@ -29,5 +29,10 @@ CREATE TABLE IF NOT EXISTS alumni (
   company VARCHAR(150) NOT NULL,
   designation VARCHAR(150) NOT NULL,
   linkedin_profile VARCHAR(255) NULL,
+  experience_years INT NULL,
+  industry VARCHAR(100) NULL,
+  skills TEXT NULL,
+  bio TEXT NULL,
+  max_mentees INT NULL,
   CONSTRAINT fk_alumni_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
