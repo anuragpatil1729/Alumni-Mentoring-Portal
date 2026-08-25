@@ -1,4 +1,18 @@
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "./firebase";
+
 function App() {
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      alert(`Welcome, ${user.displayName || user.email}!`);
+    } catch (error) {
+      console.error("Google Sign-In Error:", error);
+      alert(`Sign-in failed: ${error.message}`);
+    }
+  };
+
   return (
     <>
       <header className="header">
@@ -16,7 +30,7 @@ function App() {
           </div>
 
           <div className="form-body">
-            <button type="button" className="google-btn">
+            <button type="button" className="google-btn" onClick={handleGoogleSignIn}>
               <span className="google-icon">G</span>
               Continue with Google
             </button>

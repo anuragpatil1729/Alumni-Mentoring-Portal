@@ -5,9 +5,9 @@
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
-    "vite": "latest",
+    "firebase": "^12.18.0",
     "react": "latest",
-    "react-dom": "latest"
-  },
-  "devDependencies": {}
+    "react-dom": "latest",
+    "vite": "latest"
+  }
 }
