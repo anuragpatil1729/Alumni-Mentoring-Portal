@@ -1,0 +1,281 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #eaf3ff, #f8fbff);
+  color: #263238;
+  min-height: 100vh;
+}
+
+.header {
+  align-items: center;
+  background: #155e95;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 18px 7%;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.logo span {
+  color: #b9dcff;
+}
+
+.header-text {
+  font-size: 14px;
+}
+
+.main {
+  padding: 40px 20px;
+}
+
+.form-container {
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  margin: auto;
+  max-width: 850px;
+  overflow: hidden;
+}
+
+.form-header {
+  background: linear-gradient(135deg, #155e95, #1976b9);
+  color: white;
+  padding: 35px;
+  text-align: center;
+}
+
+.form-header h1 {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.form-header p {
+  color: #e5f2ff;
+  font-size: 15px;
+}
+
+.form-body {
+  padding: 35px 45px 40px;
+}
+
+.google-btn {
+  background: white;
+  border: 1px solid #d0d7de;
+  border-radius: 7px;
+  color: #333;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  height: 46px;
+  transition: 0.2s;
+  width: 100%;
+}
+
+.google-btn:hover {
+  background: #f8f8f8;
+  border-color: #aaa;
+}
+
+.google-icon {
+  color: #4285f4;
+  font-size: 18px;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.divider {
+  align-items: center;
+  color: #999;
+  display: flex;
+  font-size: 13px;
+  margin: 25px 0;
+}
+
+.divider::before,
+.divider::after {
+  background: #ddd;
+  content: '';
+  flex: 1;
+  height: 1px;
+}
+
+.divider span {
+  padding: 0 12px;
+}
+
+.section {
+  margin-top: 28px;
+}
+
+.section:first-of-type {
+  margin-top: 0;
+}
+
+.section-title {
+  align-items: center;
+  border-bottom: 1px solid #e2e8ee;
+  color: #155e95;
+  display: flex;
+  font-size: 19px;
+  font-weight: bold;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
+
+.section-number {
+  align-items: center;
+  background: #eaf4ff;
+  border-radius: 50%;
+  color: #155e95;
+  display: flex;
+  font-size: 13px;
+  height: 28px;
+  justify-content: center;
+  width: 28px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+label {
+  color: #37474f;
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 7px;
+}
+
+.required {
+  color: #e53935;
+}
+
+input,
+select,
+textarea {
+  background: #fff;
+  border: 1px solid #ccd5dd;
+  border-radius: 7px;
+  color: #333;
+  font-size: 14px;
+  padding: 12px 13px;
+  transition: 0.2s;
+  width: 100%;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #a0a8ae;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #1976b9;
+  box-shadow: 0 0 0 3px rgba(25, 118, 185, 0.1);
+  outline: none;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.hint {
+  color: #888;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.register-btn {
+  background: #155e95;
+  border: none;
+  border-radius: 7px;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  height: 48px;
+  margin-top: 15px;
+  transition: 0.2s;
+  width: 100%;
+}
+
+.register-btn:hover {
+  background: #0f4d7c;
+  transform: translateY(-1px);
+}
+
+.login {
+  color: #777;
+  font-size: 14px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.login a {
+  color: #155e95;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.login a:hover {
+  text-decoration: underline;
+}
+
+.footer {
+  color: #888;
+  font-size: 12px;
+  margin-top: 25px;
+  text-align: center;
+}
+
+@media (max-width: 650px) {
+  .header {
+    padding: 15px 20px;
+  }
+
+  .header-text {
+    display: none;
+  }
+
+  .main {
+    padding: 20px 10px;
+  }
+
+  .form-body {
+    padding: 25px 20px 30px;
+  }
+
+  .form-header {
+    padding: 28px 20px;
+  }
+
+  .form-header h1 {
+    font-size: 25px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
