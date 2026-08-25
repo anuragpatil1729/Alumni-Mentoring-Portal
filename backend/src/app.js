@@ -2,6 +2,8 @@
  * Express Application Server Entry Point
  */
 
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
