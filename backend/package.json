@@ -1,0 +1,14 @@
+{
+  "name": "alumni-mentoring-portal-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Alumni Mentoring Portal",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "test": "node tests/validation.test.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5"
+  }
+}
