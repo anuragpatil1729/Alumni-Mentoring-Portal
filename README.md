@@ -70,6 +70,22 @@ cd backend
 npm install
 ```
 
+### MySQL configuration
+
+Create the database and registration tables before starting the API:
+
+```bash
+mysql -u root -p < database/schema.sql
+```
+
+Set these environment variables as appropriate: `DB_HOST`, `DB_PORT`, `DB_USER`,
+`DB_PASSWORD`, `DB_NAME`, and `DB_CONNECTION_LIMIT`. The defaults target a local
+MySQL server and database named `alumni_mentoring_portal`.
+
+Validated registrations are inserted transactionally into `users` plus either
+`students` or `alumni`; passwords are stored only as salted scrypt hashes. Retrieve
+safe, non-password registration data with `GET /api/auth/registrations/:email`.
+
 ### 2. Start Backend Server
 ```bash
 npm start

@@ -8,7 +8,8 @@ const router = express.Router();
 const {
   registerStudent,
   registerAlumni,
-  registerUser
+  registerUser,
+  getRegistrationByEmail
 } = require('../controllers/authController');
 
 const {
@@ -25,5 +26,8 @@ router.post('/register/student', validateStudentRegistrationMiddleware, register
 
 // Alumni registration route
 router.post('/register/alumni', validateAlumniRegistrationMiddleware, registerAlumni);
+
+// Returns stored registration data without exposing the password hash.
+router.get('/registrations/:email', getRegistrationByEmail);
 
 module.exports = router;
