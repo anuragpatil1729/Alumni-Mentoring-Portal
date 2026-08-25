@@ -13,6 +13,37 @@ const {
   isValidPassword
 } = require('../src/utils/validation');
 const { VALIDATION_MESSAGES } = require('../src/utils/constants');
+const { setDatabasePool } = require('../src/config/database');
+
+function createFakePool() {
+  const registrations = [];
+  let nextId = 1;
+  return {
+    async getConnection() {
+      let pending;
+      return {
+        async beginTransaction() {},
+        async commit() { if (pending) registrations.push(pending); },
+        async rollback() { pending = undefined; },
+        release() {},
+        async execute(sql, params) {
+          if (sql.includes('INSERT INTO users')) {
+            pending = { id: nextId++, fullName: params[0], email: params[1], mobileNumber: params[2], role: params[4] };
+            return [{ insertId: pending.id }];
+          }
+          if (sql.includes('INSERT INTO students')) Object.assign(pending, { studentId: params[1], department: params[2], graduationYear: params[3] });
+          if (sql.includes('INSERT INTO alumni')) Object.assign(pending, { department: params[1], graduationYear: params[2], company: params[3], designation: params[4], linkedInProfile: params[5] });
+          return [{}];
+        }
+      };
+    },
+    async execute(sql, params) {
+      return [registrations.filter((registration) => registration.email === params[0])];
+    }
+  };
+}
+
+setDatabasePool(createFakePool());
 
 let passedTests = 0;
 let failedTests = 0;
@@ -218,6 +249,11 @@ async function runHttpTests() {
     return { status: res.status, body: json };
   }
 
+  async function getJson(path) {
+    const res = await fetch(`${baseUrl}${path}`);
+    return { status: res.status, body: await res.json() };
+  }
+
   await asyncTest('POST /api/auth/register/student with valid data returns HTTP 201', async () => {
     const response = await postJson('/api/auth/register/student', {
       fullName: 'Aarav Gupta',
@@ -299,6 +335,13 @@ async function runHttpTests() {
     });
     assert.strictEqual(studentRes.status, 201);
     assert.strictEqual(studentRes.body.data.role, 'student');
+  });
+
+  await asyncTest('GET /api/auth/registrations/:email returns stored registration without a password', async () => {
+    const response = await getJson('/api/auth/registrations/aarav%40college.edu');
+    assert.strictEqual(response.status, 200);
+    assert.strictEqual(response.body.data.email, 'aarav@college.edu');
+    assert.strictEqual(response.body.data.passwordHash, undefined);
   });
 
   server.close();
