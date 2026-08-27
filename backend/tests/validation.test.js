@@ -14,6 +14,8 @@ const {
 } = require('../src/utils/validation');
 const { VALIDATION_MESSAGES } = require('../src/utils/constants');
 const { setDatabasePool } = require('../src/config/database');
+const { createRegistrationSocketServer } = require('../src/services/socketServer');
+const net = require('net');
 
 function createFakePool() {
   const registrations = [];
@@ -335,6 +337,69 @@ async function runHttpTests() {
     });
     assert.strictEqual(studentRes.status, 201);
     assert.strictEqual(studentRes.body.data.role, 'student');
+  });
+
+  await asyncTest('POST /api/servlet/register accepts JSON registration data', async () => {
+    const response = await postJson('/api/servlet/register', {
+      role: 'student',
+      fullName: 'Servlet Student',
+      email: 'servlet@student.edu',
+      mobileNumber: '9876501234',
+      password: 'Servlet#Pass1',
+      studentId: 'SERV1001',
+      department: 'CSE',
+      graduationYear: 2027
+    });
+    assert.strictEqual(response.status, 201);
+    assert.strictEqual(response.body.success, true);
+  });
+
+  await asyncTest('POST /cgi-bin/register accepts URL-encoded form data', async () => {
+    const res = await fetch(`${baseUrl}/cgi-bin/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        role: 'alumni',
+        fullName: 'CGI Alumni',
+        email: 'cgi@alumni.org',
+        mobileNumber: '9876512345',
+        password: 'Cgi#Pass123',
+        graduationYear: '2021',
+        department: 'EEE',
+        company: 'Infosys',
+        designation: 'Consultant'
+      })
+    });
+    const response = { status: res.status, body: await res.json() };
+    assert.strictEqual(response.status, 201);
+    assert.strictEqual(response.body.success, true);
+  });
+
+  await asyncTest('TCP socket registration returns newline-delimited success response', async () => {
+    const socketServer = createRegistrationSocketServer();
+    await new Promise((resolve) => socketServer.listen(0, resolve));
+    const socketPort = socketServer.address().port;
+    const responseText = await new Promise((resolve, reject) => {
+      const client = net.createConnection({ port: socketPort }, () => {
+        client.write(JSON.stringify({
+          role: 'student',
+          fullName: 'Socket Student',
+          email: 'socket@student.edu',
+          mobileNumber: '9876523456',
+          password: 'Socket#Pass1',
+          studentId: 'SOCK1001',
+          department: 'IT',
+          graduationYear: 2027
+        }) + '\n');
+      });
+      client.setEncoding('utf8');
+      client.on('data', (chunk) => { client.end(); resolve(chunk); });
+      client.on('error', reject);
+    });
+    await new Promise((resolve) => socketServer.close(resolve));
+    const response = JSON.parse(responseText);
+    assert.strictEqual(response.success, true);
+    assert.strictEqual(response.data.email, 'socket@student.edu');
   });
 
   await asyncTest('GET /api/auth/registrations/:email returns stored registration without a password', async () => {

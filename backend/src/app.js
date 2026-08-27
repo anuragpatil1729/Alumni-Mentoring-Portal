@@ -8,6 +8,8 @@ const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const { errorHandler } = require('./middleware/errorMiddleware');
+const { processRegistration } = require('./services/registrationService');
+const { startRegistrationSocketServer } = require('./services/socketServer');
 
 const app = express();
 
@@ -34,6 +36,18 @@ app.get('/api/health', (req, res) => {
 // Auth Routes
 app.use('/api/auth', authRoutes);
 
+// Servlet-style endpoint: mirrors a Java servlet registration POST handler.
+app.post('/api/servlet/register', async (req, res) => {
+  const result = await processRegistration(req.body);
+  return res.status(result.status).json(result.body);
+});
+
+// CGI-style endpoint: accepts URL-encoded form submissions and returns JSON.
+app.post('/cgi-bin/register', async (req, res) => {
+  const result = await processRegistration(req.body);
+  return res.status(result.status).json(result.body);
+});
+
 // Global Error Handler
 app.use(errorHandler);
 
@@ -43,6 +57,10 @@ if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
+
+  if (process.env.ENABLE_SOCKET_SERVER !== 'false') {
+    startRegistrationSocketServer();
+  }
 }
 
 module.exports = app;
