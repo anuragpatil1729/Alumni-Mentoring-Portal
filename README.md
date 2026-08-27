@@ -41,6 +41,9 @@ Server-side manual input validation has been implemented for **Student** and **A
 | `POST` | `/api/auth/register/student` | Register a new Student | `validateStudentRegistrationMiddleware` |
 | `POST` | `/api/auth/register/alumni` | Register a new Alumni | `validateAlumniRegistrationMiddleware` |
 | `POST` | `/api/auth/register` | Unified registration endpoint | `validateRegistrationMiddleware` |
+| `POST` | `/api/servlet/register` | Servlet-style JSON registration endpoint | Shared registration processor |
+| `POST` | `/cgi-bin/register` | CGI-style URL-encoded form registration endpoint | Shared registration processor |
+| `TCP`  | `localhost:5002` | Newline-delimited JSON socket registration channel | Set `SOCKET_PORT` to override, `ENABLE_SOCKET_SERVER=false` to disable |
 | `GET`  | `/api/health` | Backend health check | None |
 
 ### Error Response Format (HTTP `400 Bad Request`)
@@ -90,10 +93,10 @@ safe, non-password registration data with `GET /api/auth/registrations/:email`.
 ```bash
 npm start
 ```
-*Server will listen on port `5001` (or `process.env.PORT`).*
+*Server will listen on port `5001` (or `process.env.PORT`). The optional TCP registration socket listens on `5002` by default (`SOCKET_PORT`) and can be disabled with `ENABLE_SOCKET_SERVER=false`.*
 
 ### 3. Run Automated Tests
 ```bash
 npm test
 ```
-*Executes unit and HTTP API test suite in `tests/validation.test.js` (17 tests covering email, mobile, password, student fields, alumni fields, and Express routes).*
+*Executes unit, HTTP API, Servlet-style, CGI-style form, and TCP socket tests in `tests/validation.test.js`.*
