@@ -1,3 +1,10 @@
+
+Design search page layout and request lifecycle.	
+Build Search UI.	
+Implement manual Linear/Binary Search algorithm for alumni.	
+Test search algorithm accuracy.
+
+
 # Alumni Mentoring Portal
 
 An interactive web application designed to connect students with alumni mentors.
