@@ -1,3 +1,5 @@
+Design search page layout and request lifecycle. Build Search UI. Implement manual Linear/Binary Search algorithm for alumni. Test search algorithm accuracy.
+
 # AlumniConnect — Student & Alumni Mentoring Portal
 
 [![Java](https://img.shields.io/badge/Java-OpenJDK_17%2B-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/)
