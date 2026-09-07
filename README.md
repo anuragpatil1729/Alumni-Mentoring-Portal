@@ -23,7 +23,7 @@ The portal features a **100% Java JDBC backend engine** and a **zero-dependency 
 - [Quick Start Guide](#quick-start-guide)
   - [1. Start Java Backend](#1-start-java-backend)
   - [2. Start Frontend](#2-start-frontend)
-- [Demo Credentials](#demo-credentials)
+- [Database Seed Accounts](#database-seed-accounts)
 - [API Reference](#api-reference)
 - [Input Validation & Security](#input-validation--security)
 - [Search Engine & Algorithms](#search-engine--algorithms)
@@ -46,7 +46,7 @@ The portal features a **100% Java JDBC backend engine** and a **zero-dependency 
 - **Gatekeeper Pattern**: Directs unauthenticated visitors to the **Sign In** view before accessing the mentors directory or requesting sessions.
 - **Session Persistence**: Stores session tokens and user profiles in `localStorage` (`alumniConnectUser`).
 - **Dynamic Header Navigation**: Displays user avatar initial, user full name, and role badge (`STUDENT` or `MENTOR`), along with a quick **Logout** button.
-- **One-Click Demo Accounts**: Instant credential autofill for testing both Student and Mentor personas.
+- **Dynamic User Registration**: Seamless registration for Students and Alumni Mentors with immediate cryptographic credential storage.
 
 ### 🛡️ Real-Time Name & Password Strength Testing
 - **Full Name Validator**: Enforces 2–50 character limits, letters/spaces/hyphens/periods only, prevents numbers or illegal symbols, and disallows consecutive whitespace with instant inline feedback.
@@ -223,9 +223,9 @@ python3 -m http.server 5173
 
 ---
 
-## Demo Credentials
+## Database Seed Accounts
 
-You can use the one-click demo buttons on the login page or manually enter the credentials below:
+You can register new student and alumni accounts at any time via the registration forms, or sign in using the seeded database accounts (stored with cryptographic SHA-256 salted hashes in MySQL):
 
 | Role | Name | Email | Password |
 | :--- | :--- | :--- | :--- |
@@ -244,6 +244,7 @@ You can use the one-click demo buttons on the login page or manually enter the c
 | Method | Endpoint | Description | Sample Request Payload |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/api/auth/login` | Authenticate Student or Alumni | `{"email": "rahul.student@college.edu", "password": "Student@123"}` |
+| `GET`  | `/api/auth/check-availability` | Real-time Email & Mobile In-Use Check | `?email=...&mobileNumber=...` |
 | `POST` | `/api/auth/register/student` | Register a new Student | `{"fullName": "Aman Gupta", "email": "aman@college.edu", "mobileNumber": "9876543210", "password": "StrongP@ss1", "studentId": "STU-2024-042", "department": "Computer Engineering", "graduationYear": 2026}` |
 | `POST` | `/api/auth/register/alumni` | Register a new Alumni Mentor | `{"fullName": "Ritu Roy", "email": "ritu@tech.com", "mobileNumber": "9876543215", "password": "StrongP@ss1", "department": "Information Technology", "graduationYear": 2021, "company": "Apple", "designation": "Software Engineer", "industry": "Information Technology", "skills": "Swift, iOS", "maxMentees": 5}` |
 | `POST` | `/api/auth/password-strength` | Evaluate password strength | `{"password": "Password@123"}` |

@@ -63,6 +63,7 @@ public class JDBCTest {
         long userId = registrationDAO.registerStudent(user, student);
         Assertions.assertTrue(userId > 0, "Generated user ID should be positive");
         Assertions.assertTrue(registrationDAO.existsByEmail(testEmail));
+        Assertions.assertTrue(registrationDAO.existsByMobileNumber("9123456780"));
 
         // Clean up test record
         cleanupUser(userId);
@@ -71,11 +72,12 @@ public class JDBCTest {
     @Test
     public void testTransactionalAlumniRegistration() throws SQLException {
         String testEmail = "test_alumni_" + System.currentTimeMillis() + "@example.com";
+        String testMobile = "9" + String.format("%09d", Math.abs(new java.util.Random().nextInt(1_000_000_000)));
 
         User user = new User();
         user.setFullName("JDBC Test Mentor");
         user.setEmail(testEmail);
-        user.setMobileNumber("9876543210");
+        user.setMobileNumber(testMobile);
         user.setPasswordHash("test_hash_456");
 
         Alumni alumni = new Alumni();

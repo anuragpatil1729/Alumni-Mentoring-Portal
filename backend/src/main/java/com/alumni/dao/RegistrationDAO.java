@@ -52,17 +52,13 @@ public class RegistrationDAO {
                 }
             }
         }
-        if (storedHash.startsWith("plain$")) {
-            return storedHash.substring("plain$".length()).equals(rawPassword);
-        }
-        if (storedHash.startsWith("scrypt$hash$")) {
-            // For demo alumni accounts, accept Alumni@123, Demo@123, or Password@123
-            return "Alumni@123".equals(rawPassword) || "Demo@123".equals(rawPassword) || "Password@123".equals(rawPassword);
-        }
-        return storedHash.equals(rawPassword);
+        return false;
     }
 
     public long registerStudent(User user, Student student) throws SQLException {
+        if (user.getPasswordHash() == null || user.getPasswordHash().trim().isEmpty()) {
+            throw new SQLException("User password hash cannot be empty.");
+        }
         String insertUserSql = "INSERT INTO users (full_name, email, mobile_number, password_hash, role) VALUES (?, ?, ?, ?, ?)";
         String insertStudentSql = "INSERT INTO students (user_id, student_id, department, graduation_year) VALUES (?, ?, ?, ?)";
 
@@ -74,7 +70,7 @@ public class RegistrationDAO {
                 userStmt.setString(1, user.getFullName());
                 userStmt.setString(2, user.getEmail());
                 userStmt.setString(3, user.getMobileNumber());
-                userStmt.setString(4, user.getPasswordHash() != null ? user.getPasswordHash() : hashPassword("Default@123"));
+                userStmt.setString(4, user.getPasswordHash());
                 userStmt.setString(5, "student");
 
                 int affected = userStmt.executeUpdate();
@@ -112,6 +108,9 @@ public class RegistrationDAO {
     }
 
     public long registerAlumni(User user, Alumni alumni) throws SQLException {
+        if (user.getPasswordHash() == null || user.getPasswordHash().trim().isEmpty()) {
+            throw new SQLException("User password hash cannot be empty.");
+        }
         String insertUserSql = "INSERT INTO users (full_name, email, mobile_number, password_hash, role) VALUES (?, ?, ?, ?, ?)";
         String insertAlumniSql = "INSERT INTO alumni (user_id, department, graduation_year, company, designation, linkedin_profile, experience_years, industry, skills, bio, max_mentees) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -124,7 +123,7 @@ public class RegistrationDAO {
                 userStmt.setString(1, user.getFullName());
                 userStmt.setString(2, user.getEmail());
                 userStmt.setString(3, user.getMobileNumber());
-                userStmt.setString(4, user.getPasswordHash() != null ? user.getPasswordHash() : hashPassword("Default@123"));
+                userStmt.setString(4, user.getPasswordHash());
                 userStmt.setString(5, "alumni");
 
                 int affected = userStmt.executeUpdate();
@@ -180,10 +179,26 @@ public class RegistrationDAO {
     }
 
     public boolean existsByEmail(String email) throws SQLException {
-        String sql = "SELECT COUNT(1) FROM users WHERE email = ?";
+        if (email == null || email.trim().isEmpty()) return false;
+        String sql = "SELECT COUNT(1) FROM users WHERE LOWER(email) = LOWER(?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, email);
+            stmt.setString(1, email.trim());
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    public boolean existsByMobileNumber(String mobileNumber) throws SQLException {
+        if (mobileNumber == null || mobileNumber.trim().isEmpty()) return false;
+        String digits = mobileNumber.replaceAll("[^0-9]", "");
+        if (digits.isEmpty()) return false;
+        String last10 = digits.length() >= 10 ? digits.substring(digits.length() - 10) : digits;
+        String sql = "SELECT COUNT(1) FROM users WHERE RIGHT(REPLACE(REPLACE(REPLACE(mobile_number, '+', ''), ' ', ''), '-', ''), 10) = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, last10);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
             }

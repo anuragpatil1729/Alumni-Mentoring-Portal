@@ -119,5 +119,26 @@ const ApiClient = {
       ok: response.ok,
       data
     };
+  },
+
+  /**
+   * Checks whether email and/or mobile number are available or already in use.
+   */
+  async checkAvailability({ email, mobileNumber } = {}) {
+    const params = new URLSearchParams();
+    if (email) params.append("email", email);
+    if (mobileNumber) params.append("mobileNumber", mobileNumber);
+
+    const response = await fetch(`${API_BASE_URL}/api/auth/check-availability?${params.toString()}`, {
+      method: "GET",
+      headers: { "Accept": "application/json" }
+    });
+
+    const data = await response.json().catch(() => ({}));
+    return {
+      status: response.status,
+      ok: response.ok,
+      data
+    };
   }
 };

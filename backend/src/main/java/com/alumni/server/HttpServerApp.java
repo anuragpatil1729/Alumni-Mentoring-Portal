@@ -48,6 +48,7 @@ public class HttpServerApp {
         // Auth & Registrations
         server.createContext("/api/auth/login", new LoginHandler());
         server.createContext("/api/auth/password-strength", new PasswordStrengthHandler());
+        server.createContext("/api/auth/check-availability", new AvailabilityCheckHandler());
         server.createContext("/api/auth/register/student", new StudentRegisterHandler());
         server.createContext("/api/auth/register/alumni", new AlumniRegisterHandler());
         server.createContext("/api/auth/register", new UnifiedRegisterHandler());
@@ -200,6 +201,69 @@ public class HttpServerApp {
             resp.put("strength", ps.toJsonObject());
 
             HttpUtils.sendJsonResponse(exchange, 200, resp.toString());
+        }
+    }
+
+    // Availability Check for Email and Mobile: GET or POST /api/auth/check-availability
+    private class AvailabilityCheckHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            HttpUtils.addCorsHeaders(exchange);
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(204, -1);
+                return;
+            }
+
+            try {
+                String email = null;
+                String mobile = null;
+
+                if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+                    String query = exchange.getRequestURI().getQuery();
+                    if (query != null) {
+                        for (String param : query.split("&")) {
+                            String[] pair = param.split("=", 2);
+                            if (pair.length == 2) {
+                                String key = URLDecoder.decode(pair[0], StandardCharsets.UTF_8).trim();
+                                String val = URLDecoder.decode(pair[1], StandardCharsets.UTF_8).trim();
+                                if ("email".equalsIgnoreCase(key)) email = val;
+                                if ("mobileNumber".equalsIgnoreCase(key) || "mobile".equalsIgnoreCase(key) || "phone".equalsIgnoreCase(key)) mobile = val;
+                            }
+                        }
+                    }
+                } else if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+                    JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                    email = body.optString("email", null);
+                    mobile = body.optString("mobileNumber", body.optString("mobile", body.optString("phone", null)));
+                } else {
+                    HttpUtils.sendErrorResponse(exchange, 405, "Method Not Allowed");
+                    return;
+                }
+
+                JSONObject resp = new JSONObject();
+                resp.put("success", true);
+
+                if (email != null && !email.trim().isEmpty()) {
+                    boolean emailInUse = registrationDAO.existsByEmail(email.trim());
+                    resp.put("email", email.trim());
+                    resp.put("emailAvailable", !emailInUse);
+                    resp.put("emailMessage", emailInUse ? "This email address is already in use." : "Email is available.");
+                }
+
+                if (mobile != null && !mobile.trim().isEmpty()) {
+                    boolean mobileInUse = registrationDAO.existsByMobileNumber(mobile.trim());
+                    resp.put("mobileNumber", mobile.trim());
+                    resp.put("mobileAvailable", !mobileInUse);
+                    resp.put("mobileMessage", mobileInUse ? "This mobile number is already in use." : "Mobile number is available.");
+                }
+
+                HttpUtils.sendJsonResponse(exchange, 200, resp.toString());
+            } catch (Exception e) {
+                JSONObject err = new JSONObject();
+                err.put("success", false);
+                err.put("message", "Error checking availability: " + e.getMessage());
+                HttpUtils.sendJsonResponse(exchange, 500, err.toString());
+            }
         }
     }
 

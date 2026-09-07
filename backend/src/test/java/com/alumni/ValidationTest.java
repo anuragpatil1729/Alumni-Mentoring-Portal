@@ -231,7 +231,7 @@ public class ValidationTest {
         JSONObject payload = new JSONObject();
         payload.put("fullName", "Aman Gupta");
         payload.put("email", testEmail);
-        payload.put("mobileNumber", "9876543210");
+        payload.put("mobileNumber", generateTestMobile());
         payload.put("password", "StrongP@ss1");
         payload.put("studentId", "STU" + System.currentTimeMillis());
         payload.put("department", "Computer Engineering");
@@ -264,7 +264,7 @@ public class ValidationTest {
         JSONObject payload = new JSONObject();
         payload.put("fullName", "Ritu Roy");
         payload.put("email", testEmail);
-        payload.put("mobileNumber", "9876543211");
+        payload.put("mobileNumber", generateTestMobile());
         payload.put("password", "StrongP@ss2");
         payload.put("department", "Information Technology");
         payload.put("graduationYear", 2021);
@@ -299,7 +299,7 @@ public class ValidationTest {
         payload.put("role", "student");
         payload.put("fullName", "Deepak Shah");
         payload.put("email", testEmail);
-        payload.put("mobileNumber", "9876543212");
+        payload.put("mobileNumber", generateTestMobile());
         payload.put("password", "StrongP@ss3");
         payload.put("studentId", "STU-U-" + (System.currentTimeMillis() % 1000000000L));
         payload.put("department", "Computer Engineering");
@@ -320,7 +320,7 @@ public class ValidationTest {
         payload.put("role", "student");
         payload.put("fullName", "Servlet User");
         payload.put("email", testEmail);
-        payload.put("mobileNumber", "9876543213");
+        payload.put("mobileNumber", generateTestMobile());
         payload.put("password", "ServletP@ss1");
         payload.put("studentId", "SRV" + System.currentTimeMillis());
         payload.put("department", "Computer Engineering");
@@ -338,7 +338,7 @@ public class ValidationTest {
     public void testCgiStyleFormRegistration() throws Exception {
         String testEmail = "cgi_test_" + System.currentTimeMillis() + "@college.edu";
         String formBody = "role=student&fullName=CGI+Tester&email=" + testEmail +
-                "&mobileNumber=9876543214&password=CgiStrongP%40ss1&studentId=CGI" + System.currentTimeMillis() +
+                "&mobileNumber=" + generateTestMobile() + "&password=CgiStrongP%40ss1&studentId=CGI" + System.currentTimeMillis() +
                 "&department=Computer+Engineering&graduationYear=2026";
 
         HttpResult res = sendHttp("POST", "/cgi-bin/register", formBody, "application/x-www-form-urlencoded");
@@ -356,7 +356,7 @@ public class ValidationTest {
         payload.put("role", "student");
         payload.put("fullName", "Socket User");
         payload.put("email", testEmail);
-        payload.put("mobileNumber", "9876543215");
+        payload.put("mobileNumber", generateTestMobile());
         payload.put("password", "SocketP@ss1");
         payload.put("studentId", "SOCK" + System.currentTimeMillis());
         payload.put("department", "Computer Engineering");
@@ -385,7 +385,7 @@ public class ValidationTest {
         JSONObject payload = new JSONObject();
         payload.put("fullName", "Maya Sen");
         payload.put("email", testEmail);
-        payload.put("mobileNumber", "9876543216");
+        payload.put("mobileNumber", generateTestMobile());
         payload.put("password", "StrongP@ss4");
         payload.put("department", "Computer Engineering");
         payload.put("graduationYear", 2020);
@@ -423,7 +423,7 @@ public class ValidationTest {
         JSONObject payload = new JSONObject();
         payload.put("fullName", "Login Tester");
         payload.put("email", testEmail);
-        payload.put("mobileNumber", "9876543210");
+        payload.put("mobileNumber", generateTestMobile());
         payload.put("password", "StrongP@ss1");
         payload.put("studentId", "STU" + System.currentTimeMillis());
         payload.put("department", "Computer Engineering");
@@ -526,6 +526,111 @@ public class ValidationTest {
         Assertions.assertTrue(res.json.getBoolean("valid"));
         Assertions.assertEquals("Strong", res.json.getJSONObject("strength").getString("level"));
         Assertions.assertEquals(4, res.json.getJSONObject("strength").getInt("score"));
+    }
+
+    // ==========================================
+    // [7] Email & Mobile Number In-Use Verification Tests
+    // ==========================================
+    @Test
+    @Order(26)
+    public void testDuplicateEmailRegistrationFails() throws Exception {
+        String testEmail = "dup_email_" + System.currentTimeMillis() + "@college.edu";
+        String testMobile1 = generateTestMobile();
+        String testMobile2 = generateTestMobile();
+
+        JSONObject p1 = new JSONObject();
+        p1.put("fullName", "Original Email User");
+        p1.put("email", testEmail);
+        p1.put("mobileNumber", testMobile1);
+        p1.put("password", "StrongP@ss1");
+        p1.put("studentId", "STU1" + (System.currentTimeMillis() % 10000000L));
+        p1.put("department", "Computer Engineering");
+        p1.put("graduationYear", 2026);
+
+        HttpResult r1 = sendHttp("POST", "/api/auth/register/student", p1.toString(), "application/json");
+        Assertions.assertEquals(201, r1.status);
+        long uid = r1.json.getLong("id");
+
+        // Attempt second registration with same email
+        JSONObject p2 = new JSONObject();
+        p2.put("fullName", "Duplicate Email User");
+        p2.put("email", testEmail);
+        p2.put("mobileNumber", testMobile2);
+        p2.put("password", "StrongP@ss2");
+        p2.put("studentId", "STU2" + (System.currentTimeMillis() % 10000000L));
+        p2.put("department", "Computer Engineering");
+        p2.put("graduationYear", 2026);
+
+        HttpResult r2 = sendHttp("POST", "/api/auth/register/student", p2.toString(), "application/json");
+        Assertions.assertEquals(409, r2.status);
+        Assertions.assertFalse(r2.json.getBoolean("success"));
+        Assertions.assertTrue(r2.json.has("errors"));
+        Assertions.assertTrue(r2.json.getJSONObject("errors").has("email"));
+
+        cleanupUser(uid);
+    }
+
+    @Test
+    @Order(27)
+    public void testDuplicateMobileRegistrationFails() throws Exception {
+        String testEmail1 = "mobile1_" + System.currentTimeMillis() + "@college.edu";
+        String testEmail2 = "mobile2_" + System.currentTimeMillis() + "@college.edu";
+        String sharedMobile = generateTestMobile();
+
+        JSONObject p1 = new JSONObject();
+        p1.put("fullName", "Original Mobile User");
+        p1.put("email", testEmail1);
+        p1.put("mobileNumber", sharedMobile);
+        p1.put("password", "StrongP@ss1");
+        p1.put("studentId", "STU3" + (System.currentTimeMillis() % 10000000L));
+        p1.put("department", "Computer Engineering");
+        p1.put("graduationYear", 2026);
+
+        HttpResult r1 = sendHttp("POST", "/api/auth/register/student", p1.toString(), "application/json");
+        Assertions.assertEquals(201, r1.status);
+        long uid = r1.json.getLong("id");
+
+        // Attempt second registration with same mobile number
+        JSONObject p2 = new JSONObject();
+        p2.put("fullName", "Duplicate Mobile User");
+        p2.put("email", testEmail2);
+        p2.put("mobileNumber", sharedMobile);
+        p2.put("password", "StrongP@ss2");
+        p2.put("studentId", "STU4" + (System.currentTimeMillis() % 10000000L));
+        p2.put("department", "Computer Engineering");
+        p2.put("graduationYear", 2026);
+
+        HttpResult r2 = sendHttp("POST", "/api/auth/register/student", p2.toString(), "application/json");
+        Assertions.assertEquals(409, r2.status);
+        Assertions.assertFalse(r2.json.getBoolean("success"));
+        Assertions.assertTrue(r2.json.has("errors"));
+        Assertions.assertTrue(r2.json.getJSONObject("errors").has("mobileNumber"));
+
+        cleanupUser(uid);
+    }
+
+    @Test
+    @Order(28)
+    public void testCheckAvailabilityEndpoint() throws Exception {
+        // Seeded account should be marked in-use (available = false)
+        HttpResult resInUse = sendHttp("GET", "/api/auth/check-availability?email=anurag.patil@microsoft.com&mobileNumber=9876543210", null, null);
+        Assertions.assertEquals(200, resInUse.status);
+        Assertions.assertTrue(resInUse.json.getBoolean("success"));
+        Assertions.assertFalse(resInUse.json.getBoolean("emailAvailable"));
+        Assertions.assertFalse(resInUse.json.getBoolean("mobileAvailable"));
+
+        // Fresh random credentials should be available (available = true)
+        String freshEmail = "fresh_" + System.currentTimeMillis() + "@college.edu";
+        String freshMobile = generateTestMobile();
+        HttpResult resAvailable = sendHttp("GET", "/api/auth/check-availability?email=" + freshEmail + "&mobileNumber=" + freshMobile, null, null);
+        Assertions.assertEquals(200, resAvailable.status);
+        Assertions.assertTrue(resAvailable.json.getBoolean("success"));
+        Assertions.assertTrue(resAvailable.json.getBoolean("emailAvailable"));
+        Assertions.assertTrue(resAvailable.json.getBoolean("mobileAvailable"));
+    }
+
+    private static String generateTestMobile() {
+        return "9" + String.format("%09d", Math.abs(new java.util.Random().nextInt(1_000_000_000)));
     }
 
     private static class HttpResult {

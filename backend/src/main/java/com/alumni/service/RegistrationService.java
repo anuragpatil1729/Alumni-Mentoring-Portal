@@ -42,11 +42,29 @@ public class RegistrationService {
         }
 
         String email = InputValidator.getField(data, "email");
+        String mobile = InputValidator.getField(data, "mobileNumber", "phone");
         try {
-            if (registrationDAO.existsByEmail(email)) {
+            boolean emailExists = registrationDAO.existsByEmail(email);
+            boolean mobileExists = registrationDAO.existsByMobileNumber(mobile);
+
+            if (emailExists || mobileExists) {
                 JSONObject err = new JSONObject();
                 err.put("success", false);
-                err.put("message", "An account with this email address already exists.");
+                JSONObject fieldErrors = new JSONObject();
+                if (emailExists) {
+                    fieldErrors.put("email", "This email address is already in use.");
+                }
+                if (mobileExists) {
+                    fieldErrors.put("mobileNumber", "This mobile number is already in use.");
+                }
+                err.put("errors", fieldErrors);
+                if (emailExists && mobileExists) {
+                    err.put("message", "Email and mobile number are already registered.");
+                } else if (emailExists) {
+                    err.put("message", "This email address is already in use.");
+                } else {
+                    err.put("message", "This mobile number is already in use.");
+                }
                 return new ProcessResult(409, err);
             }
 
@@ -88,11 +106,29 @@ public class RegistrationService {
         }
 
         String email = InputValidator.getField(data, "email");
+        String mobile = InputValidator.getField(data, "mobileNumber", "phone");
         try {
-            if (registrationDAO.existsByEmail(email)) {
+            boolean emailExists = registrationDAO.existsByEmail(email);
+            boolean mobileExists = registrationDAO.existsByMobileNumber(mobile);
+
+            if (emailExists || mobileExists) {
                 JSONObject err = new JSONObject();
                 err.put("success", false);
-                err.put("message", "An account with this email address already exists.");
+                JSONObject fieldErrors = new JSONObject();
+                if (emailExists) {
+                    fieldErrors.put("email", "This email address is already in use.");
+                }
+                if (mobileExists) {
+                    fieldErrors.put("mobileNumber", "This mobile number is already in use.");
+                }
+                err.put("errors", fieldErrors);
+                if (emailExists && mobileExists) {
+                    err.put("message", "Email and mobile number are already registered.");
+                } else if (emailExists) {
+                    err.put("message", "This email address is already in use.");
+                } else {
+                    err.put("message", "This mobile number is already in use.");
+                }
                 return new ProcessResult(409, err);
             }
 

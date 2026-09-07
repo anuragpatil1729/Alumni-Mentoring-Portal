@@ -56,8 +56,6 @@
     els.loginPassword = document.getElementById("loginPassword");
     els.loginSubmitBtn = document.getElementById("loginSubmitBtn");
     els.loginStatusAlert = document.getElementById("loginStatusAlert");
-    els.fillDemoStudentBtn = document.getElementById("fillDemoStudentBtn");
-    els.fillDemoAlumniBtn = document.getElementById("fillDemoAlumniBtn");
     els.linkLoginToStudent = document.getElementById("linkLoginToStudent");
     els.linkLoginToAlumni = document.getElementById("linkLoginToAlumni");
 
@@ -715,12 +713,30 @@
       el.textContent = msg;
       el.classList.add("visible");
     }
+
+    let input = null;
+    if (field.startsWith("s_")) {
+      const suffix = field.substring(2);
+      input = document.getElementById(`sreg_${suffix}`) || document.getElementById(`sreg_mobile`) || document.querySelector(`[name="${suffix}"]`);
+    } else {
+      input = document.getElementById(`reg_${field}`) || document.getElementById(`reg_mobile`) || document.querySelector(`[name="${field}"]`);
+    }
+    if (input) {
+      input.classList.add("is-invalid");
+      input.classList.remove("is-valid");
+    }
   }
 
   function clearFieldErrors() {
     document.querySelectorAll(".field-error-msg").forEach((el) => {
       el.textContent = "";
       el.classList.remove("visible");
+    });
+    document.querySelectorAll("input.is-invalid, select.is-invalid, textarea.is-invalid").forEach((el) => {
+      el.classList.remove("is-invalid");
+    });
+    document.querySelectorAll("input.is-valid, select.is-valid, textarea.is-valid").forEach((el) => {
+      el.classList.remove("is-valid");
     });
   }
 
@@ -1059,17 +1075,6 @@
       switchView("studentRegister");
     });
 
-    // Quick Demo Credentials Buttons
-    els.fillDemoStudentBtn.addEventListener("click", () => {
-      els.loginEmail.value = "rahul.student@college.edu";
-      els.loginPassword.value = "Student@123";
-      clearFieldErrors();
-    });
-    els.fillDemoAlumniBtn.addEventListener("click", () => {
-      els.loginEmail.value = "anurag.patil@microsoft.com";
-      els.loginPassword.value = "Alumni@123";
-      clearFieldErrors();
-    });
 
     // Forms
     els.loginForm.addEventListener("submit", handleLoginSubmit);
@@ -1129,6 +1134,92 @@
         validateFullNameLive(e.target.value, regNameErr);
       });
     }
+
+    // Live Email & Mobile In-Use Availability Verification
+    function setupAvailabilityCheck(inputEl, errEl, type) {
+      if (!inputEl || !errEl) return;
+      let timer = null;
+
+      async function check() {
+        const val = inputEl.value.trim();
+        if (!val) {
+          errEl.textContent = "";
+          errEl.classList.remove("visible");
+          inputEl.classList.remove("is-invalid", "is-valid");
+          return;
+        }
+
+        if (type === "email") {
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return;
+          try {
+            const res = await ApiClient.checkAvailability({ email: val });
+            if (res.ok && res.data.success) {
+              if (!res.data.emailAvailable) {
+                errEl.textContent = "This email address is already in use.";
+                errEl.classList.add("visible");
+                inputEl.classList.add("is-invalid");
+                inputEl.classList.remove("is-valid");
+              } else {
+                errEl.textContent = "";
+                errEl.classList.remove("visible");
+                inputEl.classList.remove("is-invalid");
+                inputEl.classList.add("is-valid");
+              }
+            }
+          } catch (err) {
+            console.error("Email availability check failed:", err);
+          }
+        } else if (type === "mobile") {
+          const digits = val.replace(/[^0-9]/g, "");
+          if (digits.length < 10) return;
+          try {
+            const res = await ApiClient.checkAvailability({ mobileNumber: val });
+            if (res.ok && res.data.success) {
+              if (!res.data.mobileAvailable) {
+                errEl.textContent = "This mobile number is already in use.";
+                errEl.classList.add("visible");
+                inputEl.classList.add("is-invalid");
+                inputEl.classList.remove("is-valid");
+              } else {
+                errEl.textContent = "";
+                errEl.classList.remove("visible");
+                inputEl.classList.remove("is-invalid");
+                inputEl.classList.add("is-valid");
+              }
+            }
+          } catch (err) {
+            console.error("Mobile availability check failed:", err);
+          }
+        }
+      }
+
+      inputEl.addEventListener("input", () => {
+        inputEl.classList.remove("is-invalid", "is-valid");
+        clearTimeout(timer);
+        timer = setTimeout(check, 350);
+      });
+
+      inputEl.addEventListener("blur", () => {
+        clearTimeout(timer);
+        check();
+      });
+    }
+
+    // Student Registration: Live Email & Mobile Checks
+    const sregEmailInput = document.getElementById("sreg_email");
+    const sregEmailErr = document.getElementById("err_s_email");
+    const sregMobileInput = document.getElementById("sreg_mobile");
+    const sregMobileErr = document.getElementById("err_s_mobileNumber");
+    setupAvailabilityCheck(sregEmailInput, sregEmailErr, "email");
+    setupAvailabilityCheck(sregMobileInput, sregMobileErr, "mobile");
+
+    // Alumni Registration: Live Email & Mobile Checks
+    const regEmailInput = document.getElementById("reg_email");
+    const regEmailErr = document.getElementById("err_email");
+    const regMobileInput = document.getElementById("reg_mobile");
+    const regMobileErr = document.getElementById("err_mobileNumber");
+    setupAvailabilityCheck(regEmailInput, regEmailErr, "email");
+    setupAvailabilityCheck(regMobileInput, regMobileErr, "mobile");
 
     // Form input clear error listeners
     document.querySelectorAll("input, select, textarea").forEach((input) => {
