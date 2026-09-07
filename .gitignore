@@ -29,7 +29,12 @@ pnpm-debug.log*
 # Build outputs
 dist/
 build/
+target/
+*.class
+*.jar
+*.war
 *.tsbuildinfo
+mysql-connector-j-*/
 
 # IDE / Editor configuration
 .idea/

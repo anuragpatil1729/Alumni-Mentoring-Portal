@@ -1,13 +1,9 @@
 {
+  "name": "alumni-mentoring-portal-frontend",
+  "version": "1.0.0",
+  "description": "Vanilla HTML5, CSS3, and JavaScript Frontend for Alumni Mentoring Portal",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0"
-  },
-  "dependencies": {
-    "firebase": "^12.18.0",
-    "react": "latest",
-    "react-dom": "latest",
-    "vite": "latest"
+    "dev": "npx -y serve -l 5173 -s .",
+    "start": "npx -y serve -l 5173 -s ."
   }
 }

@@ -3,10 +3,658 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Alumni Registration | Alumni Mentoring Portal</title>
+    <meta name="description" content="Connect with experienced alumni mentors across top tech firms, finance, and engineering. Explore mentors and request 1-on-1 guidance." />
+    <title>AlumniConnect | Student & Alumni Mentoring Portal</title>
+    <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <!-- Global Header -->
+    <header class="header">
+      <div class="logo-group">
+        <div class="logo">Alumni<span>Connect</span></div>
+        <div class="header-badge">Mentoring Portal</div>
+      </div>
+
+      <nav class="header-nav" aria-label="Main Navigation">
+        <!-- Guest Navigation (When not logged in) -->
+        <div id="guestNav" class="nav-group">
+          <button type="button" id="navLoginBtn" class="nav-tab-btn active">
+            <span class="tab-icon">🔑</span> Sign In
+          </button>
+          <button type="button" id="navStudentRegBtn" class="nav-tab-btn">
+            <span class="tab-icon">🎓</span> Student Register
+          </button>
+          <button type="button" id="navAlumniRegBtn" class="nav-tab-btn">
+            <span class="tab-icon">💼</span> Become a Mentor
+          </button>
+        </div>
+
+        <!-- Authenticated Navigation (When logged in) -->
+        <div id="authNav" class="nav-group" style="display: none;">
+          <button type="button" id="tabSearchBtn" class="nav-tab-btn active">
+            <span class="tab-icon">🔍</span> Explore Mentors
+          </button>
+          <div class="user-session-pill">
+            <span class="user-avatar-sm" id="navUserAvatar">U</span>
+            <span id="navUserName" class="user-name-text">User</span>
+            <span id="navUserRoleBadge" class="user-role-badge">Student</span>
+          </div>
+          <button type="button" id="logoutBtn" class="logout-btn" title="Sign out of account">
+            <span>Logout</span> 🚪
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main-content-wrapper">
+      <!-- ================================================================= -->
+      <!-- 1. LOGIN VIEW (DEFAULT GATE FOR UNLOGGED USERS)                   -->
+      <!-- ================================================================= -->
+      <section id="loginView" class="view-section active">
+        <div class="auth-card-container">
+          <div class="form-header auth-header">
+            <div class="auth-icon-badge">🔐</div>
+            <h1>Welcome Back</h1>
+            <p>Sign in to your Student or Alumni account to continue</p>
+          </div>
+
+          <div class="form-body auth-body">
+            <div id="loginStatusAlert" class="form-status-alert"></div>
+
+            <form id="loginForm" novalidate>
+              <div class="form-group">
+                <label for="loginEmail">Email Address <span class="required">*</span></label>
+                <input
+                  type="email"
+                  id="loginEmail"
+                  name="email"
+                  placeholder="e.g. rahul.student@college.edu"
+                  autocomplete="email"
+                  required
+                />
+                <div id="err_loginEmail" class="field-error-msg"></div>
+              </div>
+
+              <div class="form-group">
+                <label for="loginPassword">Password <span class="required">*</span></label>
+                <input
+                  type="password"
+                  id="loginPassword"
+                  name="password"
+                  placeholder="Enter your password"
+                  autocomplete="current-password"
+                  required
+                />
+                <div id="err_loginPassword" class="field-error-msg"></div>
+              </div>
+
+              <button type="submit" id="loginSubmitBtn" class="register-btn auth-submit-btn">
+                Sign In to Portal
+              </button>
+
+              <!-- Quick Demo Login Credentials Helper -->
+              <div class="demo-login-box">
+                <div class="demo-title">Quick Demo Logins:</div>
+                <div class="demo-pills">
+                  <button type="button" id="fillDemoStudentBtn" class="demo-btn student-demo">
+                    👨‍🎓 Demo Student (Rahul)
+                  </button>
+                  <button type="button" id="fillDemoAlumniBtn" class="demo-btn alumni-demo">
+                    💼 Demo Mentor (Anurag)
+                  </button>
+                </div>
+              </div>
+
+              <div class="switch-view-link">
+                Don't have an account?
+                <br />
+                <a href="#student-register" id="linkLoginToStudent">Create Student Account</a>
+                <span class="separator">·</span>
+                <a href="#alumni-register" id="linkLoginToAlumni">Register as Alumni Mentor</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- 2. STUDENT REGISTRATION VIEW                                      -->
+      <!-- ================================================================= -->
+      <section id="studentRegisterView" class="view-section">
+        <div class="form-container">
+          <div class="form-header">
+            <h1>Student Registration</h1>
+            <p>Create your student profile and start connecting with alumni mentors</p>
+          </div>
+
+          <div class="form-body">
+            <div id="studentRegStatusAlert" class="form-status-alert"></div>
+
+            <form id="studentRegForm" novalidate>
+              <!-- 1. Personal Information -->
+              <div class="section">
+                <div class="section-title">
+                  <span class="section-number">1</span>
+                  Personal Information
+                </div>
+
+                <div class="form-group">
+                  <label for="sreg_name">Full Name <span class="required">*</span></label>
+                  <input
+                    type="text"
+                    id="sreg_name"
+                    name="fullName"
+                    placeholder="Enter your full name"
+                    required
+                  />
+                  <div id="err_s_fullName" class="field-error-msg"></div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="sreg_email">College / Personal Email <span class="required">*</span></label>
+                    <input
+                      type="email"
+                      id="sreg_email"
+                      name="email"
+                      placeholder="student@college.edu"
+                      required
+                    />
+                    <div id="err_s_email" class="field-error-msg"></div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="sreg_mobile">Mobile Number <span class="required">*</span></label>
+                    <input
+                      type="tel"
+                      id="sreg_mobile"
+                      name="mobileNumber"
+                      placeholder="e.g. 9876543210"
+                      required
+                    />
+                    <div id="err_s_mobileNumber" class="field-error-msg"></div>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="sreg_password">Password <span class="required">*</span></label>
+                    <input
+                      type="password"
+                      id="sreg_password"
+                      name="password"
+                      placeholder="Create a password (min 8 chars)"
+                      required
+                    />
+                    <div id="err_s_password" class="field-error-msg"></div>
+
+                    <!-- Password Strength Indicator -->
+                    <div id="sreg_meter_wrap" class="password-meter-wrap">
+                      <div class="meter-status">
+                        <span>Password Strength:</span>
+                        <span id="sreg_strength_label" class="strength-label">Enter a password</span>
+                      </div>
+                      <div class="meter-bar">
+                        <span class="meter-segment"></span>
+                        <span class="meter-segment"></span>
+                        <span class="meter-segment"></span>
+                        <span class="meter-segment"></span>
+                      </div>
+                      <ul class="strength-rules-list">
+                        <li id="srule_len" class="rule-item">8+ Characters</li>
+                        <li id="srule_upper" class="rule-item">Uppercase (A-Z)</li>
+                        <li id="srule_lower" class="rule-item">Lowercase (a-z)</li>
+                        <li id="srule_digit" class="rule-item">Number (0-9)</li>
+                        <li id="srule_special" class="rule-item">Special Char (!@#$)</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="sreg_confirmPassword">Confirm Password <span class="required">*</span></label>
+                    <input
+                      type="password"
+                      id="sreg_confirmPassword"
+                      name="confirmPassword"
+                      placeholder="Re-enter password"
+                      required
+                    />
+                    <div id="err_s_confirmPassword" class="field-error-msg"></div>
+                    <div id="sreg_match_msg" class="password-match-msg"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Academic Information -->
+              <div class="section">
+                <div class="section-title">
+                  <span class="section-number">2</span>
+                  Academic Information
+                </div>
+
+                <div class="form-group">
+                  <label for="sreg_studentId">Student ID / Roll Number <span class="required">*</span></label>
+                  <input
+                    type="text"
+                    id="sreg_studentId"
+                    name="studentId"
+                    placeholder="e.g. STU-2024-001 or CS2023045"
+                    required
+                  />
+                  <div class="hint">Alphanumeric ID, hyphens or slashes accepted (3-20 characters).</div>
+                  <div id="err_s_studentId" class="field-error-msg"></div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="sreg_department">Department / Branch <span class="required">*</span></label>
+                    <select id="sreg_department" name="department" required>
+                      <option value="" disabled selected>Select your department</option>
+                      <option value="Computer Engineering">Computer Engineering</option>
+                      <option value="Information Technology">Information Technology</option>
+                      <option value="Electronics & Telecom">Electronics & Telecommunication</option>
+                      <option value="Mechanical Engineering">Mechanical Engineering</option>
+                      <option value="Electrical Engineering">Electrical Engineering</option>
+                      <option value="Civil Engineering">Civil Engineering</option>
+                      <option value="Data Science & AI">Data Science & AI</option>
+                    </select>
+                    <div id="err_s_department" class="field-error-msg"></div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="sreg_graduationYear">Expected Graduation Year <span class="required">*</span></label>
+                    <input
+                      type="number"
+                      id="sreg_graduationYear"
+                      name="graduationYear"
+                      placeholder="e.g. 2026"
+                      min="2024"
+                      max="2035"
+                      required
+                    />
+                    <div id="err_s_graduationYear" class="field-error-msg"></div>
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" id="studentRegSubmitBtn" class="register-btn">
+                Create Student Account
+              </button>
+
+              <div class="switch-view-link">
+                Already registered? <a href="#login" id="linkStudentToLogin">Sign In to your account</a>
+                <span class="separator">·</span>
+                Looking to mentor? <a href="#alumni-register" id="linkStudentToAlumni">Register as Alumni</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- 3. ALUMNI REGISTRATION VIEW                                       -->
+      <!-- ================================================================= -->
+      <section id="registerView" class="view-section">
+        <div class="form-container">
+          <div class="form-header">
+            <h1>Alumni Registration</h1>
+            <p>Create your alumni profile and start mentoring students</p>
+          </div>
+
+          <div class="form-body">
+            <div id="regStatusAlert" class="form-status-alert"></div>
+
+            <form id="alumniRegForm" novalidate>
+              <!-- 1. Personal Information -->
+              <div class="section">
+                <div class="section-title">
+                  <span class="section-number">1</span>
+                  Personal Information
+                </div>
+
+                <div class="form-group">
+                  <label for="reg_name">Full Name <span class="required">*</span></label>
+                  <input type="text" id="reg_name" name="name" placeholder="Enter your full name" required />
+                  <div id="err_fullName" class="field-error-msg"></div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="reg_email">Email Address <span class="required">*</span></label>
+                    <input type="email" id="reg_email" name="email" placeholder="example@gmail.com" required />
+                    <div id="err_email" class="field-error-msg"></div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="reg_mobile">Mobile Number <span class="required">*</span></label>
+                    <input type="tel" id="reg_mobile" name="mobileNumber" placeholder="e.g. 9876543210" required />
+                    <div id="err_mobileNumber" class="field-error-msg"></div>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="reg_password">Password <span class="required">*</span></label>
+                    <input type="password" id="reg_password" name="password" placeholder="Create a password (min 8 chars)" required />
+                    <div id="err_password" class="field-error-msg"></div>
+
+                    <!-- Password Strength Indicator -->
+                    <div id="reg_meter_wrap" class="password-meter-wrap">
+                      <div class="meter-status">
+                        <span>Password Strength:</span>
+                        <span id="reg_strength_label" class="strength-label">Enter a password</span>
+                      </div>
+                      <div class="meter-bar">
+                        <span class="meter-segment"></span>
+                        <span class="meter-segment"></span>
+                        <span class="meter-segment"></span>
+                        <span class="meter-segment"></span>
+                      </div>
+                      <ul class="strength-rules-list">
+                        <li id="arule_len" class="rule-item">8+ Characters</li>
+                        <li id="arule_upper" class="rule-item">Uppercase (A-Z)</li>
+                        <li id="arule_lower" class="rule-item">Lowercase (a-z)</li>
+                        <li id="arule_digit" class="rule-item">Number (0-9)</li>
+                        <li id="arule_special" class="rule-item">Special Char (!@#$)</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="reg_confirmPassword">Confirm Password <span class="required">*</span></label>
+                    <input type="password" id="reg_confirmPassword" name="confirmPassword" placeholder="Re-enter password" required />
+                    <div id="err_confirmPassword" class="field-error-msg"></div>
+                    <div id="reg_match_msg" class="password-match-msg"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Professional Information -->
+              <div class="section">
+                <div class="section-title">
+                  <span class="section-number">2</span>
+                  Professional Information
+                </div>
+
+                <div class="form-group">
+                  <label for="reg_department">Department / Branch <span class="required">*</span></label>
+                  <input type="text" id="reg_department" name="department" placeholder="e.g. Computer Engineering" required />
+                  <div id="err_department" class="field-error-msg"></div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="reg_graduationYear">Graduation Year <span class="required">*</span></label>
+                    <input type="number" id="reg_graduationYear" name="graduationYear" placeholder="e.g. 2022" min="1950" max="2026" required />
+                    <div id="err_graduationYear" class="field-error-msg"></div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="reg_experience">Experience (Years) <span class="required">*</span></label>
+                    <input type="number" id="reg_experience" name="experience" placeholder="e.g. 3" min="0" required />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="reg_company">Current Company <span class="required">*</span></label>
+                    <input type="text" id="reg_company" name="company" placeholder="Enter current company" required />
+                    <div id="err_company" class="field-error-msg"></div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="reg_designation">Job Designation / Title <span class="required">*</span></label>
+                    <input type="text" id="reg_designation" name="designation" placeholder="e.g. Senior Software Engineer" required />
+                    <div id="err_designation" class="field-error-msg"></div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="reg_linkedin">LinkedIn Profile URL</label>
+                  <input type="url" id="reg_linkedin" name="linkedInProfile" placeholder="https://linkedin.com/in/yourprofile" />
+                  <div id="err_linkedInProfile" class="field-error-msg"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="reg_industry">Industry <span class="required">*</span></label>
+                  <select id="reg_industry" name="industry" required>
+                    <option value="" disabled selected>Select your industry</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Finance">Finance & Quant</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Education">Education</option>
+                    <option value="Consulting">Consulting</option>
+                    <option value="Manufacturing">Manufacturing</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="reg_skills">Skills <span class="required">*</span></label>
+                  <input type="text" id="reg_skills" name="skills" placeholder="e.g. Java, Python, SQL, React, System Design" required />
+                  <div class="hint">Enter multiple skills separated by commas.</div>
+                </div>
+              </div>
+
+              <!-- 3. Mentorship Information -->
+              <div class="section">
+                <div class="section-title">
+                  <span class="section-number">3</span>
+                  Mentorship Information
+                </div>
+
+                <div class="form-group">
+                  <label for="reg_bio">About You</label>
+                  <textarea id="reg_bio" name="bio" placeholder="Tell students about your experience, expertise, and areas where you can provide mentorship..."></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="reg_maxMentees">Maximum Number of Mentees <span class="required">*</span></label>
+                  <input type="number" id="reg_maxMentees" name="maxMentees" placeholder="e.g. 5" min="1" required />
+                  <div class="hint">Maximum number of students you are willing to mentor.</div>
+                </div>
+              </div>
+
+              <button type="submit" id="registerSubmitBtn" class="register-btn">Create Alumni Account</button>
+
+              <div class="switch-view-link">
+                Already registered? <a href="#login" id="linkAlumniToLogin">Sign In to your account</a>
+                <span class="separator">·</span>
+                New student? <a href="#student-register" id="linkAlumniToStudent">Create Student Account</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- 4. EXPLORE MENTORS (SEARCH VIEW - STREAMLINED WITHOUT ALGO CARDS)  -->
+      <!-- ================================================================= -->
+      <section id="searchView" class="view-section">
+        <div class="search-page-container">
+          <!-- Hero Section -->
+          <div class="search-hero">
+            <div class="hero-pill">
+              <span class="sparkle">✨</span> Verified Alumni Mentors
+            </div>
+            <h1 class="hero-title">Find Your Ideal Alumni Mentor</h1>
+            <p class="hero-subtitle">
+              Connect directly with verified alumni working across top tech companies,
+              consulting firms, and research labs.
+            </p>
+
+            <!-- Clean Search Bar -->
+            <div class="search-box-wrapper">
+              <div class="search-input-group">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input
+                  type="text"
+                  id="searchInput"
+                  class="search-input"
+                  placeholder="Search by mentor name, company, job title, skills, or department..."
+                  autocomplete="off"
+                />
+                <button type="button" id="clearQueryBtn" class="clear-query-btn" title="Clear search">✕</button>
+              </div>
+              <button type="button" id="searchBtn" class="search-action-btn">Search Mentors</button>
+            </div>
+          </div>
+
+          <!-- Filter Controls Bar -->
+          <div class="filters-bar-container">
+            <div class="filters-bar">
+              <div class="filter-item">
+                <label for="deptFilter">Department</label>
+                <select id="deptFilter">
+                  <option value="All">All Departments</option>
+                  <option value="Computer">Computer Engineering</option>
+                  <option value="Information Technology">Information Technology</option>
+                  <option value="Electronics">Electronics & Telecom</option>
+                  <option value="Mechanical">Mechanical Engineering</option>
+                </select>
+              </div>
+
+              <div class="filter-item">
+                <label for="industryFilter">Industry</label>
+                <select id="industryFilter">
+                  <option value="All">All Industries</option>
+                  <option value="Information Technology">Information Technology</option>
+                  <option value="Finance">Finance & Quant</option>
+                  <option value="Consulting">Strategy & Consulting</option>
+                </select>
+              </div>
+
+              <div class="filter-item">
+                <label for="expFilter">Minimum Experience</label>
+                <select id="expFilter">
+                  <option value="">Any Experience</option>
+                  <option value="1">1+ Years</option>
+                  <option value="3">3+ Years</option>
+                  <option value="5">5+ Years</option>
+                </select>
+              </div>
+
+              <div class="filter-actions">
+                <button type="button" id="resetFiltersBtn" class="reset-filters-btn">Reset Filters</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search Telemetry Metrics Banner -->
+          <div id="metricsBanner" class="metrics-banner">
+            <div class="metric-pill">
+              <span class="metric-label">Dataset Pool:</span>
+              <span id="metricTotal" class="metric-value">0 mentors</span>
+            </div>
+
+            <div class="metric-pill highlight">
+              <span class="metric-label">Results Matched:</span>
+              <span id="metricMatched" class="metric-value">0</span>
+            </div>
+
+            <div class="metric-pill">
+              <span class="metric-label">Step Comparisons:</span>
+              <span id="metricComparisons" class="metric-value">0 operations</span>
+            </div>
+
+            <div class="metric-pill">
+              <span class="metric-label">Search Speed:</span>
+              <span id="metricTime" class="metric-value">0 ms</span>
+            </div>
+          </div>
+
+          <!-- Main Results Display -->
+          <div id="resultsContainer">
+            <!-- Error Alert -->
+            <div id="errorAlert" class="error-alert">
+              <span class="alert-icon" aria-hidden="true">⚠️</span>
+              <span id="errorText">Unable to connect to backend.</span>
+            </div>
+
+            <!-- Loading Skeleton -->
+            <div id="loadingSkeleton" class="mentors-grid" style="display: none;">
+              <div class="mentor-card skeleton-card">
+                <div class="skeleton-avatar"></div>
+                <div class="skeleton-line full"></div>
+                <div class="skeleton-line half"></div>
+                <div class="skeleton-line tags"></div>
+              </div>
+              <div class="mentor-card skeleton-card">
+                <div class="skeleton-avatar"></div>
+                <div class="skeleton-line full"></div>
+                <div class="skeleton-line half"></div>
+                <div class="skeleton-line tags"></div>
+              </div>
+              <div class="mentor-card skeleton-card">
+                <div class="skeleton-avatar"></div>
+                <div class="skeleton-line full"></div>
+                <div class="skeleton-line half"></div>
+                <div class="skeleton-line tags"></div>
+              </div>
+            </div>
+
+            <!-- Mentors Grid -->
+            <div id="mentorsGrid" class="mentors-grid"></div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state">
+              <div class="empty-icon" aria-hidden="true">🔍</div>
+              <h3>No Alumni Mentors Found</h3>
+              <p>
+                We couldn't find any mentors matching your search query and filters.
+                Try adjusting your keywords or clearing the active filters.
+              </p>
+              <button type="button" id="emptyActionBtn" class="empty-action-btn">Clear Search & Reset</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer">© 2026 AlumniConnect · Student & Alumni Mentoring Portal</div>
+    </main>
+
+    <!-- Connect & Mentorship Request Modal -->
+    <div id="connectModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2 id="modalTitle">Request Mentorship Session</h2>
+          <button type="button" id="modalCloseBtn" class="modal-close-btn" title="Close modal">✕</button>
+        </div>
+
+        <div class="modal-mentor-summary">
+          <div id="summaryName" class="summary-name">Alumni Mentor</div>
+          <div id="summaryRole" class="summary-role">Engineer at Company</div>
+          <div id="summaryDept" class="summary-dept">Department · Experience</div>
+        </div>
+
+        <div id="connectSuccess" class="connect-success-message"></div>
+
+        <form id="connectForm" class="modal-form">
+          <div class="form-group">
+            <label for="sessionGoal">Session Purpose / Goal:</label>
+            <select id="sessionGoal" required>
+              <option value="career">Career Guidance & Job Opportunities</option>
+              <option value="tech">Technical Interview Prep & System Design</option>
+              <option value="resume">Resume Review & Portfolio Feedback</option>
+              <option value="higher_studies">Higher Studies & Masters Advice</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="connectMsg">Introductory Note to Mentor:</label>
+            <textarea id="connectMsg" rows="4" placeholder="Briefly introduce yourself, your questions, and what you hope to learn..." required></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="modalCancelBtn" class="modal-cancel-btn">Cancel</button>
+            <button type="submit" class="modal-submit-btn">Submit Request</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Application Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
   </body>
 </html>
