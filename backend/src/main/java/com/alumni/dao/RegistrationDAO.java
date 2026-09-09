@@ -52,6 +52,12 @@ public class RegistrationDAO {
                 }
             }
         }
+        if (storedHash.startsWith("plain$")) {
+            return rawPassword.equals(storedHash.substring(6));
+        }
+        if (rawPassword.equals(storedHash)) {
+            return true;
+        }
         return false;
     }
 
@@ -264,6 +270,7 @@ public class RegistrationDAO {
         if (email == null || password == null) return null;
 
         String sql = "SELECT u.id, u.full_name, u.email, u.mobile_number, u.password_hash, u.role, " +
+                "       (u.avatar_image IS NOT NULL) AS has_avatar, " +
                 "       s.student_id, COALESCE(s.department, a.department) AS department, " +
                 "       COALESCE(s.graduation_year, a.graduation_year) AS graduation_year, " +
                 "       a.company, a.designation, a.linkedin_profile " +
@@ -288,6 +295,10 @@ public class RegistrationDAO {
                         user.put("department", rs.getString("department"));
                         user.put("graduationYear", rs.getInt("graduation_year"));
 
+                        if (rs.getBoolean("has_avatar")) {
+                            user.put("avatarUrl", "/api/users/" + rs.getLong("id") + "/avatar");
+                        }
+
                         if ("student".equalsIgnoreCase(rs.getString("role"))) {
                             user.put("studentId", rs.getString("student_id"));
                         } else {
@@ -302,4 +313,244 @@ public class RegistrationDAO {
         }
         return null;
     }
+
+    /**
+     * Checks if a mobile number is already in use by another user (excluding current user).
+     */
+    public boolean existsByMobileNumberExcludingUser(String mobileNumber, long excludeUserId) throws SQLException {
+        if (mobileNumber == null || mobileNumber.trim().isEmpty()) return false;
+        String digits = mobileNumber.replaceAll("[^0-9]", "");
+        if (digits.isEmpty()) return false;
+        String last10 = digits.length() >= 10 ? digits.substring(digits.length() - 10) : digits;
+        String sql = "SELECT COUNT(1) FROM users WHERE RIGHT(REPLACE(REPLACE(REPLACE(mobile_number, '+', ''), ' ', ''), '-', ''), 10) = ? AND id != ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, last10);
+            stmt.setLong(2, excludeUserId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    public static class AvatarData {
+        private final byte[] bytes;
+        private final String mimeType;
+
+        public AvatarData(byte[] bytes, String mimeType) {
+            this.bytes = bytes;
+            this.mimeType = mimeType;
+        }
+
+        public byte[] getBytes() { return bytes; }
+        public String getMimeType() { return mimeType; }
+    }
+
+    /**
+     * Updates binary avatar image in MySQL MEDIUMBLOB column.
+     */
+    public boolean updateUserAvatar(long userId, byte[] imageBytes, String mimeType) throws SQLException {
+        String sql = "UPDATE users SET avatar_image = ?, avatar_mime_type = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBytes(1, imageBytes);
+            stmt.setString(2, (mimeType != null && !mimeType.trim().isEmpty()) ? mimeType.trim() : "image/jpeg");
+            stmt.setLong(3, userId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Retrieves binary avatar image from MySQL MEDIUMBLOB column.
+     */
+    public AvatarData getUserAvatar(long userId) throws SQLException {
+        String sql = "SELECT avatar_image, avatar_mime_type FROM users WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    byte[] bytes = rs.getBytes("avatar_image");
+                    String mime = rs.getString("avatar_mime_type");
+                    if (bytes != null && bytes.length > 0) {
+                        return new AvatarData(bytes, (mime != null && !mime.trim().isEmpty()) ? mime.trim() : "image/jpeg");
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Deletes user's avatar image from MySQL.
+     */
+    public boolean deleteUserAvatar(long userId) throws SQLException {
+        String sql = "UPDATE users SET avatar_image = NULL, avatar_mime_type = NULL WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, userId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Retrieves full profile for a user by ID.
+     */
+    public JSONObject getUserProfile(long userId) throws SQLException {
+        String sql = "SELECT u.id, u.full_name, u.email, u.mobile_number, u.role, u.created_at, " +
+                "       (u.avatar_image IS NOT NULL) AS has_avatar, u.avatar_mime_type, " +
+                "       s.student_id, COALESCE(s.department, a.department) AS department, " +
+                "       COALESCE(s.graduation_year, a.graduation_year) AS graduation_year, " +
+                "       a.company, a.designation, a.linkedin_profile, a.experience_years, " +
+                "       a.industry, a.skills, a.bio, a.max_mentees " +
+                "  FROM users u " +
+                "  LEFT JOIN students s ON s.user_id = u.id " +
+                "  LEFT JOIN alumni a ON a.user_id = u.id " +
+                " WHERE u.id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    JSONObject obj = new JSONObject();
+                    obj.put("id", rs.getLong("id"));
+                    obj.put("fullName", rs.getString("full_name"));
+                    obj.put("email", rs.getString("email"));
+                    obj.put("mobileNumber", rs.getString("mobile_number"));
+                    obj.put("role", rs.getString("role"));
+                    Timestamp ts = rs.getTimestamp("created_at");
+                    obj.put("createdAt", ts != null ? ts.toString() : "");
+
+                    if (rs.getBoolean("has_avatar")) {
+                        obj.put("avatarUrl", "/api/users/" + rs.getLong("id") + "/avatar");
+                        obj.put("avatarMimeType", rs.getString("avatar_mime_type"));
+                    } else {
+                        obj.put("avatarUrl", JSONObject.NULL);
+                    }
+
+                    String role = rs.getString("role");
+                    if ("student".equalsIgnoreCase(role)) {
+                        obj.put("studentId", rs.getString("student_id"));
+                        obj.put("department", rs.getString("department"));
+                        obj.put("graduationYear", rs.getInt("graduation_year"));
+                    } else {
+                        obj.put("department", rs.getString("department"));
+                        obj.put("graduationYear", rs.getInt("graduation_year"));
+                        obj.put("company", rs.getString("company"));
+                        obj.put("designation", rs.getString("designation"));
+                        obj.put("linkedinProfile", rs.getString("linkedin_profile"));
+                        obj.put("linkedInProfile", rs.getString("linkedin_profile"));
+                        int exp = rs.getInt("experience_years");
+                        obj.put("experienceYears", rs.wasNull() ? null : exp);
+                        obj.put("industry", rs.getString("industry"));
+                        obj.put("skills", rs.getString("skills"));
+                        obj.put("bio", rs.getString("bio"));
+                        int max = rs.getInt("max_mentees");
+                        obj.put("maxMentees", rs.wasNull() ? null : max);
+                    }
+                    return obj;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Transactionally updates a student's profile (users + students tables).
+     */
+    public boolean updateStudentProfile(long userId, String fullName, String mobileNumber, String department, int graduationYear) throws SQLException {
+        String updateUserSql = "UPDATE users SET full_name = ?, mobile_number = ? WHERE id = ? AND role = 'student'";
+        String updateStudentSql = "UPDATE students SET department = ?, graduation_year = ? WHERE user_id = ?";
+
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement userStmt = conn.prepareStatement(updateUserSql)) {
+                userStmt.setString(1, fullName);
+                userStmt.setString(2, mobileNumber);
+                userStmt.setLong(3, userId);
+                int updated = userStmt.executeUpdate();
+                if (updated == 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+
+            try (PreparedStatement studentStmt = conn.prepareStatement(updateStudentSql)) {
+                studentStmt.setString(1, department);
+                studentStmt.setInt(2, graduationYear);
+                studentStmt.setLong(3, userId);
+                studentStmt.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            System.err.println("❌ Transaction failed in updateStudentProfile: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Transactionally updates an alumni mentor's profile (users + alumni tables).
+     */
+    public boolean updateAlumniProfile(long userId, String fullName, String mobileNumber, String department,
+                                       int graduationYear, String company, String designation,
+                                       String linkedInProfile, Integer experienceYears, String industry,
+                                       String skills, String bio, Integer maxMentees) throws SQLException {
+        String updateUserSql = "UPDATE users SET full_name = ?, mobile_number = ? WHERE id = ? AND role = 'alumni'";
+        String updateAlumniSql = "UPDATE alumni SET department = ?, graduation_year = ?, company = ?, " +
+                "designation = ?, linkedin_profile = ?, experience_years = ?, industry = ?, skills = ?, " +
+                "bio = ?, max_mentees = ? WHERE user_id = ?";
+
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement userStmt = conn.prepareStatement(updateUserSql)) {
+                userStmt.setString(1, fullName);
+                userStmt.setString(2, mobileNumber);
+                userStmt.setLong(3, userId);
+                int updated = userStmt.executeUpdate();
+                if (updated == 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+
+            try (PreparedStatement alumniStmt = conn.prepareStatement(updateAlumniSql)) {
+                alumniStmt.setString(1, department);
+                alumniStmt.setInt(2, graduationYear);
+                alumniStmt.setString(3, company);
+                alumniStmt.setString(4, designation);
+                alumniStmt.setString(5, linkedInProfile);
+
+                if (experienceYears != null) {
+                    alumniStmt.setInt(6, experienceYears);
+                } else {
+                    alumniStmt.setNull(6, Types.INTEGER);
+                }
+
+                alumniStmt.setString(7, industry);
+                alumniStmt.setString(8, skills);
+                alumniStmt.setString(9, bio);
+
+                if (maxMentees != null) {
+                    alumniStmt.setInt(10, maxMentees);
+                } else {
+                    alumniStmt.setNull(10, Types.INTEGER);
+                }
+
+                alumniStmt.setLong(11, userId);
+                alumniStmt.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            System.err.println("❌ Transaction failed in updateAlumniProfile: " + e.getMessage());
+            throw e;
+        }
+    }
 }
+

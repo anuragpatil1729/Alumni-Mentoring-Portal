@@ -60,6 +60,10 @@ public class Alumni {
     public Integer getMaxMentees() { return maxMentees; }
     public void setMaxMentees(Integer maxMentees) { this.maxMentees = maxMentees; }
 
+    private String avatarUrl;
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+
     @Override
     public String toString() {
         return "Alumni{" +

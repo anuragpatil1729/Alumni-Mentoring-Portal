@@ -140,5 +140,163 @@ const ApiClient = {
       ok: response.ok,
       data
     };
+  },
+
+  /**
+   * Retrieves full profile of current authenticated user.
+   */
+  async getProfile(userId) {
+    const response = await fetch(`${API_BASE_URL}/api/profile?id=${userId}`, {
+      method: "GET",
+      headers: { "Accept": "application/json" }
+    });
+
+    const data = await response.json().catch(() => ({}));
+    return {
+      status: response.status,
+      ok: response.ok,
+      data
+    };
+  },
+
+  /**
+   * Updates profile fields for the given user.
+   */
+  async updateProfile(userId, payload) {
+    const response = await fetch(`${API_BASE_URL}/api/profile?id=${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json().catch(() => ({}));
+    return {
+      status: response.status,
+      ok: response.ok,
+      data
+    };
+  },
+
+  /**
+   * Uploads base64 avatar image to MySQL BLOB (Approach 2).
+   */
+  async uploadAvatar(userId, base64Data, mimeType = "image/jpeg") {
+    const response = await fetch(`${API_BASE_URL}/api/users/avatar?userId=${userId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        userId,
+        imageData: base64Data,
+        mimeType
+      })
+    });
+
+    const data = await response.json().catch(() => ({}));
+    return {
+      status: response.status,
+      ok: response.ok,
+      data
+    };
+  },
+
+  /**
+   * Deletes avatar image from MySQL BLOB.
+   */
+  async deleteAvatar(userId) {
+    const response = await fetch(`${API_BASE_URL}/api/users/avatar?userId=${userId}`, {
+      method: "DELETE",
+      headers: { "Accept": "application/json" }
+    });
+
+    const data = await response.json().catch(() => ({}));
+    return {
+      status: response.status,
+      ok: response.ok,
+      data
+    };
+  },
+
+  /**
+   * Creates a new mentorship request (Student -> Mentor)
+   */
+  async createMentorshipRequest(payload) {
+    const response = await fetch(`${API_BASE_URL}/api/requests`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json().catch(() => ({}));
+    return {
+      status: response.status,
+      ok: response.ok,
+      data
+    };
+  },
+
+  /**
+   * Retrieves mentorship requests sent by a student
+   */
+  async getRequestsByStudent(studentId) {
+    const response = await fetch(`${API_BASE_URL}/api/requests?studentId=${studentId}`, {
+      method: "GET",
+      headers: { "Accept": "application/json" }
+    });
+
+    const data = await response.json().catch(() => ({}));
+    return {
+      status: response.status,
+      ok: response.ok,
+      data
+    };
+  },
+
+  /**
+   * Retrieves mentorship requests received by a mentor (alumni)
+   */
+  async getRequestsByMentor(mentorId) {
+    const response = await fetch(`${API_BASE_URL}/api/requests?mentorId=${mentorId}`, {
+      method: "GET",
+      headers: { "Accept": "application/json" }
+    });
+
+    const data = await response.json().catch(() => ({}));
+    return {
+      status: response.status,
+      ok: response.ok,
+      data
+    };
+  },
+
+  /**
+   * Updates mentorship request status (ACCEPTED, REJECTED, CANCELLED)
+   */
+  async updateRequestStatus(requestId, payload) {
+    const response = await fetch(`${API_BASE_URL}/api/requests?id=${requestId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json().catch(() => ({}));
+    return {
+      status: response.status,
+      ok: response.ok,
+      data
+    };
   }
 };
+
+

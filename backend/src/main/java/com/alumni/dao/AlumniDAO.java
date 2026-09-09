@@ -19,6 +19,7 @@ public class AlumniDAO {
 
     private static final String SELECT_ALUMNI_BASE =
             "SELECT u.id AS user_id, u.full_name, u.email, u.mobile_number, " +
+            "       (u.avatar_image IS NOT NULL) AS has_avatar, " +
             "       a.department, a.graduation_year, a.company, a.designation, " +
             "       a.linkedin_profile, a.experience_years, a.industry, a.skills, " +
             "       a.bio, a.max_mentees " +
@@ -100,6 +101,9 @@ public class AlumniDAO {
         alumni.setFullName(rs.getString("full_name"));
         alumni.setEmail(rs.getString("email"));
         alumni.setMobileNumber(rs.getString("mobile_number"));
+        if (rs.getBoolean("has_avatar")) {
+            alumni.setAvatarUrl("/api/users/" + alumni.getUserId() + "/avatar");
+        }
         alumni.setDepartment(rs.getString("department"));
         alumni.setGraduationYear(rs.getInt("graduation_year"));
         alumni.setCompany(rs.getString("company"));

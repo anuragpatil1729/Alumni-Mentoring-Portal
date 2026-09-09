@@ -34,7 +34,14 @@
           <button type="button" id="tabSearchBtn" class="nav-tab-btn active">
             <span class="tab-icon">🔍</span> Explore Mentors
           </button>
-          <div class="user-session-pill">
+          <button type="button" id="tabRequestsBtn" class="nav-tab-btn" style="display: none;">
+            <span class="tab-icon">📬</span> Received Requests
+            <span id="navRequestsBadge" class="nav-counter-badge" style="display:none;">0</span>
+          </button>
+          <button type="button" id="tabProfileBtn" class="nav-tab-btn">
+            <span class="tab-icon">👤</span> My Profile
+          </button>
+          <div id="navUserSessionPill" class="user-session-pill" role="button" tabindex="0" title="View your profile">
             <span class="user-avatar-sm" id="navUserAvatar">U</span>
             <span id="navUserName" class="user-name-text">User</span>
             <span id="navUserRoleBadge" class="user-role-badge">Student</span>
@@ -123,6 +130,25 @@
                 <div class="section-title">
                   <span class="section-number">1</span>
                   Personal Information
+                </div>
+
+                <!-- Profile Photo Picker (MySQL BLOB Approach 2 - Compulsory) -->
+                <div class="form-avatar-picker-card" id="sreg_avatar_card">
+                  <div class="form-avatar-preview" id="sreg_avatar_preview">
+                    <span>👤</span>
+                  </div>
+                  <div class="form-avatar-meta">
+                    <label class="form-avatar-title">Profile Picture <span class="required">*</span></label>
+                    <div class="form-avatar-btn-row">
+                      <label for="sreg_avatar_input" class="btn-avatar-upload">
+                        <span>📷 Choose Photo</span>
+                        <input type="file" id="sreg_avatar_input" accept="image/png,image/jpeg,image/webp" style="display:none;" />
+                      </label>
+                      <button type="button" id="sreg_avatar_remove" class="btn-avatar-remove" style="display:none;">Remove</button>
+                    </div>
+                    <span class="form-avatar-help">Upload PNG, JPG, or WebP. Saved directly into MySQL database.</span>
+                    <div id="err_s_avatar" class="field-error-msg"></div>
+                  </div>
                 </div>
 
                 <div class="form-group">
@@ -297,6 +323,25 @@
                 <div class="section-title">
                   <span class="section-number">1</span>
                   Personal Information
+                </div>
+
+                <!-- Profile Photo Picker (MySQL BLOB Approach 2 - Compulsory) -->
+                <div class="form-avatar-picker-card" id="reg_avatar_card">
+                  <div class="form-avatar-preview" id="reg_avatar_preview">
+                    <span>👤</span>
+                  </div>
+                  <div class="form-avatar-meta">
+                    <label class="form-avatar-title">Profile Picture <span class="required">*</span></label>
+                    <div class="form-avatar-btn-row">
+                      <label for="reg_avatar_input" class="btn-avatar-upload">
+                        <span>📷 Choose Photo</span>
+                        <input type="file" id="reg_avatar_input" accept="image/png,image/jpeg,image/webp" style="display:none;" />
+                      </label>
+                      <button type="button" id="reg_avatar_remove" class="btn-avatar-remove" style="display:none;">Remove</button>
+                    </div>
+                    <span class="form-avatar-help">Upload PNG, JPG, or WebP. Saved directly into MySQL database.</span>
+                    <div id="err_avatar" class="field-error-msg"></div>
+                  </div>
                 </div>
 
                 <div class="form-group">
@@ -597,10 +642,376 @@
         </div>
       </section>
 
+      <!-- ================================================================= -->
+      <!-- 5. USER PROFILE VIEW & EDIT WORKFLOW (WEEK 3)                     -->
+      <!-- ================================================================= -->
+      <section id="profileView" class="view-section">
+        <div class="profile-page-container">
+          <!-- Profile Header Card -->
+          <div class="profile-header-card">
+            <div class="profile-header-main">
+              <div class="profile-avatar-wrapper">
+                <div class="profile-avatar-lg" id="profileAvatarLg">U</div>
+                <label for="avatarFileInput" class="avatar-upload-trigger" title="Upload profile picture (Stored in MySQL BLOB)">
+                  <span class="camera-icon">📷</span>
+                  <input type="file" id="avatarFileInput" accept="image/png,image/jpeg,image/webp" style="display:none;" />
+                </label>
+                <button type="button" id="removeAvatarBtn" class="avatar-remove-btn" title="Remove profile picture" style="display:none;">✕</button>
+              </div>
+              <div class="profile-identity">
+                <div class="profile-name-row">
+                  <h1 id="profileHeaderName" class="profile-display-name">User Name</h1>
+                  <span id="profileHeaderBadge" class="user-role-badge">Student</span>
+                </div>
+                <p id="profileHeaderEmail" class="profile-display-email">user@college.edu</p>
+                <div class="profile-meta-row">
+                  <span class="meta-item"><span class="meta-icon">📅</span> Joined <span id="profileMemberSince">2026</span></span>
+                  <span class="meta-item"><span class="meta-icon">🛡️</span> Verified Account</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="profile-header-actions">
+              <button type="button" id="editProfileToggleBtn" class="edit-profile-btn">
+                <span class="btn-icon">✏️</span> Edit Profile
+              </button>
+            </div>
+          </div>
+
+          <!-- Profile Status Alert -->
+          <div id="profileStatusAlert" class="form-status-alert"></div>
+
+          <!-- A. VIEW MODE (DEFAULT) -->
+          <div id="profileViewMode" class="profile-view-mode">
+            <div class="profile-grid">
+              <!-- Card 1: Contact Details -->
+              <div class="profile-card">
+                <div class="card-header">
+                  <span class="card-header-icon">📞</span>
+                  <h3>Contact Information</h3>
+                </div>
+                <div class="info-list">
+                  <div class="info-row">
+                    <span class="info-label">Full Name</span>
+                    <span id="pv_fullName" class="info-value">—</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Email Address</span>
+                    <span id="pv_email" class="info-value">—</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Mobile Number</span>
+                    <span id="pv_mobile" class="info-value">—</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 2: Academic Details -->
+              <div class="profile-card">
+                <div class="card-header">
+                  <span class="card-header-icon">🎓</span>
+                  <h3 id="pv_academicTitle">Academic Background</h3>
+                </div>
+                <div class="info-list">
+                  <div id="pv_studentIdRow" class="info-row">
+                    <span class="info-label">Student ID / Roll No.</span>
+                    <span id="pv_studentId" class="info-value">—</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Department / Branch</span>
+                    <span id="pv_department" class="info-value">—</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Graduation Year</span>
+                    <span id="pv_graduationYear" class="info-value">—</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 3: Professional Experience (Alumni Only) -->
+              <div id="pv_professionalCard" class="profile-card full-width" style="display: none;">
+                <div class="card-header">
+                  <span class="card-header-icon">💼</span>
+                  <h3>Professional & Career</h3>
+                </div>
+                <div class="info-grid-two">
+                  <div class="info-row">
+                    <span class="info-label">Current Organization</span>
+                    <span id="pv_company" class="info-value highlight-bold">—</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Designation / Role</span>
+                    <span id="pv_designation" class="info-value highlight-bold">—</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Industry Domain</span>
+                    <span id="pv_industry" class="info-value">—</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Experience</span>
+                    <span id="pv_experience" class="info-value">—</span>
+                  </div>
+                  <div class="info-row full-span">
+                    <span class="info-label">LinkedIn Profile</span>
+                    <span id="pv_linkedin" class="info-value">—</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 4: Mentorship & Skills (Alumni Only) -->
+              <div id="pv_mentorshipCard" class="profile-card full-width" style="display: none;">
+                <div class="card-header">
+                  <span class="card-header-icon">🌟</span>
+                  <h3>Mentorship & Expertise</h3>
+                </div>
+                <div class="info-list">
+                  <div class="info-row">
+                    <span class="info-label">Skills & Technologies</span>
+                    <div id="pv_skillsTags" class="skills-tags-container"></div>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">Mentee Capacity</span>
+                    <span id="pv_maxMentees" class="info-value">—</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">About / Bio</span>
+                    <p id="pv_bio" class="bio-paragraph">—</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- B. EDIT MODE (TOGGLEABLE) -->
+          <div id="profileEditMode" class="profile-edit-mode" style="display: none;">
+            <div class="profile-edit-card">
+              <div class="edit-card-header">
+                <h2>Edit Your Profile</h2>
+                <p>Update your personal and professional details below</p>
+              </div>
+
+              <form id="profileEditForm" novalidate>
+                <!-- 1. Personal Info -->
+                <div class="edit-section">
+                  <h3 class="edit-section-title">👤 Personal Details</h3>
+
+                  <!-- Profile Photo Picker (MySQL BLOB Approach 2) -->
+                  <div class="form-avatar-picker-card" id="pe_avatar_card">
+                    <div class="form-avatar-preview" id="pe_avatar_preview">
+                      <span>👤</span>
+                    </div>
+                    <div class="form-avatar-meta">
+                      <label class="form-avatar-title">Profile Picture <span class="required">*</span></label>
+                      <div class="form-avatar-btn-row">
+                        <label for="pe_avatar_input" class="btn-avatar-upload">
+                          <span>📷 Change Photo</span>
+                          <input type="file" id="pe_avatar_input" accept="image/png,image/jpeg,image/webp" style="display:none;" />
+                        </label>
+                        <button type="button" id="pe_avatar_remove" class="btn-avatar-remove" style="display:none;">Remove</button>
+                      </div>
+                      <span class="form-avatar-help">PNG, JPG, or WebP. Automatically synchronized across all pages.</span>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="pe_fullName">Full Name <span class="required">*</span></label>
+                    <input type="text" id="pe_fullName" name="fullName" required />
+                    <div id="err_pe_fullName" class="field-error-msg"></div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="pe_email">Email Address <span class="locked-hint">(Permanent)</span></label>
+                      <input type="email" id="pe_email" name="email" disabled />
+                      <div class="hint">Email address cannot be changed.</div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="pe_mobileNumber">Mobile Number <span class="required">*</span></label>
+                      <input type="tel" id="pe_mobileNumber" name="mobileNumber" required />
+                      <div id="err_pe_mobileNumber" class="field-error-msg"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 2. Student Fields -->
+                <div id="pe_studentFields" class="edit-section" style="display: none;">
+                  <h3 class="edit-section-title">🎓 Student Academic Information</h3>
+
+                  <div class="form-group">
+                    <label for="pe_studentId">Student ID</label>
+                    <input type="text" id="pe_studentId" name="studentId" disabled />
+                    <div class="hint">Assigned student roll number.</div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="pe_s_department">Department <span class="required">*</span></label>
+                      <select id="pe_s_department" name="department">
+                        <option value="Computer Engineering">Computer Engineering</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Electronics & Telecom">Electronics & Telecommunication</option>
+                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                        <option value="Electrical Engineering">Electrical Engineering</option>
+                        <option value="Civil Engineering">Civil Engineering</option>
+                        <option value="Data Science & AI">Data Science & AI</option>
+                      </select>
+                      <div id="err_pe_s_department" class="field-error-msg"></div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="pe_s_graduationYear">Expected Graduation Year <span class="required">*</span></label>
+                      <input type="number" id="pe_s_graduationYear" name="graduationYear" min="2024" max="2035" />
+                      <div id="err_pe_s_graduationYear" class="field-error-msg"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. Alumni Fields -->
+                <div id="pe_alumniFields" class="edit-section" style="display: none;">
+                  <h3 class="edit-section-title">💼 Professional & Mentorship Details</h3>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="pe_a_department">Department <span class="required">*</span></label>
+                      <input type="text" id="pe_a_department" name="department" />
+                      <div id="err_pe_a_department" class="field-error-msg"></div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="pe_a_graduationYear">Graduation Year <span class="required">*</span></label>
+                      <input type="number" id="pe_a_graduationYear" name="graduationYear" min="1950" max="2026" />
+                      <div id="err_pe_a_graduationYear" class="field-error-msg"></div>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="pe_company">Current Company <span class="required">*</span></label>
+                      <input type="text" id="pe_company" name="company" />
+                      <div id="err_pe_company" class="field-error-msg"></div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="pe_designation">Job Title / Designation <span class="required">*</span></label>
+                      <input type="text" id="pe_designation" name="designation" />
+                      <div id="err_pe_designation" class="field-error-msg"></div>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="pe_experience">Experience (Years)</label>
+                      <input type="number" id="pe_experience" name="experienceYears" min="0" />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="pe_industry">Industry <span class="required">*</span></label>
+                      <select id="pe_industry" name="industry">
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Finance">Finance & Quant</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Education">Education</option>
+                        <option value="Consulting">Consulting</option>
+                        <option value="Manufacturing">Manufacturing</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="pe_linkedin">LinkedIn Profile URL</label>
+                    <input type="url" id="pe_linkedin" name="linkedInProfile" placeholder="https://linkedin.com/in/username" />
+                    <div id="err_pe_linkedInProfile" class="field-error-msg"></div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="pe_skills">Skills (Comma-separated) <span class="required">*</span></label>
+                    <input type="text" id="pe_skills" name="skills" placeholder="e.g. Java, Python, Cloud, System Design" />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="pe_bio">About / Bio</label>
+                    <textarea id="pe_bio" name="bio" rows="3" placeholder="Share your experience and mentoring focus..."></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="pe_maxMentees">Max Mentees</label>
+                    <input type="number" id="pe_maxMentees" name="maxMentees" min="1" max="50" />
+                  </div>
+                </div>
+
+                <!-- Form Action Buttons -->
+                <div class="edit-form-actions">
+                  <button type="button" id="cancelProfileEditBtn" class="cancel-edit-btn">Cancel</button>
+                  <button type="submit" id="saveProfileBtn" class="save-profile-btn">Save Changes</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- 6. MENTORSHIP REQUESTS VIEW                                       -->
+      <!-- ================================================================= -->
+      <section id="requestsView" class="view-section">
+        <div class="requests-container">
+          <div class="requests-header-card">
+            <div class="requests-header-info">
+              <div class="requests-icon-badge">📬</div>
+              <div>
+                <h1 id="requestsTitle">Mentorship Requests</h1>
+                <p id="requestsSubtitle">Manage, track, and respond to 1-on-1 mentorship interactions</p>
+              </div>
+            </div>
+            <div class="requests-header-actions">
+              <button type="button" id="refreshRequestsBtn" class="btn-refresh-requests">
+                <span>🔄</span> Refresh
+              </button>
+            </div>
+          </div>
+
+          <div id="requestsAlert" class="form-status-alert" style="display: none;"></div>
+
+          <!-- Stats Overview Bar -->
+          <div id="requestsStatsBar" class="requests-stats-bar">
+            <div class="stat-pill stat-total">
+              <span class="stat-num" id="statTotalRequests">0</span>
+              <span class="stat-label">Total Requests</span>
+            </div>
+            <div class="stat-pill stat-pending">
+              <span class="stat-num" id="statPendingRequests">0</span>
+              <span class="stat-label">Pending</span>
+            </div>
+            <div class="stat-pill stat-accepted">
+              <span class="stat-num" id="statAcceptedRequests">0</span>
+              <span class="stat-label">Accepted</span>
+            </div>
+            <div class="stat-pill stat-rejected">
+              <span class="stat-num" id="statRejectedRequests">0</span>
+              <span class="stat-label">Rejected / Cancelled</span>
+            </div>
+          </div>
+
+          <!-- Requests List Container -->
+          <div id="requestsList" class="requests-grid">
+            <!-- Dynamic Request Cards injected by JavaScript -->
+          </div>
+
+          <!-- Empty State -->
+          <div id="requestsEmptyState" class="requests-empty" style="display: none;">
+            <div class="empty-icon">📭</div>
+            <h3 id="emptyRequestsTitle">No Mentorship Requests</h3>
+            <p id="emptyRequestsMsg">You don't have any mentorship requests yet. Browse the directory to connect with mentors!</p>
+          </div>
+        </div>
+      </section>
+
       <div class="footer">© 2026 AlumniConnect · Student & Alumni Mentoring Portal</div>
     </main>
 
-    <!-- Connect & Mentorship Request Modal -->
+    <!-- Connect & Mentorship Request Modal (Student -> Mentor) -->
     <div id="connectModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div class="modal-content" onclick="event.stopPropagation()">
         <div class="modal-header">
@@ -614,34 +1025,71 @@
           <div id="summaryDept" class="summary-dept">Department · Experience</div>
         </div>
 
-        <div id="connectSuccess" class="connect-success-message"></div>
+        <div id="connectPreviousStatus" class="modal-status-box" style="display: none;"></div>
+        <div id="connectAlert" class="form-status-alert" style="display: none;"></div>
+        <div id="connectSuccess" class="connect-success-message" style="display: none;"></div>
 
         <form id="connectForm" class="modal-form">
           <div class="form-group">
-            <label for="sessionGoal">Session Purpose / Goal:</label>
+            <label for="sessionGoal">Session Purpose / Goal <span class="required">*</span></label>
             <select id="sessionGoal" required>
-              <option value="career">Career Guidance & Job Opportunities</option>
-              <option value="tech">Technical Interview Prep & System Design</option>
-              <option value="resume">Resume Review & Portfolio Feedback</option>
-              <option value="higher_studies">Higher Studies & Masters Advice</option>
+              <option value="Career Guidance & Job Opportunities">Career Guidance & Job Opportunities</option>
+              <option value="Technical Interview Prep & System Design">Technical Interview Prep & System Design</option>
+              <option value="Resume Review & Portfolio Feedback">Resume Review & Portfolio Feedback</option>
+              <option value="Higher Studies & Masters Advice">Higher Studies & Masters Advice</option>
+              <option value="General Professional Mentorship">General Professional Mentorship</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="connectMsg">Introductory Note to Mentor:</label>
-            <textarea id="connectMsg" rows="4" placeholder="Briefly introduce yourself, your questions, and what you hope to learn..." required></textarea>
+            <label for="connectMsg">Message / Learning Objectives <span class="required">*</span></label>
+            <textarea id="connectMsg" rows="4" placeholder="Briefly introduce yourself, your current projects, and specific questions you have for your mentor..." required></textarea>
+            <div class="char-counter"><span id="connectMsgLen">0</span> / 1000 characters</div>
           </div>
 
           <div class="modal-actions">
             <button type="button" id="modalCancelBtn" class="modal-cancel-btn">Cancel</button>
-            <button type="submit" class="modal-submit-btn">Submit Request</button>
+            <button type="submit" id="modalSubmitBtn" class="modal-submit-btn">Send Request</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Mentor Response / Decision Modal (Accept / Reject) -->
+    <div id="decisionModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="decisionModalTitle">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2 id="decisionModalTitle">Respond to Request</h2>
+          <button type="button" id="decisionModalCloseBtn" class="modal-close-btn" title="Close modal">✕</button>
+        </div>
+
+        <div class="modal-mentor-summary">
+          <div id="decisionStudentName" class="summary-name">Student Name</div>
+          <div id="decisionSessionGoal" class="summary-role">Goal</div>
+          <div id="decisionStudentMessage" class="decision-student-quote">"Message"</div>
+        </div>
+
+        <div id="decisionAlert" class="form-status-alert" style="display: none;"></div>
+
+        <form id="decisionForm" class="modal-form">
+          <input type="hidden" id="decisionRequestId" />
+          <input type="hidden" id="decisionAction" />
+
+          <div class="form-group">
+            <label for="decisionNote">Note / Feedback to Student (Optional):</label>
+            <textarea id="decisionNote" rows="3" placeholder="e.g. Happy to connect! Please email me at mentor@company.com with your schedule..."></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="decisionCancelBtn" class="modal-cancel-btn">Cancel</button>
+            <button type="submit" id="decisionConfirmBtn" class="modal-submit-btn">Confirm</button>
           </div>
         </form>
       </div>
     </div>
 
     <!-- Application Scripts -->
-    <script src="js/api.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/api.js?v=20260909_06"></script>
+    <script src="js/app.js?v=20260909_06"></script>
   </body>
 </html>

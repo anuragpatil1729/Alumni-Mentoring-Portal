@@ -365,4 +365,188 @@ public class InputValidator {
         }
         return null;
     }
+
+    public static ValidationResult validateStudentProfileUpdate(JSONObject data) {
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        // Full Name
+        String fullName = getField(data, "fullName", "name");
+        if (isEmpty(fullName)) {
+            errors.put("fullName", FULL_NAME_REQUIRED);
+        } else if (!isValidFullName(fullName)) {
+            errors.put("fullName", FULL_NAME_INVALID);
+        }
+
+        // Mobile
+        String mobile = getField(data, "mobileNumber", "phone");
+        if (isEmpty(mobile)) {
+            errors.put("mobileNumber", MOBILE_REQUIRED);
+        } else if (!isValidMobile(mobile)) {
+            errors.put("mobileNumber", MOBILE_INVALID);
+        }
+
+        // Department
+        String department = getField(data, "department", "branch");
+        if (isEmpty(department)) {
+            errors.put("department", STUDENT_DEPT_REQUIRED);
+        }
+
+        // Graduation Year
+        Object gradYear = getFieldObj(data, "graduationYear", "passoutYear");
+        if (isEmpty(gradYear)) {
+            errors.put("graduationYear", STUDENT_GRAD_YEAR_REQUIRED);
+        } else if (!isValidStudentGraduationYear(gradYear)) {
+            errors.put("graduationYear", STUDENT_GRAD_YEAR_INVALID);
+        }
+
+        if (!errors.isEmpty()) {
+            return ValidationResult.failure("Profile validation failed", errors);
+        }
+        return ValidationResult.success();
+    }
+
+    public static ValidationResult validateAlumniProfileUpdate(JSONObject data) {
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        // Full Name
+        String fullName = getField(data, "fullName", "name");
+        if (isEmpty(fullName)) {
+            errors.put("fullName", FULL_NAME_REQUIRED);
+        } else if (!isValidFullName(fullName)) {
+            errors.put("fullName", FULL_NAME_INVALID);
+        }
+
+        // Mobile
+        String mobile = getField(data, "mobileNumber", "phone");
+        if (isEmpty(mobile)) {
+            errors.put("mobileNumber", MOBILE_REQUIRED);
+        } else if (!isValidMobile(mobile)) {
+            errors.put("mobileNumber", MOBILE_INVALID);
+        }
+
+        // Department
+        String department = getField(data, "department", "branch");
+        if (isEmpty(department)) {
+            errors.put("department", ALUMNI_DEPT_REQUIRED);
+        }
+
+        // Graduation Year
+        Object gradYear = getFieldObj(data, "graduationYear", "passoutYear");
+        if (isEmpty(gradYear)) {
+            errors.put("graduationYear", ALUMNI_GRAD_YEAR_REQUIRED);
+        } else if (!isValidAlumniGraduationYear(gradYear)) {
+            errors.put("graduationYear", ALUMNI_GRAD_YEAR_INVALID);
+        }
+
+        // Company
+        String company = getField(data, "company", "currentCompany");
+        if (isEmpty(company)) {
+            errors.put("company", ALUMNI_COMPANY_REQUIRED);
+        }
+
+        // Designation
+        String designation = getField(data, "designation", "jobTitle");
+        if (isEmpty(designation)) {
+            errors.put("designation", ALUMNI_DESIGNATION_REQUIRED);
+        }
+
+        // LinkedIn Profile (Optional, but if present must be valid)
+        String linkedIn = getField(data, "linkedInProfile", "linkedin");
+        if (!isEmpty(linkedIn) && !isValidLinkedIn(linkedIn)) {
+            errors.put("linkedInProfile", LINKEDIN_INVALID);
+        }
+
+        if (!errors.isEmpty()) {
+            return ValidationResult.failure("Profile validation failed", errors);
+        }
+        return ValidationResult.success();
+    }
+
+    public static ValidationResult validateMentorshipRequest(JSONObject data) {
+        if (data == null) {
+            return ValidationResult.failure("Payload cannot be null", Map.of("payload", "Request payload is required"));
+        }
+
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        // Student ID
+        Object studentIdObj = getFieldObj(data, "studentId", "student_id");
+        if (isEmpty(studentIdObj)) {
+            errors.put("studentId", "Student ID is required.");
+        } else {
+            try {
+                long sid = Long.parseLong(studentIdObj.toString().trim());
+                if (sid <= 0) errors.put("studentId", "Student ID must be positive.");
+            } catch (NumberFormatException e) {
+                errors.put("studentId", "Invalid student ID format.");
+            }
+        }
+
+        // Mentor ID
+        Object mentorIdObj = getFieldObj(data, "mentorId", "mentor_id");
+        if (isEmpty(mentorIdObj)) {
+            errors.put("mentorId", "Mentor ID is required.");
+        } else {
+            try {
+                long mid = Long.parseLong(mentorIdObj.toString().trim());
+                if (mid <= 0) errors.put("mentorId", "Mentor ID must be positive.");
+            } catch (NumberFormatException e) {
+                errors.put("mentorId", "Invalid mentor ID format.");
+            }
+        }
+
+        // Session Goal
+        String sessionGoal = getField(data, "sessionGoal", "session_goal", "goal");
+        if (isEmpty(sessionGoal)) {
+            errors.put("sessionGoal", "Session goal is required.");
+        } else if (sessionGoal.length() > 100) {
+            errors.put("sessionGoal", "Session goal cannot exceed 100 characters.");
+        }
+
+        // Message
+        String message = getField(data, "message", "note", "introductoryNote");
+        if (isEmpty(message)) {
+            errors.put("message", "Introductory note/message is required.");
+        } else {
+            String trimmed = message.trim();
+            if (trimmed.length() < 10) {
+                errors.put("message", "Message must be at least 10 characters.");
+            } else if (trimmed.length() > 1000) {
+                errors.put("message", "Message cannot exceed 1000 characters.");
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            return ValidationResult.failure("Mentorship request validation failed", errors);
+        }
+        return ValidationResult.success();
+    }
+
+    public static ValidationResult validateRequestStatusUpdate(JSONObject data) {
+        if (data == null) {
+            return ValidationResult.failure("Payload cannot be null", Map.of("payload", "Request payload is required"));
+        }
+
+        Map<String, String> errors = new LinkedHashMap<>();
+        String status = getField(data, "status");
+        if (isEmpty(status)) {
+            errors.put("status", "Status is required.");
+        } else {
+            String upper = status.trim().toUpperCase();
+            if (!"ACCEPTED".equals(upper) && !"REJECTED".equals(upper) && !"CANCELLED".equals(upper)) {
+                errors.put("status", "Status must be ACCEPTED, REJECTED, or CANCELLED.");
+            }
+        }
+
+        String mentorResponse = getField(data, "mentorResponse", "response", "note");
+        if (mentorResponse != null && mentorResponse.length() > 1000) {
+            errors.put("mentorResponse", "Mentor response note cannot exceed 1000 characters.");
+        }
+
+        if (!errors.isEmpty()) {
+            return ValidationResult.failure("Status update validation failed", errors);
+        }
+        return ValidationResult.success();
+    }
 }
+
