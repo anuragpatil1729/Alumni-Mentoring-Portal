@@ -35,9 +35,12 @@ target/
 *.war
 *.tsbuildinfo
 mysql-connector-j-*/
+*.res
+*.obj
 
 # IDE / Editor configuration
 .idea/
 .vscode/
 *.swp
 *.swo
+*.vs
