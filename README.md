@@ -2,9 +2,9 @@
 
 [![Java](https://img.shields.io/badge/Java-OpenJDK_17%2B-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Maven](https://img.shields.io/badge/Build-Maven_3.8%2B-C71A36?logo=apache-maven&logoColor=white)](https://maven.apache.org/)
-[![MySQL](https://img.shields.io/badge/Database-MySQL_Connector%2FJ_9.2.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Database](https://img.shields.io/badge/Database-MySQL_%2F_MariaDB-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Frontend](https://img.shields.io/badge/Frontend-Vanilla_HTML5_%2F_CSS3_%2F_ES6-E34F26?logo=html5&logoColor=white)](frontend/)
-[![Tests](https://img.shields.io/badge/JUnit_5-87_Tests_Passing-25A162?logo=junit5&logoColor=white)](backend/src/test/)
+[![Tests](https://img.shields.io/badge/JUnit_5-129_Tests_Passing-25A162?logo=junit5&logoColor=white)](backend/src/test/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **AlumniConnect** is a comprehensive, production-grade alumni mentorship portal connecting undergraduate and graduate students directly with verified industry alumni working across top technology companies, quantitative finance firms, and research institutions.
@@ -60,7 +60,7 @@ The platform features a **100% Java JDBC backend engine** and a **zero-dependenc
   - *Protected against accessing mentor-only management routes.*
 
 ### 📷 Profile Management & Avatar System
-- **Database Image Storage**: Avatars are stored directly in MySQL as `MEDIUMBLOB` with MIME type tracking (`image/jpeg`, `image/png`, `image/webp`).
+- **Database Image Storage**: Avatars are stored directly in MySQL / MariaDB as `MEDIUMBLOB` with MIME type tracking (`image/jpeg`, `image/png`, `image/webp`).
 - **Direct Image REST API**: Dedicated endpoint `GET /api/users/{id}/avatar` and `HEAD /api/users/{id}/avatar` with HTTP caching and fallback to user initials.
 - **Live Profile Editor**: Editable full name, contact details, bio, department, company, and mentee capacity.
 
@@ -134,7 +134,7 @@ Alumni-Mentoring-Portal/
 │   │   │   ├── java/com/alumni/
 │   │   │   │   ├── Main.java             # Entry point (Starts HTTP & TCP servers)
 │   │   │   │   ├── config/
-│   │   │   │   │   └── DBConnection.java # JDBC MySQL connection pool manager (.env loader)
+│   │   │   │   │   └── DBConnection.java # JDBC MySQL / MariaDB connection pool manager (.env loader)
 │   │   │   │   ├── dao/
 │   │   │   │   │   ├── AlumniDAO.java    # Alumni profile queries & searches
 │   │   │   │   │   ├── MentorshipRequestDAO.java # CRUD & state queries for mentorship requests
@@ -159,14 +159,16 @@ Alumni-Mentoring-Portal/
 │   │   │   │       ├── ValidationConstants.java # Regex patterns & constants
 │   │   │   │       └── ValidationResult.java    # Validation status & field error dictionary
 │   │   │   └── resources/
-│   │   │       └── application.properties   # Port configuration & MySQL defaults
+│   │   │       └── application.properties   # Port configuration & MySQL / MariaDB defaults
 │   │   └── test/java/com/alumni/
+│   │       ├── AuthProfileIntegrationTest.java # 16 end-to-end integration tests (Auth, Profile, Search)
+│   │       ├── LoginBoundaryTest.java    # 26 boundary value analysis tests on login inputs
 │   │       ├── MentorshipRequestTest.java# 23 tests for request lifecycle & duplicate rules
 │   │       ├── ProfileTest.java          # 13 tests for avatars & profile updates
 │   │       ├── ValidationTest.java       # 28 validation & endpoint integration tests
 │   │       ├── SearchAlgorithmsTest.java # 19 linear vs binary search telemetry tests
 │   │       └── JDBCTest.java             # 4 database connectivity & CRUD tests
-│   └── .env                              # MySQL credentials & environment config
+│   └── .env                              # MySQL / MariaDB credentials & environment config
 ├── frontend/                             # Pure Vanilla HTML/CSS/JS Frontend
 │   ├── index.html                        # Application views (Auth, Search, Profile, Requests)
 │   ├── css/
@@ -179,6 +181,8 @@ Alumni-Mentoring-Portal/
 │   ├── schema.sql                        # DDL table definitions (users, students, alumni, requests)
 │   └── seed.sql                          # Demo students and 15+ industry alumni mentors
 └── docs/
+    ├── API_Documentation.md              # Complete REST API reference
+    ├── Testing_Report.md                 # Boundary and integration testing report
     └── SEARCH_LIFECYCLE.md               # Search engine flow and algorithm specifications
 ```
 
@@ -195,10 +199,12 @@ Alumni-Mentoring-Portal/
 
 ## Database Setup
 
-1. **Start your local MySQL service**:
+1. **Start your local MySQL or MariaDB service**:
    ```bash
-   # On macOS via Homebrew:
+   # On macOS via Homebrew (MySQL):
    brew services start mysql
+   # Or MariaDB:
+   brew services start mariadb
    ```
 
 2. **Initialize Schema & Seed Data**:
@@ -208,7 +214,7 @@ Alumni-Mentoring-Portal/
    ```
 
 3. **Verify Database Configuration**:
-   Ensure `backend/.env` contains your MySQL credentials:
+   Ensure `backend/.env` contains your MySQL / MariaDB credentials:
    ```env
    DB_HOST=localhost
    DB_PORT=3306
@@ -248,7 +254,7 @@ python3 -m http.server 5173
 
 ## Database Seed Accounts
 
-All accounts use cryptographically hashed passwords stored in MySQL:
+All accounts use cryptographically hashed passwords stored in MySQL / MariaDB:
 
 | Role | Name | Email | Password |
 | :--- | :--- | :--- | :--- |
@@ -280,8 +286,8 @@ All accounts use cryptographically hashed passwords stored in MySQL:
 | :--- | :--- | :--- | :--- |
 | `GET`  | `/api/users/:id/avatar` | `id` (path) | Stream user avatar image binary (`image/jpeg`, `image/png`) |
 | `HEAD` | `/api/users/:id/avatar` | `id` (path) | Check avatar existence and content headers |
-| `GET`  | `/api/users/profile?id=...` | `id` (query) | Retrieve complete user profile details |
-| `PUT`  | `/api/users/profile` | JSON profile payload | Update user details, bio, and mentee capacity |
+| `GET`  | `/api/profile?id=...` | `id` (query) | Retrieve complete user profile details |
+| `PUT`  | `/api/profile?id=...` | JSON profile payload | Update user details, bio, and mentee capacity |
 
 ### Authentication & Registration Endpoints
 
@@ -310,7 +316,7 @@ All accounts use cryptographically hashed passwords stored in MySQL:
 
 ## Terminal Image Inspection Guide
 
-To verify avatars stored in the MySQL `users` table directly from the terminal:
+To verify avatars stored in the MySQL / MariaDB `users` table directly from the terminal:
 
 ### 1. View Image Metadata
 ```bash
@@ -364,14 +370,16 @@ cd backend
 mvn clean test
 ```
 
-### Test Coverage Breakdown (**87 Tests Run, 0 Failures**):
+### Test Coverage Breakdown (**129 Tests Run, 0 Failures**):
+- **`AuthProfileIntegrationTest` (16 tests)**: End-to-end integration workflows (Availability Pre-Check ➔ Registration ➔ Login ➔ Profile View & Update ➔ BLOB Avatar ➔ Search Discovery).
+- **`LoginBoundaryTest` (26 tests)**: Boundary Value Analysis on login inputs (empty/null bounds, 254-char RFC email limit, 128-char password limits, SQL injection resilience, unicode, whitespace normalization).
 - **`MentorshipRequestTest` (23 tests)**: Request creation, self-request prevention, duplicate request blocking (`PENDING` lock), re-requesting after approval/rejection, mentor capacity validation, status transitions (`ACCEPTED`, `REJECTED`, `CANCELLED`), and HTTP `/api/requests` endpoints.
 - **`ValidationTest` (28 tests)**: RFC email compliance, mobile number regex, full name constraints, 4-segment password strength evaluator, password mismatch, student ID regex, graduation years, HTTP registration, login flow, and password-strength REST endpoint.
 - **`SearchAlgorithmsTest` (19 tests)**: Multi-attribute Linear Search scans, case insensitivity, Quicksort ordering, exact vs prefix Binary Search, boundary expansions, and execution telemetry metrics.
-- **`ProfileTest` (13 tests)**: Profile picture uploads, avatar retrieval, MIME type verification, profile updates, and HTTP `/api/users/profile` endpoints.
+- **`ProfileTest` (13 tests)**: Profile picture uploads, avatar retrieval, MIME type verification, profile updates, and HTTP `/api/profile` endpoints.
 - **`JDBCTest` (4 tests)**: Database connectivity, connection pool stability, and transactional integrity.
 
-**Result: `Tests run: 87, Failures: 0, Errors: 0, Skipped: 0` (BUILD SUCCESS — 100% Pass Rate)**
+**Result: `Tests run: 129, Failures: 0, Errors: 0, Skipped: 0` (BUILD SUCCESS — 100% Pass Rate)**
 
 ---
 

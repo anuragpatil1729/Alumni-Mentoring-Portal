@@ -1,11 +1,11 @@
-# Java MySQL JDBC Backend
+# Java MySQL / MariaDB JDBC Backend
 
-A high-performance Java backend utilizing the official MySQL Connector/J JDBC driver (`com.mysql.cj.jdbc.Driver`) to store and retrieve Student and Alumni records in the local MySQL database (`alumni_mentoring_portal`).
+A high-performance Java backend utilizing the official MySQL Connector/J JDBC driver (`com.mysql.cj.jdbc.Driver`) to store and retrieve Student and Alumni records in the local MySQL / MariaDB database (`alumni_mentoring_portal`).
 
 ---
 
 ## 1. Features
-- **Official MySQL JDBC Driver**: Configured with `com.mysql:mysql-connector-j` (version 9.2.0).
+- **Official MySQL / MariaDB JDBC Driver**: Configured with `com.mysql:mysql-connector-j` (version 9.2.0) for connecting to MySQL Server 8.0+ and MariaDB 10.5+.
 - **Transactional Atomicity**: `RegistrationDAO` executes multi-table inserts into `users` and either `students` or `alumni` wrapped in strict JDBC transaction boundaries (`conn.setAutoCommit(false)`, `conn.commit()`, and `conn.rollback()`).
 - **SQL Injection Prevention**: All SQL statements use `PreparedStatement` with typed parameter binding.
 - **Environment & Property Fallbacks**: Dynamically reads database credentials from environment variables (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) or `application.properties`.
@@ -53,7 +53,7 @@ java-backend/
 ### Prerequisites
 - JDK 17+ (JDK 25 installed)
 - Apache Maven 3.9+
-- MySQL Server running on `localhost:3306` with database `alumni_mentoring_portal`
+- MySQL Server 8.0+ or MariaDB 10.5+ running on `localhost:3306` with database `alumni_mentoring_portal`
 
 ### 1. Compile & Run Tests
 ```bash
@@ -79,7 +79,7 @@ curl http://localhost:8080/api/health
 **Response:**
 ```json
 {
-  "database": "MySQL Local",
+  "database": "MySQL / MariaDB Local",
   "runtime": "Java OpenJDK JDBC Driver",
   "status": "OK"
 }
@@ -90,7 +90,7 @@ curl http://localhost:8080/api/health
 curl http://localhost:8080/api/mentors
 ```
 
-### C. Register Student (Stored via JDBC in MySQL)
+### C. Register Student (Stored via JDBC in MySQL / MariaDB)
 ```bash
 curl -X POST http://localhost:8080/api/register/student \
   -H "Content-Type: application/json" \
@@ -104,7 +104,7 @@ curl -X POST http://localhost:8080/api/register/student \
   }'
 ```
 
-### D. Register Alumni Mentor (Stored via JDBC in MySQL)
+### D. Register Alumni Mentor (Stored via JDBC in MySQL / MariaDB)
 ```bash
 curl -X POST http://localhost:8080/api/register/alumni \
   -H "Content-Type: application/json" \

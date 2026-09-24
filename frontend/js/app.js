@@ -1264,7 +1264,7 @@
     }
 
     try {
-      setProfileAlert("info", "Saving image directly to MySQL database...");
+      setProfileAlert("info", "Saving image directly to MySQL / MariaDB database...");
       const dataUrl = await resizeImageToDataUrl(file, 400, 400);
 
       const res = await ApiClient.uploadAvatar(state.currentUser.id, dataUrl, "image/jpeg");
@@ -1277,7 +1277,7 @@
         if (els.removeAvatarBtn) els.removeAvatarBtn.style.display = "flex";
         updateAuthHeader();
 
-        setProfileAlert("success", "✅ Profile picture saved directly in MySQL BLOB storage!");
+        setProfileAlert("success", "✅ Profile picture saved directly in MySQL / MariaDB BLOB storage!");
       } else {
         setProfileAlert("error", res.data.message || "Failed to save profile picture.");
       }
@@ -2273,7 +2273,7 @@
       async (dataUrl) => {
         if (state.currentUser && state.currentUser.id) {
           try {
-            setProfileAlert("info", "Saving image directly to MySQL database...");
+            setProfileAlert("info", "Saving image directly to MySQL / MariaDB database...");
             const res = await ApiClient.uploadAvatar(state.currentUser.id, dataUrl, "image/jpeg");
             if (res.ok && res.data.success) {
               const url = `${res.data.avatarUrl}?t=${Date.now()}`;
@@ -2283,7 +2283,7 @@
               if (els.removeAvatarBtn) els.removeAvatarBtn.style.display = "flex";
               if (els.pe_avatar_remove) els.pe_avatar_remove.style.display = "inline-flex";
               updateAuthHeader();
-              setProfileAlert("success", "✅ Profile picture saved in MySQL database!");
+              setProfileAlert("success", "✅ Profile picture saved in MySQL / MariaDB database!");
             }
           } catch (e) {
             setProfileAlert("error", "Error saving image: " + e.message);

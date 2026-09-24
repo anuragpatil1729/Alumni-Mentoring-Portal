@@ -76,7 +76,7 @@ sequenceDiagram
     participant Ctrl as Mentor Controller
     participant Repo as Alumni Repository
     participant Engine as Search Engine (Linear / Binary)
-    participant DB as MySQL Database
+    participant DB as MySQL / MariaDB Database
 
     Student->>UI: Type search query or select filter
     UI->>Debounce: Queue input change (300ms debounce)
@@ -112,7 +112,7 @@ sequenceDiagram
 | **1. User Interaction** | React Frontend | User types in search bar, toggles search algorithm, or selects department/experience filters. |
 | **2. Request Dispatch** | Fetch API / Axios | Sends HTTP `GET /api/mentors/search` with URL parameters (`query`, `algorithm`, `key`, `department`, `industry`, `minExp`). |
 | **3. Request Routing & Validation** | Express Router & Controller | Validates query parameters; ensures valid algorithm (`linear` or `binary`) and sanitizes string inputs. |
-| **4. Data Fetching** | Alumni Repository | Queries MySQL `users` and `alumni` tables, normalizing skills and profile data. |
+| **4. Data Fetching** | Alumni Repository | Queries MySQL / MariaDB `users` and `alumni` tables, normalizing skills and profile data. |
 | **5. Algorithm Execution** | Custom Search Engine | Runs either the manual Linear Search or manual Binary Search algorithm. Records comparison operations and elapsed time. |
 | **6. Filter Post-Processing** | Mentor Controller | Applies any facet constraints (e.g. department or industry match) to the candidate result set. |
 | **7. Response Delivery** | Express Response | Sends structured JSON with search results and detailed execution telemetry. |

@@ -1943,7 +1943,7 @@ input.is-valid, select.is-valid, textarea.is-valid {
 }
 
 /* ========================================================================= */
-/* Registration & Form Avatar Picker Styles (MySQL BLOB Approach 2)          */
+/* Registration & Form Avatar Picker Styles (MySQL / MariaDB BLOB Approach 2)*/
 /* ========================================================================= */
 .form-avatar-picker-card {
   display: flex;

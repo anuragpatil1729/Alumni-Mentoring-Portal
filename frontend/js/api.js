@@ -181,7 +181,7 @@ const ApiClient = {
   },
 
   /**
-   * Uploads base64 avatar image to MySQL BLOB (Approach 2).
+   * Uploads base64 avatar image to MySQL / MariaDB BLOB (Approach 2).
    */
   async uploadAvatar(userId, base64Data, mimeType = "image/jpeg") {
     const response = await fetch(`${API_BASE_URL}/api/users/avatar?userId=${userId}`, {
@@ -206,7 +206,7 @@ const ApiClient = {
   },
 
   /**
-   * Deletes avatar image from MySQL BLOB.
+   * Deletes avatar image from MySQL / MariaDB BLOB.
    */
   async deleteAvatar(userId) {
     const response = await fetch(`${API_BASE_URL}/api/users/avatar?userId=${userId}`, {
