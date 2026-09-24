@@ -26,10 +26,11 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Build outputs
+# Build outputs & Maven artifacts
 dist/
 build/
 target/
+**/target/
 *.class
 *.jar
 *.war
@@ -37,6 +38,8 @@ target/
 mysql-connector-j-*/
 *.res
 *.obj
+*.dump
+*.dumpstream
 
 # IDE / Editor configuration
 .idea/
@@ -44,3 +47,14 @@ mysql-connector-j-*/
 *.swp
 *.swo
 *.vs
+.project
+.classpath
+.settings/
+.factorypath
+nbproject/
+nb-configuration.xml
+
+# Temporary files & caches
+tmp/
+*.tmp
+.cache/
