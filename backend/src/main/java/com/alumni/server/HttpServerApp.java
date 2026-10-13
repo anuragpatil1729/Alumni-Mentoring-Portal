@@ -13,13 +13,25 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import com.alumni.security.AuthService;
+import com.alumni.dao.EventDAO;
+import com.alumni.dao.OpportunityDAO;
+import com.alumni.security.AuthException;
+import com.alumni.security.AuthenticatedUser;
+import com.alumni.dao.TeacherDAO;
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import com.alumni.dao.AlumniSlotBookingDAO;
+import com.alumni.dao.PasswordResetDAO;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
+import java.time.format.DateTimeParseException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -51,7 +63,16 @@ public class HttpServerApp {
         server.createContext("/api/health", new HealthHandler());
 
         // Auth & Registrations
+        server.createContext("/api/admin", new AdminHandler());
         server.createContext("/api/auth/login", new LoginHandler());
+        server.createContext("/api/auth/logout", new LogoutHandler());
+        server.createContext("/api/auth/password-reset/request", new PasswordResetRequestHandler());
+        server.createContext("/api/auth/password-reset/confirm", new PasswordResetConfirmHandler());
+        server.createContext("/api/events", new EventHandler());
+        server.createContext("/api/opportunities", new OpportunityHandler());
+        server.createContext("/api/admin/events", new AdminEventsHandler());
+        server.createContext("/api/teacher", new TeacherHandler());
+        server.createContext("/api/session-history", new SessionHistoryHandler());
         server.createContext("/api/auth/password-strength", new PasswordStrengthHandler());
         server.createContext("/api/auth/check-availability", new AvailabilityCheckHandler());
         server.createContext("/api/auth/register/student", new StudentRegisterHandler());
@@ -139,10 +160,13 @@ public class HttpServerApp {
     }
 
     // User Login: POST /api/auth/login
+    
+    // User Login: POST /api/auth/login
     private class LoginHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             HttpUtils.addCorsHeaders(exchange);
+
             if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
                 exchange.sendResponseHeaders(204, -1);
                 return;
@@ -166,24 +190,51 @@ public class HttpServerApp {
                     return;
                 }
 
-                JSONObject user = registrationDAO.authenticateUser(email, password);
-                if (user != null) {
-                    JSONObject resp = new JSONObject();
-                    resp.put("success", true);
-                    resp.put("message", "Login successful!");
-                    resp.put("user", user);
-                    HttpUtils.sendJsonResponse(exchange, 200, resp.toString());
-                } else {
-                    JSONObject err = new JSONObject();
-                    err.put("success", false);
-                    err.put("message", "Invalid email or password.");
-                    HttpUtils.sendJsonResponse(exchange, 401, err.toString());
+                JSONObject user =
+                        registrationDAO.authenticateUser(email, password);
+
+                if (user == null) {
+                    JSONObject error = new JSONObject();
+                    error.put("success", false);
+                    error.put("message", "Invalid email or password.");
+                    HttpUtils.sendJsonResponse(exchange, 401, error.toString());
+                    return;
                 }
+
+                try {
+                    AuthService authService = new AuthService();
+                    String token = authService.createToken(user.getLong("id"));
+
+                    JSONObject response = new JSONObject();
+                    response.put("success", true);
+                    response.put("message", "Login successful!");
+                    response.put("token", token);
+                    response.put("user", user);
+
+                    HttpUtils.sendJsonResponse(
+                            exchange, 200, response.toString()
+                    );
+
+                } catch (Exception e) {
+                    System.err.println(
+                            "Token creation failed: " + e.getMessage()
+                    );
+
+                    HttpUtils.sendErrorResponse(
+                            exchange, 500, "Unable to complete login."
+                    );
+                }
+
             } catch (Exception e) {
-                HttpUtils.sendErrorResponse(exchange, 500, "Authentication failed: " + e.getMessage());
+                System.err.println("Login request failed: " + e.getMessage());
+
+                HttpUtils.sendErrorResponse(
+                        exchange, 400, "Invalid login request."
+                );
             }
         }
     }
+
 
     // Password Strength Evaluator: POST or GET /api/auth/password-strength
     private class PasswordStrengthHandler implements HttpHandler {
@@ -369,6 +420,12 @@ public class HttpServerApp {
                 return;
             }
 
+            try {
+                new AuthService().requireRole(exchange, "ADMIN");
+            } catch (AuthException e) {
+                HttpUtils.sendErrorResponse(exchange, e.getStatusCode(), e.getMessage());
+                return;
+            }
             String path = exchange.getRequestURI().getPath();
             String prefix = "/api/auth/registrations/";
             if (!path.startsWith(prefix) || path.length() <= prefix.length()) {
@@ -608,6 +665,25 @@ public class HttpServerApp {
             }
         }
     }
+    
+    // Allow users to access their own profile; admins can access any profile.
+    private void authorizeProfileAccess(
+            HttpExchange exchange, long targetUserId)
+            throws com.alumni.security.AuthException {
+
+        com.alumni.security.AuthService authService =
+                new com.alumni.security.AuthService();
+
+        com.alumni.security.AuthenticatedUser currentUser =
+                authService.authenticate(exchange);
+
+        if (currentUser.getUserId() != targetUserId
+                && !currentUser.hasRole("ADMIN")) {
+            throw new com.alumni.security.AuthException(
+                    403, "You can only access your own profile."
+            );
+        }
+    }
 
     // Profile Handler: GET /api/profile?id=... or PUT/POST /api/profile
     private class ProfileHandler implements HttpHandler {
@@ -642,9 +718,14 @@ public class HttpServerApp {
 
                 try {
                     long userId = Long.parseLong(idStr.trim());
+                    authorizeProfileAccess(exchange, userId);
                     RegistrationService.ProcessResult result = registrationService.getProfile(userId);
                     HttpUtils.sendJsonResponse(exchange, result.getStatus(), result.getBody().toString());
-                } catch (NumberFormatException e) {
+                } catch (com.alumni.security.AuthException e) {
+                     HttpUtils.sendErrorResponse(
+                         exchange, e.getStatusCode(), e.getMessage()
+                        );
+                }catch (NumberFormatException e) {
                     HttpUtils.sendErrorResponse(exchange, 400, "Invalid user ID format.");
                 } catch (Exception e) {
                     HttpUtils.sendErrorResponse(exchange, 500, "Error fetching profile: " + e.getMessage());
@@ -667,9 +748,12 @@ public class HttpServerApp {
                     }
 
                     long userId = Long.parseLong(idStr.trim());
+                    authorizeProfileAccess(exchange, userId);
                     RegistrationService.ProcessResult result = registrationService.updateProfile(userId, body);
                     HttpUtils.sendJsonResponse(exchange, result.getStatus(), result.getBody().toString());
 
+                } catch (com.alumni.security.AuthException e) {
+                    HttpUtils.sendErrorResponse(exchange, e.getStatusCode(), e.getMessage());
                 } catch (NumberFormatException e) {
                     HttpUtils.sendErrorResponse(exchange, 400, "Invalid user ID format.");
                 } catch (Exception e) {
@@ -718,6 +802,24 @@ public class HttpServerApp {
                     try {
                         userId = Long.parseLong(idStr.trim());
                     } catch (NumberFormatException ignored) {}
+                }
+            }
+
+            if ("GET".equals(method) || "HEAD".equals(method)
+                    || "POST".equals(method) || "PUT".equals(method) || "DELETE".equals(method)) {
+                if (userId == null) {
+                    HttpUtils.sendErrorResponse(exchange, 400, "User ID is required.");
+                    return;
+                }
+                try {
+                    AuthenticatedUser current = new AuthService().authenticate(exchange);
+                    if (current.getUserId() != userId && !current.hasRole("ADMIN")) {
+                        HttpUtils.sendErrorResponse(exchange, 403, "You can only manage your own avatar.");
+                        return;
+                    }
+                } catch (AuthException e) {
+                    HttpUtils.sendErrorResponse(exchange, e.getStatusCode(), e.getMessage());
+                    return;
                 }
             }
 
@@ -867,6 +969,9 @@ public class HttpServerApp {
 
             Map<String, String> qp = HttpUtils.parseQueryParams(exchange);
             String path = exchange.getRequestURI().getPath();
+            AuthenticatedUser currentUser;
+            try { currentUser = new AuthService().authenticate(exchange); }
+            catch (AuthException e) { HttpUtils.sendErrorResponse(exchange, e.getStatusCode(), e.getMessage()); return; }
 
             if ("GET".equals(method)) {
                 String studentIdStr = qp.get("studentId");
@@ -880,15 +985,18 @@ public class HttpServerApp {
                 try {
                     if (studentIdStr != null && !studentIdStr.isEmpty()) {
                         long studentId = Long.parseLong(studentIdStr.trim());
+                        if (currentUser.getUserId() != studentId && !currentUser.hasRole("ADMIN")) { HttpUtils.sendErrorResponse(exchange, 403, "You cannot view another user's requests."); return; }
                         MentorshipService.ProcessResult res = mentorshipService.getRequestsByStudent(studentId);
                         HttpUtils.sendJsonResponse(exchange, res.getStatus(), res.getBody().toString());
                     } else if (mentorIdStr != null && !mentorIdStr.isEmpty()) {
                         long mentorId = Long.parseLong(mentorIdStr.trim());
+                        if (currentUser.getUserId() != mentorId && !currentUser.hasRole("ADMIN")) { HttpUtils.sendErrorResponse(exchange, 403, "You cannot view another user's requests."); return; }
                         MentorshipService.ProcessResult res = mentorshipService.getRequestsByMentor(mentorId);
                         HttpUtils.sendJsonResponse(exchange, res.getStatus(), res.getBody().toString());
                     } else if (idStr != null && !idStr.isEmpty()) {
                         long reqId = Long.parseLong(idStr.trim());
                         com.alumni.model.MentorshipRequest req = new com.alumni.dao.MentorshipRequestDAO().getRequestById(reqId);
+                        if (req != null && currentUser.getUserId() != req.getMentorId() && !currentUser.hasRole("ADMIN")) { HttpUtils.sendErrorResponse(exchange, 403, "You cannot view this request."); return; }
                         if (req != null) {
                             JSONObject resp = new JSONObject();
                             resp.put("success", true);
@@ -909,6 +1017,8 @@ public class HttpServerApp {
             } else if ("POST".equals(method)) {
                 try {
                     JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                    if (!currentUser.hasRole("ADMIN") && !currentUser.hasRole("STUDENT")) { HttpUtils.sendErrorResponse(exchange, 403, "Only students or admins can create mentorship requests."); return; }
+                    if (!currentUser.hasRole("ADMIN") && body.optLong("studentId", body.optLong("student_id", -1L)) != currentUser.getUserId()) { HttpUtils.sendErrorResponse(exchange, 403, "You may only create a request for your own account."); return; }
                     MentorshipService.ProcessResult res = mentorshipService.createRequest(body);
                     HttpUtils.sendJsonResponse(exchange, res.getStatus(), res.getBody().toString());
                 } catch (Exception e) {
@@ -916,6 +1026,7 @@ public class HttpServerApp {
                 }
 
             } else if ("PUT".equals(method)) {
+                if (!currentUser.hasRole("ADMIN") && !currentUser.hasRole("ALUMNI")) { HttpUtils.sendErrorResponse(exchange, 403, "Alumni or admin role required to update request status."); return; }
                 try {
                     JSONObject body = HttpUtils.parseBodyAsJson(exchange);
                     String idStr = qp.get("id");
@@ -938,6 +1049,11 @@ public class HttpServerApp {
                     }
 
                     long requestId = Long.parseLong(idStr.trim());
+                    if (!currentUser.hasRole("ADMIN")) {
+                        com.alumni.model.MentorshipRequest existing = new com.alumni.dao.MentorshipRequestDAO().getRequestById(requestId);
+                        if (existing == null) { HttpUtils.sendErrorResponse(exchange, 404, "Mentorship request not found."); return; }
+                        if (existing.getMentorId() != currentUser.getUserId()) { HttpUtils.sendErrorResponse(exchange, 403, "You can only update requests assigned to you."); return; }
+                    }
                     MentorshipService.ProcessResult res = mentorshipService.updateRequestStatus(requestId, body);
                     HttpUtils.sendJsonResponse(exchange, res.getStatus(), res.getBody().toString());
                 } catch (NumberFormatException e) {
@@ -951,7 +1067,809 @@ public class HttpServerApp {
             }
         }
     }
+    
+    /** Password reset request: POST /api/auth/password-reset/request {"email":"..."}. */
+    private static class PasswordResetRequestHandler implements HttpHandler {
+        private final PasswordResetDAO dao = new PasswordResetDAO();
+        @Override public void handle(HttpExchange exchange) throws IOException {
+            HttpUtils.addCorsHeaders(exchange);
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) { exchange.sendResponseHeaders(204, -1); return; }
+            if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) { HttpUtils.sendErrorResponse(exchange, 405, "Method not allowed."); return; }
+            try {
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                String email = body.optString("email", "").trim();
+                if (!InputValidator.isValidEmail(email)) { HttpUtils.sendErrorResponse(exchange, 400, "A valid email is required."); return; }
+                String rawToken = dao.createResetToken(email);
+                if (rawToken != null) {
+                    // Delivery is delegated to a configured email provider. Never return reset tokens in API responses.
+                    try { com.alumni.service.PasswordResetMailer.send(email, rawToken); }
+                    catch (Exception mailError) { System.err.println("Password reset email could not be sent; configure SMTP: " + mailError.getMessage()); }
+                }
+                HttpUtils.sendJsonResponse(exchange, 200, new JSONObject().put("success", true)
+                    .put("message", "If an account exists for that email, password reset instructions will be sent.").toString());
+            } catch (Exception e) { HttpUtils.sendErrorResponse(exchange, 500, "Unable to process password reset request."); }
+        }
+    }
+
+    /** Password reset confirmation: POST /api/auth/password-reset/confirm {token,newPassword}. */
+    private static class PasswordResetConfirmHandler implements HttpHandler {
+        private final PasswordResetDAO dao = new PasswordResetDAO();
+        @Override public void handle(HttpExchange exchange) throws IOException {
+            HttpUtils.addCorsHeaders(exchange);
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) { exchange.sendResponseHeaders(204, -1); return; }
+            if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) { HttpUtils.sendErrorResponse(exchange, 405, "Method not allowed."); return; }
+            try {
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                String token = body.optString("token", "").trim();
+                String password = body.optString("newPassword", "");
+                if (!token.matches("^[a-fA-F0-9]{64}$")) { HttpUtils.sendErrorResponse(exchange, 400, "Invalid or expired reset token."); return; }
+                if (!InputValidator.isValidPassword(password)) { HttpUtils.sendErrorResponse(exchange, 422, "Password does not meet the required strength rules."); return; }
+                boolean changed = dao.consumeTokenAndChangePassword(token, RegistrationDAO.hashPassword(password));
+                if (!changed) { HttpUtils.sendErrorResponse(exchange, 400, "Invalid, expired, or already used reset token."); return; }
+                HttpUtils.sendJsonResponse(exchange, 200, new JSONObject().put("success", true).put("message", "Password reset successful. Please log in again.").toString());
+            } catch (Exception e) { HttpUtils.sendErrorResponse(exchange, 500, "Unable to reset password."); }
+        }
+    }
+
+    // User Logout: POST /api/auth/logout
+    private class LogoutHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            HttpUtils.addCorsHeaders(exchange);
+
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(204, -1);
+                return;
+            }
+
+            if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+                HttpUtils.sendErrorResponse(
+                        exchange, 405, "Method Not Allowed"
+                );
+                return;
+            }
+
+            String header = exchange.getRequestHeaders()
+                    .getFirst("Authorization");
+
+            if (header == null || !header.startsWith("Bearer ")) {
+                HttpUtils.sendErrorResponse(
+                        exchange, 401, "Authentication required."
+                );
+                return;
+            }
+
+            String token = header.substring(7).trim();
+
+            if (!token.matches("^[a-fA-F0-9]{64}$")) {
+                HttpUtils.sendErrorResponse(
+                        exchange, 401, "Invalid token."
+                );
+                return;
+            }
+
+            try {
+                AuthService authService = new AuthService();
+                authService.authenticate(exchange);
+
+                authService.revokeToken(token);
+
+                JSONObject response = new JSONObject();
+                response.put("success", true);
+                response.put("message", "Logout successful.");
+
+                HttpUtils.sendJsonResponse(
+                        exchange, 200, response.toString()
+                );
+
+            } catch (com.alumni.security.AuthException e) {
+                HttpUtils.sendErrorResponse(
+                        exchange, e.getStatusCode(), e.getMessage()
+                );
+            } catch (Exception e) {
+                System.err.println("Logout failed: " + e.getMessage());
+
+                HttpUtils.sendErrorResponse(
+                        exchange, 500, "Unable to complete logout."
+                );
+            }
+        }
+    }
+
+    
+    private class AdminHandler implements HttpHandler {
+
+        private final com.alumni.dao.AdminDAO adminDAO =
+                new com.alumni.dao.AdminDAO();
+
+        private final AuthService authService = new AuthService();
+
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            HttpUtils.addCorsHeaders(exchange);
+
+            String method = exchange.getRequestMethod();
+            String path = exchange.getRequestURI().getPath();
+
+            if ("OPTIONS".equalsIgnoreCase(method)) {
+                exchange.sendResponseHeaders(204, -1);
+                return;
+            }
+
+            try {
+                authService.requireRole(exchange, "admin");
+
+                // GET /api/admin/users?role=teacher&active=true
+                if ("/api/admin/users".equals(path)
+                        && "GET".equalsIgnoreCase(method)) {
+
+                    Map<String, String> qp =
+                            HttpUtils.parseQueryParams(exchange);
+
+                    String role = qp.get("role");
+                    String active = qp.get("active");
+
+                    if (role != null && !role.isBlank()
+                            && !role.matches(
+                                "(?i)student|alumni|teacher|admin")) {
+                        HttpUtils.sendErrorResponse(
+                                exchange, 400, "Invalid role filter.");
+                        return;
+                    }
+
+                    if (active != null
+                            && !active.equalsIgnoreCase("true")
+                            && !active.equalsIgnoreCase("false")) {
+                        HttpUtils.sendErrorResponse(
+                                exchange, 400,
+                                "active must be true or false.");
+                        return;
+                    }
+
+                    JSONObject response = new JSONObject();
+                    response.put("success", true);
+                    response.put("users",
+                            adminDAO.getUsers(role, active));
+
+                    HttpUtils.sendJsonResponse(
+                            exchange, 200, response.toString());
+                    return;
+                }
+
+                // PATCH /api/admin/users/{id}/status
+                // Body: {"active": false}
+                if (path.matches(
+                        "^/api/admin/users/\\d+/status$")
+                        && "PATCH".equalsIgnoreCase(method)) {
+
+                    long userId = Long.parseLong(
+                        path.split("/")[4]);
+
+                    JSONObject body =
+                            HttpUtils.parseBodyAsJson(exchange);
+
+                    if (!body.has("active")
+                            || !(body.opt("active") instanceof Boolean)) {
+                        HttpUtils.sendErrorResponse(
+                                exchange, 400,
+                                "Boolean field 'active' is required.");
+                        return;
+                    }
+
+                    boolean active = body.getBoolean("active");
+
+                    com.alumni.security.AuthenticatedUser actor =
+                            authService.authenticate(exchange);
+
+                    if (actor.getUserId() == userId && !active) {
+                        HttpUtils.sendErrorResponse(
+                                exchange, 400,
+                                "You cannot deactivate your own account.");
+                        return;
+                    }
+
+                    if (!adminDAO.setUserActive(userId, active)) {
+                        HttpUtils.sendErrorResponse(
+                                exchange, 404, "User not found.");
+                        return;
+                    }
+
+                    JSONObject response = new JSONObject();
+                    response.put("success", true);
+                    response.put("message",
+                            active ? "User activated."
+                                : "User deactivated.");
+
+                    HttpUtils.sendJsonResponse(
+                            exchange, 200, response.toString());
+                    return;
+                }
+
+                // PATCH /api/admin/events/{id}/status
+                // Body: {"status": "APPROVED"} or {"status": "REJECTED"}
+                if (path.matches(
+                        "^/api/admin/events/\\d+/status$")
+                        && "PATCH".equalsIgnoreCase(method)) {
+
+                    long eventId = Long.parseLong(
+                            path.split("/")[4]);
+
+                    JSONObject body =
+                            HttpUtils.parseBodyAsJson(exchange);
+
+                    String status = body.optString("status", "")
+                            .trim().toUpperCase();
+
+                    if (!status.equals("APPROVED")
+                            && !status.equals("REJECTED")) {
+                        HttpUtils.sendErrorResponse(
+                                exchange, 400,
+                                "Status must be APPROVED or REJECTED.");
+                        return;
+                    }
+
+                    if (!adminDAO.updateEventStatus(eventId, status)) {
+                        HttpUtils.sendErrorResponse(
+                                exchange, 404, "Event not found.");
+                        return;
+                    }
+
+                    JSONObject response = new JSONObject();
+                    response.put("success", true);
+                    response.put("message",
+                            "Event status updated to " + status + ".");
+
+                    HttpUtils.sendJsonResponse(
+                            exchange, 200, response.toString());
+                    return;
+                }
+
+                HttpUtils.sendErrorResponse(
+                        exchange, 404, "Admin endpoint not found.");
+
+            } catch (com.alumni.security.AuthException e) {
+                HttpUtils.sendErrorResponse(
+                        exchange, e.getStatusCode(), e.getMessage());
+
+            } catch (NumberFormatException e) {
+                HttpUtils.sendErrorResponse(
+                        exchange, 400, "Invalid ID.");
+
+            } catch (Exception e) {
+                System.err.println("Admin API error: " + e.getMessage());
+                HttpUtils.sendErrorResponse(
+                        exchange, 500, "Admin operation failed.");
+            }
+        }
+    }
+
+
+private class EventHandler implements HttpHandler {
+    private final EventDAO dao = new EventDAO();
+    private final AuthService auth = new AuthService();
+
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        HttpUtils.addCorsHeaders(exchange);
+
+        String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
+
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            exchange.sendResponseHeaders(204, -1);
+            return;
+        }
+
+        try {
+            if ("GET".equalsIgnoreCase(method) &&
+                    "/api/events".equals(path)) {
+                HttpUtils.sendJsonResponse(
+                    exchange, 200, dao.getApprovedEvents().toString());
+                return;
+            }
+
+            if ("POST".equalsIgnoreCase(method) &&
+                    "/api/events".equals(path)) {
+                AuthenticatedUser user =
+                    auth.requireRole(exchange, "alumni");
+
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+
+                String title = body.optString("title", "").trim();
+                String description =
+                    body.optString("description", "").trim();
+                String date = body.optString("date", "").trim();
+                String start = body.optString("start_time", "").trim();
+                String end = body.optString("end_time", "").trim();
+                String venue = body.optString("venue", "").trim();
+                String type = body.optString("event_type", "GENERAL")
+                    .trim().toUpperCase();
+
+                if (title.isEmpty() || description.isEmpty()
+                        || date.isEmpty() || start.isEmpty()
+                        || end.isEmpty() || venue.isEmpty()) {
+                    HttpUtils.sendErrorResponse(
+                        exchange, 400, "All required event fields must be provided.");
+                    return;
+                }
+
+                LocalDate eventDate = LocalDate.parse(date);
+                LocalTime startTime = LocalTime.parse(start);
+                LocalTime endTime = LocalTime.parse(end);
+
+                if (eventDate.isBefore(LocalDate.now())) {
+                    HttpUtils.sendErrorResponse(
+                        exchange, 400, "Event date cannot be in the past.");
+                    return;
+                }
+
+                if (!endTime.isAfter(startTime)) {
+                    HttpUtils.sendErrorResponse(
+                        exchange, 400, "End time must be after start time.");
+                    return;
+                }
+
+                if (!type.matches(
+                        "GENERAL|JUDGE|GUEST_SESSION|SPONSOR")) {
+                    HttpUtils.sendErrorResponse(
+                        exchange, 400, "Invalid event type.");
+                    return;
+                }
+
+                long id = dao.createEvent(body, user.getUserId());
+
+                JSONObject response = new JSONObject();
+                response.put("success", true);
+                response.put("id", id);
+                response.put("status", "PENDING");
+
+                HttpUtils.sendJsonResponse(
+                    exchange, 201, response.toString());
+                return;
+            }
+
+            HttpUtils.sendErrorResponse(
+                exchange, 404, "Event endpoint not found.");
+
+        } catch (AuthException e) {
+            HttpUtils.sendErrorResponse(
+                exchange, e.getStatusCode(), e.getMessage());
+        } catch (DateTimeParseException e) {
+            HttpUtils.sendErrorResponse(
+                exchange, 400, "Invalid date or time format. Use YYYY-MM-DD and HH:mm.");
+        } catch (IllegalArgumentException e) {
+            HttpUtils.sendErrorResponse(
+                exchange, 400, e.getMessage());
+        } catch (SQLException e) {
+            HttpUtils.sendErrorResponse(
+                exchange, 500, "Event database operation failed.");
+        } catch (Exception e) {
+            HttpUtils.sendErrorResponse(
+                exchange, 400, "Invalid event request.");
+        }
+    }
 }
 
+private class OpportunityHandler implements HttpHandler {
+    private final OpportunityDAO dao = new OpportunityDAO();
+    private final AuthService auth = new AuthService();
 
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        HttpUtils.addCorsHeaders(exchange);
 
+        String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
+
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            exchange.sendResponseHeaders(204, -1);
+            return;
+        }
+
+        try {
+            if ("GET".equalsIgnoreCase(method) &&
+                    "/api/opportunities".equals(path)) {
+                HttpUtils.sendJsonResponse(
+                    exchange, 200, dao.getOpenOpportunities().toString());
+                return;
+            }
+
+            if ("POST".equalsIgnoreCase(method) &&
+                    "/api/opportunities".equals(path)) {
+                AuthenticatedUser user =
+                    auth.requireRole(exchange, "alumni");
+
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+
+                String[] required = {
+                    "title", "description", "organization",
+                    "opportunity_type"
+                };
+
+                for (String field : required) {
+                    if (body.optString(field, "").trim().isEmpty()) {
+                        HttpUtils.sendErrorResponse(
+                            exchange, 400, "Missing required field: " + field);
+                        return;
+                    }
+                }
+
+                String deadline = body.optString("deadline", "").trim();
+                if (!deadline.isEmpty()) {
+                    LocalDate.parse(deadline);
+                }
+
+                String link =
+                    body.optString("application_link", "").trim();
+
+                if (!link.isEmpty()
+                        && !link.matches("https?://.+")) {
+                    HttpUtils.sendErrorResponse(
+                        exchange, 400, "Application link must start with http:// or https://.");
+                    return;
+                }
+
+                long id = dao.createOpportunity(
+                    body, user.getUserId());
+
+                JSONObject response = new JSONObject();
+                response.put("success", true);
+                response.put("id", id);
+                response.put("status", "OPEN");
+
+                HttpUtils.sendJsonResponse(
+                    exchange, 201, response.toString());
+                return;
+            }
+
+            String prefix = "/api/opportunities/";
+            String suffix = "/status";
+
+            if ("PATCH".equalsIgnoreCase(method)
+                    && path.startsWith(prefix)
+                    && path.endsWith(suffix)) {
+
+                AuthenticatedUser user =
+                    auth.requireRole(exchange, "alumni");
+
+                String idText = path.substring(
+                    prefix.length(), path.length() - suffix.length());
+
+                long id = Long.parseLong(idText);
+
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                String status = body.optString("status", "")
+                    .trim().toUpperCase();
+
+                boolean updated = dao.updateStatus(
+                    id, user.getUserId(), status);
+
+                if (!updated) {
+                    HttpUtils.sendErrorResponse(
+                        exchange, 404,
+                        "Opportunity not found or not owned by this alumnus.");
+                    return;
+                }
+
+                JSONObject response = new JSONObject();
+                response.put("success", true);
+                response.put("status", status);
+                HttpUtils.sendJsonResponse(
+                    exchange, 200, response.toString());
+                return;
+            }
+
+            HttpUtils.sendErrorResponse(
+                exchange, 404, "Opportunity endpoint not found.");
+
+        } catch (AuthException e) {
+            HttpUtils.sendErrorResponse(
+                exchange, e.getStatusCode(), e.getMessage());
+        } catch (DateTimeParseException e) {
+            HttpUtils.sendErrorResponse(
+                exchange, 400, "Invalid deadline. Use YYYY-MM-DD.");
+        } catch (NumberFormatException e) {
+            HttpUtils.sendErrorResponse(
+                exchange, 400, "Invalid opportunity ID.");
+        } catch (IllegalArgumentException e) {
+            HttpUtils.sendErrorResponse(
+                exchange, 400, e.getMessage());
+        } catch (SQLException e) {
+            HttpUtils.sendErrorResponse(
+                exchange, 500, "Opportunity database operation failed.");
+        } catch (Exception e) {
+            HttpUtils.sendErrorResponse(
+                exchange, 400, "Invalid opportunity request.");
+        }
+    }
+}
+
+private class AdminEventsHandler implements HttpHandler {
+    private final EventDAO dao = new EventDAO();
+    private final AuthService auth = new AuthService();
+
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        HttpUtils.addCorsHeaders(exchange);
+
+        String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
+
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            exchange.sendResponseHeaders(204, -1);
+            return;
+        }
+
+        try {
+            auth.requireRole(exchange, "admin");
+
+            if ("GET".equalsIgnoreCase(method)
+                    && "/api/admin/events".equals(path)) {
+                HttpUtils.sendJsonResponse(
+                    exchange, 200, dao.getAllEvents().toString());
+                return;
+            }
+
+            String prefix = "/api/admin/events/";
+            String suffix = "/status";
+
+            if ("PATCH".equalsIgnoreCase(method)
+                    && path.startsWith(prefix)
+                    && path.endsWith(suffix)) {
+
+                String idText = path.substring(
+                    prefix.length(), path.length() - suffix.length());
+
+                long id = Long.parseLong(idText);
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                String status = body.optString("status", "")
+                    .trim().toUpperCase();
+
+                if (!"APPROVED".equals(status)
+                        && !"REJECTED".equals(status)) {
+                    HttpUtils.sendErrorResponse(
+                        exchange, 400,
+                        "Status must be APPROVED or REJECTED.");
+                    return;
+                }
+
+                if (!dao.updateStatus(id, status)) {
+                    HttpUtils.sendErrorResponse(
+                        exchange, 409,
+                        "Event not found or is no longer pending.");
+                    return;
+                }
+
+                JSONObject response = new JSONObject();
+                response.put("success", true);
+                response.put("id", id);
+                response.put("status", status);
+                HttpUtils.sendJsonResponse(
+                    exchange, 200, response.toString());
+                return;
+            }
+
+            HttpUtils.sendErrorResponse(
+                exchange, 404, "Admin event endpoint not found.");
+
+        } catch (AuthException e) {
+            HttpUtils.sendErrorResponse(
+                exchange, e.getStatusCode(), e.getMessage());
+        } catch (NumberFormatException e) {
+            HttpUtils.sendErrorResponse(
+                exchange, 400, "Invalid event ID.");
+        } catch (SQLException e) {
+            HttpUtils.sendErrorResponse(
+                exchange, 500, "Event database operation failed.");
+        } catch (Exception e) {
+            HttpUtils.sendErrorResponse(
+                exchange, 400, "Invalid admin event request.");
+        }
+    }
+}
+
+private static class SessionHistoryHandler implements HttpHandler {
+    private final com.alumni.dao.SessionHistoryDAO dao = new com.alumni.dao.SessionHistoryDAO();
+
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        HttpUtils.addCorsHeaders(exchange);
+        String method = exchange.getRequestMethod();
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            exchange.sendResponseHeaders(204, -1);
+            return;
+        }
+        try {
+            AuthenticatedUser user = new AuthService().authenticate(exchange);
+            if (!user.hasRole("STUDENT") && !user.hasRole("ADMIN")) {
+                HttpUtils.sendErrorResponse(exchange, 403, "Student or admin role required.");
+                return;
+            }
+            String path = exchange.getRequestURI().getPath();
+            if ("POST".equalsIgnoreCase(method) && "/api/session-history".equals(path)) {
+                if (!user.hasRole("ADMIN") && !user.hasRole("STUDENT")) { HttpUtils.sendErrorResponse(exchange, 403, "Student or admin role required."); return; }
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                if (user.hasRole("ADMIN") && !body.has("studentId")) { HttpUtils.sendErrorResponse(exchange, 400, "studentId is required when an admin creates a session."); return; }
+                long studentId = body.optLong("studentId", user.getUserId());
+                if (!user.hasRole("ADMIN") && studentId != user.getUserId()) { HttpUtils.sendErrorResponse(exchange, 403, "You can only start a session for yourself."); return; }
+                long alumniId = body.getLong("alumniId");
+                Long requestId = body.has("mentorshipRequestId") && !body.isNull("mentorshipRequestId") ? body.getLong("mentorshipRequestId") : null;
+                long id = dao.createSession(studentId, alumniId, requestId, body.optString("priority", "MEDIUM"));
+                HttpUtils.sendJsonResponse(exchange, 201, new JSONObject().put("success", true).put("sessionId", id).put("status", "STARTED").toString());
+                return;
+            }
+            if ("GET".equalsIgnoreCase(method) && "/api/session-history".equals(path)) {
+                Map<String, String> query = HttpUtils.parseQueryParams(exchange);
+                String sort = query.getOrDefault("sort", "chronological");
+                HttpUtils.sendJsonResponse(exchange, 200,
+                    dao.getHistory(user.getUserId(), sort, user.hasRole("ADMIN")).toString());
+                return;
+            }
+            if ("PATCH".equalsIgnoreCase(method) && path.matches("/api/session-history/\\d+/status")) {
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                boolean changed = dao.updateStatus(Long.parseLong(path.split("/")[3]),
+                    user.getUserId(), body.getString("status").trim().toUpperCase(), user.hasRole("ADMIN"));
+                if (!changed) {
+                    HttpUtils.sendErrorResponse(exchange, 404, "Session not found.");
+                    return;
+                }
+                HttpUtils.sendJsonResponse(exchange, 200, "{\"success\":true}");
+                return;
+            }
+            HttpUtils.sendErrorResponse(exchange, 404, "Session history endpoint not found.");
+        } catch (AuthException e) {
+            HttpUtils.sendErrorResponse(exchange, e.getStatusCode(), e.getMessage());
+        } catch (IllegalArgumentException e) {
+            HttpUtils.sendErrorResponse(exchange, 400, e.getMessage());
+        } catch (SQLException e) {
+            HttpUtils.sendErrorResponse(exchange, 500, "Session history database error.");
+        } catch (Exception e) {
+            HttpUtils.sendErrorResponse(exchange, 400, "Invalid session history request.");
+        }
+    }
+}
+
+static class TeacherHandler implements HttpHandler {
+    private final TeacherDAO dao = new TeacherDAO();
+    private final AlumniSlotBookingDAO bookingDAO = new AlumniSlotBookingDAO();
+
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        HttpUtils.addCorsHeaders(exchange);
+        String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
+        final String base = "/api/teacher/events";
+
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            exchange.getResponseHeaders().set("Access-Control-Allow-Methods",
+                    "GET, POST, PUT, PATCH, OPTIONS");
+            exchange.sendResponseHeaders(204, -1);
+            return;
+        }
+
+        try {
+            AuthService auth = new AuthService();
+            AuthenticatedUser user = auth.requireAnyRole(exchange, "TEACHER", "ADMIN");
+            boolean admin = user.hasRole("ADMIN");
+
+            // Slot bookings are restricted to authenticated teachers/admins.
+            if ("POST".equalsIgnoreCase(method) && path.equals("/api/teacher/bookings")) {
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                long bookingId = bookingDAO.createBooking(
+                    body.getLong("eventId"), body.getLong("alumniId"), user.getUserId(),
+                    LocalDate.parse(body.getString("slotDate")),
+                    LocalTime.parse(body.getString("startTime")),
+                    LocalTime.parse(body.getString("endTime")),
+                    body.getString("purpose").trim().toUpperCase(),
+                    body.optString("notes", null));
+                JSONObject out = new JSONObject().put("success", true)
+                    .put("bookingId", bookingId).put("message", "Alumni slot booked successfully.");
+                HttpUtils.sendJsonResponse(exchange, 201, out.toString());
+                return;
+            }
+            if ("GET".equalsIgnoreCase(method) && path.equals("/api/teacher/bookings")) {
+                HttpUtils.sendJsonResponse(exchange, 200,
+                    bookingDAO.getBookings(user.getUserId(), admin).toString());
+                return;
+            }
+            if ("PATCH".equalsIgnoreCase(method) && path.matches("/api/teacher/bookings/\\d+/status")) {
+                long bookingId = Long.parseLong(path.split("/")[4]);
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                String status = body.getString("status").trim().toUpperCase();
+                boolean updated = bookingDAO.updateStatus(bookingId, user.getUserId(), admin, status);
+                if (!updated) {
+                    HttpUtils.sendErrorResponse(exchange, 404,
+                        "Booking not found, not authorized, or no longer BOOKED.");
+                    return;
+                }
+                HttpUtils.sendJsonResponse(exchange, 200,
+                    "{\"success\":true,\"message\":\"Booking status updated.\"}");
+                return;
+            }
+
+            // Teachers can only access events assigned to them. Admins can inspect
+            // event details, but must have an assignment to enter/update marks.
+            if ("POST".equalsIgnoreCase(method) && path.matches("/api/teacher/events/\\d+/marks")) {
+                String[] parts = path.substring(base.length() + 1).split("/");
+                long eventId = Long.parseLong(parts[0]);
+                if (dao.getAssignedEvent(eventId, user.getUserId()) == null) {
+                    HttpUtils.sendErrorResponse(exchange, 403, "You are not assigned to this event.");
+                    return;
+                }
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                dao.createInternalMark(eventId, body.getLong("studentId"), user.getUserId(),
+                    body.getBigDecimal("marks"), body.has("maxMarks") ? body.getBigDecimal("maxMarks") : new BigDecimal("100.00"),
+                    body.optString("remarks", null));
+                HttpUtils.sendJsonResponse(exchange, 201,
+                    "{\"success\":true,\"message\":\"Marks created.\"}");
+                return;
+            }
+            if ("PUT".equalsIgnoreCase(method) && path.matches("/api/teacher/events/\\d+/marks/\\d+")) {
+                String[] parts = path.substring(base.length() + 1).split("/");
+                long eventId = Long.parseLong(parts[0]);
+                long studentId = Long.parseLong(parts[2]);
+                if (dao.getAssignedEvent(eventId, user.getUserId()) == null) {
+                    HttpUtils.sendErrorResponse(exchange, 403, "You are not assigned to this event.");
+                    return;
+                }
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                boolean updated = dao.updateInternalMark(eventId, studentId, user.getUserId(),
+                    body.getBigDecimal("marks"), body.has("maxMarks") ? body.getBigDecimal("maxMarks") : new BigDecimal("100.00"),
+                    body.optString("remarks", null));
+                if (!updated) {
+                    HttpUtils.sendErrorResponse(exchange, 404, "Marks not found or event not assigned.");
+                    return;
+                }
+                HttpUtils.sendJsonResponse(exchange, 200,
+                    "{\"success\":true,\"message\":\"Marks updated.\"}");
+                return;
+            }
+
+            if (!"GET".equalsIgnoreCase(method)) {
+                HttpUtils.sendErrorResponse(exchange, 405, "Method not allowed");
+                return;
+            }
+            if (path.equals(base) || path.equals(base + "/")) {
+                HttpUtils.sendJsonResponse(exchange, 200,
+                    dao.getScheduledEvents(user.getUserId()).toString());
+                return;
+            }
+            String remainder = path.startsWith(base) ? path.substring(base.length()) : "";
+            if (!remainder.matches("/\\d+(/marks)?")) {
+                HttpUtils.sendErrorResponse(exchange, 404, "Endpoint not found");
+                return;
+            }
+            String[] parts = remainder.substring(1).split("/");
+            long eventId = Long.parseLong(parts[0]);
+            JSONObject event = dao.getAssignedEvent(eventId, user.getUserId());
+            if (event == null) {
+                HttpUtils.sendErrorResponse(exchange, 404, "Assigned event not found");
+                return;
+            }
+            if (parts.length == 2) {
+                HttpUtils.sendJsonResponse(exchange, 200,
+                    dao.getEventMarks(eventId, user.getUserId()).toString());
+            } else {
+                HttpUtils.sendJsonResponse(exchange, 200, event.toString());
+            }
+        } catch (AuthException e) {
+            HttpUtils.sendErrorResponse(exchange, e.getStatusCode(), e.getMessage());
+        } catch (AlumniSlotBookingDAO.BookingConflictException e) {
+            HttpUtils.sendErrorResponse(exchange, 409, e.getMessage());
+        } catch (NumberFormatException e) {
+            HttpUtils.sendErrorResponse(exchange, 400, "Invalid ID or numeric value.");
+        } catch (IllegalArgumentException e) {
+            HttpUtils.sendErrorResponse(exchange, 400, e.getMessage());
+        } catch (SQLException e) {
+            if ("23000".equals(e.getSQLState())) {
+                HttpUtils.sendErrorResponse(exchange, 409, "A conflicting or duplicate record exists.");
+            } else {
+                HttpUtils.sendErrorResponse(exchange, 500, "Database operation failed.");
+            }
+        } catch (Exception e) {
+            HttpUtils.sendErrorResponse(exchange, 400, "Invalid request.");
+        }
+    }
+}
+
+}

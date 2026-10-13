@@ -47,7 +47,7 @@ public class MentorshipRequestTest {
     public static void setup() throws Exception {
         registrationDAO = new RegistrationDAO();
         requestDAO = new MentorshipRequestDAO();
-        mentorshipService = new MentorshipService(requestDAO, registrationDAO);
+        mentorshipService = new MentorshipService(requestDAO);
 
         // 1. Student 1
         User u1 = new User();

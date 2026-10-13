@@ -15,8 +15,14 @@ public class HttpUtils {
 
     public static void addCorsHeaders(HttpExchange exchange) {
         exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
-        exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+        exchange.getResponseHeaders().set(
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+        );
+        exchange.getResponseHeaders().set(
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization, X-Requested-With"
+        );
     }
 
     public static String readRequestBody(HttpExchange exchange) throws IOException {
@@ -35,11 +41,17 @@ public class HttpUtils {
             int idx = pair.indexOf("=");
             try {
                 if (idx > 0) {
-                    String key = URLDecoder.decode(pair.substring(0, idx), StandardCharsets.UTF_8);
-                    String val = URLDecoder.decode(pair.substring(idx + 1), StandardCharsets.UTF_8);
+                    String key = URLDecoder.decode(
+                        pair.substring(0, idx), StandardCharsets.UTF_8
+                    );
+                    String val = URLDecoder.decode(
+                        pair.substring(idx + 1), StandardCharsets.UTF_8
+                    );
                     params.put(key, val);
                 } else if (idx < 0 && !pair.isEmpty()) {
-                    String key = URLDecoder.decode(pair, StandardCharsets.UTF_8);
+                    String key = URLDecoder.decode(
+                        pair, StandardCharsets.UTF_8
+                    );
                     params.put(key, "");
                 }
             } catch (Exception ignored) {}
@@ -51,7 +63,9 @@ public class HttpUtils {
         String body = readRequestBody(exchange);
         String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
 
-        if (contentType != null && contentType.toLowerCase().contains("application/x-www-form-urlencoded")) {
+        if (contentType != null
+                && contentType.toLowerCase().contains(
+                    "application/x-www-form-urlencoded")) {
             return parseUrlEncodedForm(body);
         }
 
@@ -60,7 +74,7 @@ public class HttpUtils {
             return new JSONObject(trimmed);
         }
 
-        // Try url-encoded fallback if string has '='
+        // Try URL-encoded fallback if the string contains '='
         if (trimmed.contains("=")) {
             return parseUrlEncodedForm(trimmed);
         }
@@ -77,8 +91,12 @@ public class HttpUtils {
             int idx = pair.indexOf("=");
             try {
                 if (idx > 0) {
-                    String key = URLDecoder.decode(pair.substring(0, idx), StandardCharsets.UTF_8);
-                    String val = URLDecoder.decode(pair.substring(idx + 1), StandardCharsets.UTF_8);
+                    String key = URLDecoder.decode(
+                        pair.substring(0, idx), StandardCharsets.UTF_8
+                    );
+                    String val = URLDecoder.decode(
+                        pair.substring(idx + 1), StandardCharsets.UTF_8
+                    );
                     json.put(key, val);
                 }
             } catch (Exception ignored) {}
@@ -86,16 +104,22 @@ public class HttpUtils {
         return json;
     }
 
-    public static void sendJsonResponse(HttpExchange exchange, int statusCode, String responseText) throws IOException {
+    public static void sendJsonResponse(
+            HttpExchange exchange, int statusCode, String responseText)
+            throws IOException {
         byte[] bytes = responseText.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
+        exchange.getResponseHeaders().set(
+            "Content-Type", "application/json; charset=utf-8"
+        );
         exchange.sendResponseHeaders(statusCode, bytes.length);
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(bytes);
         }
     }
 
-    public static void sendErrorResponse(HttpExchange exchange, int statusCode, String message) throws IOException {
+    public static void sendErrorResponse(
+            HttpExchange exchange, int statusCode, String message)
+            throws IOException {
         JSONObject json = new JSONObject();
         json.put("success", false);
         json.put("message", message);
