@@ -2,7 +2,6 @@ package com.alumni.service;
 
 import com.alumni.config.DBConnection;
 import com.alumni.dao.MentorshipRequestDAO;
-import com.alumni.dao.RegistrationDAO;
 import com.alumni.model.MentorshipRequest;
 import com.alumni.validation.InputValidator;
 import com.alumni.validation.ValidationResult;
@@ -17,17 +16,17 @@ import java.util.List;
 
 public class MentorshipService {
 
+    
     private final MentorshipRequestDAO requestDAO;
-    private final RegistrationDAO registrationDAO;
 
     public MentorshipService() {
-        this(new MentorshipRequestDAO(), new RegistrationDAO());
+        this(new MentorshipRequestDAO());
     }
 
-    public MentorshipService(MentorshipRequestDAO requestDAO, RegistrationDAO registrationDAO) {
+    public MentorshipService(MentorshipRequestDAO requestDAO) {
         this.requestDAO = requestDAO;
-        this.registrationDAO = registrationDAO;
-    }
+    }   
+
 
     public static class ProcessResult {
         private final int status;

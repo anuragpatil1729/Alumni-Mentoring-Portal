@@ -143,12 +143,31 @@ const ApiClient = {
   },
 
   /**
+   * Helper to get Authorization header from stored session.
+   */
+  getAuthHeader() {
+    try {
+      const stored = localStorage.getItem("alumniConnectUser");
+      if (stored) {
+        const u = JSON.parse(stored);
+        if (u && u.token) {
+          return { "Authorization": `Bearer ${u.token}` };
+        }
+      }
+    } catch (e) {}
+    return {};
+  },
+
+  /**
    * Retrieves full profile of current authenticated user.
    */
   async getProfile(userId) {
     const response = await fetch(`${API_BASE_URL}/api/profile?id=${userId}`, {
       method: "GET",
-      headers: { "Accept": "application/json" }
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
     });
 
     const data = await response.json().catch(() => ({}));
@@ -167,7 +186,8 @@ const ApiClient = {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "Accept": "application/json"
+        "Accept": "application/json",
+        ...this.getAuthHeader()
       },
       body: JSON.stringify(payload)
     });
@@ -230,7 +250,8 @@ const ApiClient = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Accept": "application/json"
+        "Accept": "application/json",
+        ...this.getAuthHeader()
       },
       body: JSON.stringify(payload)
     });
@@ -249,7 +270,10 @@ const ApiClient = {
   async getRequestsByStudent(studentId) {
     const response = await fetch(`${API_BASE_URL}/api/requests?studentId=${studentId}`, {
       method: "GET",
-      headers: { "Accept": "application/json" }
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
     });
 
     const data = await response.json().catch(() => ({}));
@@ -266,7 +290,10 @@ const ApiClient = {
   async getRequestsByMentor(mentorId) {
     const response = await fetch(`${API_BASE_URL}/api/requests?mentorId=${mentorId}`, {
       method: "GET",
-      headers: { "Accept": "application/json" }
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
     });
 
     const data = await response.json().catch(() => ({}));
@@ -285,7 +312,54 @@ const ApiClient = {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "Accept": "application/json"
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json().catch(() => ({}));
+    return {
+      status: response.status,
+      ok: response.ok,
+      data
+    };
+  },
+
+  /**
+   * Retrieves session history with algorithmic sorting (Team C)
+   */
+  async getSessionHistory(params = {}) {
+    const urlParams = new URLSearchParams();
+    if (params.sort) urlParams.append("sort", params.sort);
+    if (params.order) urlParams.append("order", params.order);
+
+    const response = await fetch(`${API_BASE_URL}/api/session-history?${urlParams.toString()}`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+
+    const data = await response.json().catch(() => ({}));
+    return {
+      status: response.status,
+      ok: response.ok,
+      data
+    };
+  },
+
+  /**
+   * Schedules a confirmed 1-on-1 session (Team 1)
+   */
+  async scheduleSession(payload) {
+    const response = await fetch(`${API_BASE_URL}/api/sessions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
       },
       body: JSON.stringify(payload)
     });

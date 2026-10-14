@@ -248,6 +248,8 @@ public class ProfileTest {
         URL url = URI.create("http://127.0.0.1:" + httpPort + "/api/profile?id=" + studentUserId).toURL();
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
+        String token = new com.alumni.security.AuthService().createToken(studentUserId);
+        conn.setRequestProperty("Authorization", "Bearer " + token);
         Assertions.assertEquals(200, conn.getResponseCode());
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
@@ -268,6 +270,8 @@ public class ProfileTest {
         conn.setRequestMethod("PUT");
         conn.setDoOutput(true);
         conn.setRequestProperty("Content-Type", "application/json");
+        String token = new com.alumni.security.AuthService().createToken(alumniUserId);
+        conn.setRequestProperty("Authorization", "Bearer " + token);
 
         String uniqueMobile = "9" + String.format("%09d", Math.abs(new Random().nextInt(1_000_000_000)));
         JSONObject payload = new JSONObject();
@@ -306,6 +310,8 @@ public class ProfileTest {
         URL url = URI.create("http://127.0.0.1:" + httpPort + "/api/profile?id=9999999").toURL();
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
+        String adminToken = new com.alumni.security.AuthService().createToken(1L);
+        conn.setRequestProperty("Authorization", "Bearer " + adminToken);
         Assertions.assertEquals(404, conn.getResponseCode());
     }
 
@@ -339,6 +345,8 @@ public class ProfileTest {
         upConn.setRequestMethod("POST");
         upConn.setDoOutput(true);
         upConn.setRequestProperty("Content-Type", "application/json");
+        String token = new com.alumni.security.AuthService().createToken(alumniUserId);
+        upConn.setRequestProperty("Authorization", "Bearer " + token);
 
         JSONObject uploadBody = new JSONObject();
         uploadBody.put("userId", alumniUserId);
@@ -367,6 +375,8 @@ public class ProfileTest {
         URL delUrl = URI.create("http://127.0.0.1:" + httpPort + "/api/users/avatar?userId=" + alumniUserId).toURL();
         HttpURLConnection delConn = (HttpURLConnection) delUrl.openConnection();
         delConn.setRequestMethod("DELETE");
+        String token = new com.alumni.security.AuthService().createToken(alumniUserId);
+        delConn.setRequestProperty("Authorization", "Bearer " + token);
         Assertions.assertEquals(200, delConn.getResponseCode());
 
         // Next GET should return 404

@@ -47,7 +47,7 @@ public class MentorshipRequestTest {
     public static void setup() throws Exception {
         registrationDAO = new RegistrationDAO();
         requestDAO = new MentorshipRequestDAO();
-        mentorshipService = new MentorshipService(requestDAO, registrationDAO);
+        mentorshipService = new MentorshipService(requestDAO);
 
         // 1. Student 1
         User u1 = new User();
@@ -504,6 +504,9 @@ public class MentorshipRequestTest {
         conn.setDoOutput(true);
         conn.setRequestProperty("Content-Type", "application/json");
 
+        String studentToken = new com.alumni.security.AuthService().createToken(studentId2);
+        conn.setRequestProperty("Authorization", "Bearer " + studentToken);
+
         JSONObject payload = new JSONObject();
         payload.put("studentId", studentId2);
         payload.put("mentorId", mentorId1);
@@ -532,9 +535,11 @@ public class MentorshipRequestTest {
     @Test
     @Order(22)
     public void testHttpGetRequestsEndpoint() throws Exception {
+        String studentToken = new com.alumni.security.AuthService().createToken(studentId2);
         URL url = URI.create("http://127.0.0.1:" + httpPort + "/api/requests?studentId=" + studentId2).toURL();
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
+        conn.setRequestProperty("Authorization", "Bearer " + studentToken);
 
         Assertions.assertEquals(200, conn.getResponseCode());
 
@@ -559,11 +564,13 @@ public class MentorshipRequestTest {
         Assertions.assertFalse(list.isEmpty());
         long reqId = list.get(0).getId();
 
+        String mentorToken = new com.alumni.security.AuthService().createToken(mentorId1);
         URL url = URI.create("http://127.0.0.1:" + httpPort + "/api/requests?id=" + reqId).toURL();
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("PUT");
         conn.setDoOutput(true);
         conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Authorization", "Bearer " + mentorToken);
 
         JSONObject payload = new JSONObject();
         payload.put("mentorId", mentorId1);

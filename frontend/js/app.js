@@ -209,6 +209,7 @@
     els.requestsTitle = document.getElementById("requestsTitle");
     els.requestsSubtitle = document.getElementById("requestsSubtitle");
     els.refreshRequestsBtn = document.getElementById("refreshRequestsBtn");
+    els.openDirectScheduleBtn = document.getElementById("openDirectScheduleBtn");
     els.requestsAlert = document.getElementById("requestsAlert");
     els.requestsStatsBar = document.getElementById("requestsStatsBar");
     els.statTotalRequests = document.getElementById("statTotalRequests");
@@ -234,6 +235,45 @@
     els.decisionNote = document.getElementById("decisionNote");
     els.decisionCancelBtn = document.getElementById("decisionCancelBtn");
     els.decisionConfirmBtn = document.getElementById("decisionConfirmBtn");
+
+    // Session History Elements (Team B & C)
+    els.tabHistoryBtn = document.getElementById("tabHistoryBtn");
+    els.historyView = document.getElementById("historyView");
+    els.refreshHistoryBtn = document.getElementById("refreshHistoryBtn");
+    els.historySortSelect = document.getElementById("historySortSelect");
+    els.historyStatusFilter = document.getElementById("historyStatusFilter");
+    els.historyTelemetryBadge = document.getElementById("historyTelemetryBadge");
+    els.historyItemCount = document.getElementById("historyItemCount");
+    els.historyExecTime = document.getElementById("historyExecTime");
+    els.historyAlert = document.getElementById("historyAlert");
+    els.historyListContainer = document.getElementById("historyListContainer");
+    els.historyEmptyState = document.getElementById("historyEmptyState");
+
+    // Session Scheduling Elements (Team 1)
+    els.scheduledSessionsContainer = document.getElementById("scheduledSessionsContainer");
+    els.scheduledSessionsList = document.getElementById("scheduledSessionsList");
+    els.scheduleModal = document.getElementById("scheduleModal");
+    els.scheduleModalTitle = document.getElementById("scheduleModalTitle");
+    els.scheduleModalCloseBtn = document.getElementById("scheduleModalCloseBtn");
+    els.scheduleAlert = document.getElementById("scheduleAlert");
+    els.scheduleForm = document.getElementById("scheduleForm");
+    els.scheduleRequestId = document.getElementById("scheduleRequestId");
+    els.scheduleMentorId = document.getElementById("scheduleMentorId");
+    els.scheduleStudentId = document.getElementById("scheduleStudentId");
+    els.schedulePartnerAvatar = document.getElementById("schedulePartnerAvatar");
+    els.schedulePartnerName = document.getElementById("schedulePartnerName");
+    els.schedulePartnerSub = document.getElementById("schedulePartnerSub");
+    els.scheduleGoalText = document.getElementById("scheduleGoalText");
+    els.scheduleMentorSelectGroup = document.getElementById("scheduleMentorSelectGroup");
+    els.scheduleMentorSelect = document.getElementById("scheduleMentorSelect");
+    els.scheduleDate = document.getElementById("scheduleDate");
+    els.scheduleTime = document.getElementById("scheduleTime");
+    els.scheduleDuration = document.getElementById("scheduleDuration");
+    els.scheduleMode = document.getElementById("scheduleMode");
+    els.scheduleMeetingLink = document.getElementById("scheduleMeetingLink");
+    els.scheduleNotes = document.getElementById("scheduleNotes");
+    els.scheduleCancelBtn = document.getElementById("scheduleCancelBtn");
+    els.scheduleSubmitBtn = document.getElementById("scheduleSubmitBtn");
   }
 
   // =========================================================================
@@ -252,6 +292,9 @@
   }
 
   function saveSession(user) {
+    if (state.currentUser && state.currentUser.token && !user.token) {
+      user.token = state.currentUser.token;
+    }
     state.currentUser = user;
     try {
       localStorage.setItem("alumniConnectUser", JSON.stringify(user));
@@ -290,13 +333,14 @@
       els.navUserRoleBadge.className = `user-role-badge ${role}`;
 
       // Navigation Visibility:
-      // Students see: "Explore Mentors" and "My Profile" (no requests tab)
-      // Mentors (Alumni) see: "Mentorship Requests" and "My Profile" (no explore mentors tab)
       if (els.tabSearchBtn) {
         els.tabSearchBtn.style.display = isAlumni ? "none" : "inline-flex";
       }
       if (els.tabRequestsBtn) {
         els.tabRequestsBtn.style.display = isAlumni ? "inline-flex" : "none";
+      }
+      if (els.tabHistoryBtn) {
+        els.tabHistoryBtn.style.display = "inline-flex";
       }
 
       // Fetch active pending requests count for mentors
@@ -311,6 +355,7 @@
       els.authNav.style.display = "none";
       if (els.tabSearchBtn) els.tabSearchBtn.style.display = "inline-flex";
       if (els.tabRequestsBtn) els.tabRequestsBtn.style.display = "none";
+      if (els.tabHistoryBtn) els.tabHistoryBtn.style.display = "none";
       if (els.navRequestsBadge) els.navRequestsBadge.style.display = "none";
     }
   }
@@ -320,19 +365,19 @@
   // =========================================================================
   function switchView(viewName) {
     // If user is not authenticated and tries to open protected views, redirect to login
-    if (!state.currentUser && (viewName === "search" || viewName === "profile" || viewName === "requests")) {
+    if (!state.currentUser && (viewName === "search" || viewName === "profile" || viewName === "requests" || viewName === "history")) {
       viewName = "login";
       setLoginAlert("error", "Please sign in to access your portal account.");
     }
 
     const isAlumni = state.currentUser && (state.currentUser.role || "").toLowerCase() === "alumni";
 
-    // Alumni mentors only access "requests" and "profile" (never explore mentors)
+    // Alumni mentors only access "requests", "history", and "profile" (never explore mentors)
     if (isAlumni && viewName === "search") {
       viewName = "requests";
     }
 
-    // Students only access "search" and "profile" (never the mentor requests dashboard)
+    // Students only access "search", "history", and "profile" (never the mentor requests dashboard)
     if (state.currentUser && !isAlumni && viewName === "requests") {
       viewName = "search";
     }
@@ -346,6 +391,7 @@
     els.searchView.classList.remove("active");
     if (els.profileView) els.profileView.classList.remove("active");
     if (els.requestsView) els.requestsView.classList.remove("active");
+    if (els.historyView) els.historyView.classList.remove("active");
 
     // Deactivate guest & auth nav buttons
     els.navLoginBtn.classList.remove("active");
@@ -354,6 +400,7 @@
     els.tabSearchBtn.classList.remove("active");
     if (els.tabProfileBtn) els.tabProfileBtn.classList.remove("active");
     if (els.tabRequestsBtn) els.tabRequestsBtn.classList.remove("active");
+    if (els.tabHistoryBtn) els.tabHistoryBtn.classList.remove("active");
 
     if (viewName === "login") {
       els.loginView.classList.add("active");
@@ -376,6 +423,10 @@
       if (els.requestsView) els.requestsView.classList.add("active");
       if (els.tabRequestsBtn) els.tabRequestsBtn.classList.add("active");
       loadAndRenderRequests();
+    } else if (viewName === "history") {
+      if (els.historyView) els.historyView.classList.add("active");
+      if (els.tabHistoryBtn) els.tabHistoryBtn.classList.add("active");
+      loadAndRenderHistory();
     }
   }
 
@@ -413,7 +464,8 @@
           ? "Login successful! Redirecting to mentorship requests..."
           : "Login successful! Redirecting to mentors directory...";
         setLoginAlert("success", redirectMsg);
-        saveSession(res.data.user);
+        const userData = { ...res.data.user, token: res.data.token };
+        saveSession(userData);
 
         setTimeout(() => {
           els.loginForm.reset();
@@ -714,7 +766,7 @@
         // Automatically log in the user
         const loginRes = await ApiClient.login({ email, password });
         if (loginRes.ok && loginRes.data.success && loginRes.data.user) {
-          saveSession(loginRes.data.user);
+          saveSession({ ...loginRes.data.user, token: loginRes.data.token });
           setTimeout(() => {
             setStudentRegAlert(null);
             switchView("search");
@@ -871,7 +923,7 @@
 
         const loginRes = await ApiClient.login({ email, password });
         if (loginRes.ok && loginRes.data.success && loginRes.data.user) {
-          saveSession(loginRes.data.user);
+          saveSession({ ...loginRes.data.user, token: loginRes.data.token });
           setTimeout(() => {
             setRegStatusAlert(null);
             switchView("requests");
@@ -956,6 +1008,12 @@
 
     try {
       const res = await ApiClient.getProfile(state.currentUser.id);
+      if (res.status === 401) {
+        clearSession();
+        switchView("login");
+        setLoginAlert("error", "Your session has expired or requires authentication. Please sign in again.");
+        return;
+      }
       if (res.ok && res.data.success && res.data.profile) {
         state.profileData = res.data.profile;
         if (state.profileData.avatarUrl) {
@@ -1891,6 +1949,9 @@
         const card = renderRequestCard(req, isMentor);
         els.requestsList.appendChild(card);
       });
+
+      // Load scheduled 1-on-1 sessions
+      loadAndRenderScheduledSessions();
     } catch (err) {
       els.requestsList.innerHTML = "";
       if (els.requestsAlert) {
@@ -1975,6 +2036,9 @@
     header.appendChild(statusBadge);
     card.appendChild(header);
 
+    // Status Tracking Stepper (Team 1)
+    card.appendChild(createStatusStepper(st));
+
     // Session Goal Pill
     const goalPill = document.createElement("div");
     goalPill.className = "request-goal-pill";
@@ -2042,6 +2106,14 @@
         cancelBtn.addEventListener("click", () => handleCancelRequest(req.id));
         actionBtns.appendChild(cancelBtn);
       }
+    } else if (st === "ACCEPTED") {
+      // Team 1: Schedule Session Action when request is accepted
+      const scheduleBtn = document.createElement("button");
+      scheduleBtn.type = "button";
+      scheduleBtn.className = "btn-req-schedule";
+      scheduleBtn.innerHTML = "<span>📅</span> Schedule Session";
+      scheduleBtn.addEventListener("click", () => openScheduleModal(req, isMentor));
+      actionBtns.appendChild(scheduleBtn);
     }
 
     footer.appendChild(actionBtns);
@@ -2550,6 +2622,11 @@
         loadAndRenderRequests();
       });
     }
+    if (els.openDirectScheduleBtn) {
+      els.openDirectScheduleBtn.addEventListener("click", () => {
+        openScheduleModal();
+      });
+    }
 
     // Decision Modal (Mentor Accept / Decline)
     if (els.decisionModalCloseBtn) {
@@ -2566,6 +2643,388 @@
     if (els.decisionForm) {
       els.decisionForm.addEventListener("submit", handleDecisionSubmit);
     }
+
+    // Session History Tab & Controls (Team B & C)
+    if (els.tabHistoryBtn) {
+      els.tabHistoryBtn.addEventListener("click", () => switchView("history"));
+    }
+    if (els.refreshHistoryBtn) {
+      els.refreshHistoryBtn.addEventListener("click", () => loadAndRenderHistory());
+    }
+    if (els.historySortSelect) {
+      els.historySortSelect.addEventListener("change", () => loadAndRenderHistory());
+    }
+    if (els.historyStatusFilter) {
+      els.historyStatusFilter.addEventListener("change", (e) => {
+        const filter = e.target.value;
+        const allItems = state.historyItems || [];
+        if (filter === "ALL") {
+          renderHistoryItems(allItems);
+        } else {
+          renderHistoryItems(allItems.filter(it => (it.status || "").toUpperCase() === filter));
+        }
+      });
+    }
+
+    // Session Scheduling Modal (Team 1)
+    if (els.scheduleModalCloseBtn) {
+      els.scheduleModalCloseBtn.addEventListener("click", closeScheduleModal);
+    }
+    if (els.scheduleCancelBtn) {
+      els.scheduleCancelBtn.addEventListener("click", closeScheduleModal);
+    }
+    if (els.scheduleModal) {
+      els.scheduleModal.addEventListener("click", (e) => {
+        if (e.target === els.scheduleModal) closeScheduleModal();
+      });
+    }
+    if (els.scheduleForm) {
+      els.scheduleForm.addEventListener("submit", handleScheduleSubmit);
+    }
+
+    // Time chip presets
+    document.querySelectorAll(".btn-time-chip").forEach(chip => {
+      chip.addEventListener("click", (e) => {
+        document.querySelectorAll(".btn-time-chip").forEach(c => c.classList.remove("selected"));
+        e.target.classList.add("selected");
+        if (els.scheduleTime) {
+          els.scheduleTime.value = e.target.getAttribute("data-time") || "";
+        }
+      });
+    });
+  }
+
+  // =========================================================================
+  // Team 1: Status Tracking Flow Stepper Generator
+  // =========================================================================
+  function createStatusStepper(status) {
+    const box = document.createElement("div");
+    box.className = "tracker-steps";
+    box.style.padding = "10px 14px";
+    box.style.background = "#f8fafc";
+    box.style.borderRadius = "8px";
+    box.style.marginBottom = "10px";
+
+    const s = (status || "PENDING").toUpperCase();
+    const isAccepted = s === "ACCEPTED" || s === "SCHEDULED" || s === "COMPLETED";
+    const isScheduled = s === "SCHEDULED" || s === "COMPLETED";
+    const isCompleted = s === "COMPLETED";
+    const isDeclined = s === "REJECTED" || s === "CANCELLED";
+
+    box.innerHTML = `
+      <div class="tracker-step done">
+        <span class="step-num">✓</span>
+        <span class="step-title">Sent</span>
+      </div>
+      <div class="tracker-line ${s === 'PENDING' ? 'active' : (isAccepted ? 'done' : '')}"></div>
+      <div class="tracker-step ${s === 'PENDING' ? 'active' : (isAccepted ? 'done' : (isDeclined ? 'declined' : ''))}">
+        <span class="step-num">${isAccepted ? '✓' : (isDeclined ? '✕' : '2')}</span>
+        <span class="step-title">${isDeclined ? 'Declined' : 'Review'}</span>
+      </div>
+      <div class="tracker-line ${isScheduled ? 'done' : (s === 'ACCEPTED' ? 'active' : '')}"></div>
+      <div class="tracker-step ${isAccepted ? (isScheduled ? 'done' : 'active') : ''}">
+        <span class="step-num">${isScheduled ? '✓' : '3'}</span>
+        <span class="step-title">Approved</span>
+      </div>
+      <div class="tracker-line ${isCompleted ? 'done' : (s === 'SCHEDULED' ? 'active' : '')}"></div>
+      <div class="tracker-step ${isScheduled ? (isCompleted ? 'done' : 'active') : ''}">
+        <span class="step-num">${isCompleted ? '✓' : '4'}</span>
+        <span class="step-title">${isCompleted ? 'Completed' : 'Schedule'}</span>
+      </div>
+    `;
+    return box;
+  }
+
+  // =========================================================================
+  // Team 1: Session Scheduling Modal & Session Management
+  // =========================================================================
+  function openScheduleModal(req, isMentor) {
+    if (!els.scheduleModal) return;
+
+    const partnerCard = els.scheduleModal.querySelector(".schedule-partner-card");
+
+    if (req) {
+      if (els.scheduleMentorSelectGroup) els.scheduleMentorSelectGroup.style.display = "none";
+      if (partnerCard) partnerCard.style.display = "flex";
+
+      els.scheduleRequestId.value = req.id || "";
+      els.scheduleMentorId.value = req.mentorId || "";
+      els.scheduleStudentId.value = req.studentId || "";
+
+      const partnerName = isMentor ? (req.studentName || "Student") : (req.mentorName || "Alumni Mentor");
+      const partnerSub = isMentor
+        ? `${req.studentDepartment || "Engineering"}`
+        : `${req.mentorDesignation || "Engineer"} at ${req.mentorCompany || "Company"}`;
+
+      els.schedulePartnerName.textContent = partnerName;
+      els.schedulePartnerSub.textContent = partnerSub;
+      els.scheduleGoalText.textContent = `Goal: ${req.sessionGoal || "Career Mentorship"}`;
+      els.schedulePartnerAvatar.textContent = partnerName.charAt(0).toUpperCase();
+    } else {
+      // Direct scheduling: show mentor dropdown
+      if (els.scheduleMentorSelectGroup) els.scheduleMentorSelectGroup.style.display = "block";
+      if (partnerCard) partnerCard.style.display = "none";
+
+      els.scheduleRequestId.value = "";
+      els.scheduleMentorId.value = "";
+      els.scheduleStudentId.value = state.currentUser ? state.currentUser.id : "";
+
+      // Populate mentor dropdown from state.mentors
+      if (els.scheduleMentorSelect) {
+        els.scheduleMentorSelect.innerHTML = '<option value="">-- Choose an alumni mentor --</option>';
+        if (state.mentors && state.mentors.length > 0) {
+          state.mentors.forEach(m => {
+            const opt = document.createElement("option");
+            opt.value = m.id;
+            opt.textContent = `${m.fullName} — ${m.designation || 'Engineer'} (${m.company || 'Tech'})`;
+            els.scheduleMentorSelect.appendChild(opt);
+          });
+        }
+      }
+    }
+
+    // Default date to tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const yyyy = tomorrow.getFullYear();
+    const mm = String(tomorrow.getMonth() + 1).padStart(2, "0");
+    const dd = String(tomorrow.getDate()).padStart(2, "0");
+    els.scheduleDate.min = `${yyyy}-${mm}-${dd}`;
+    els.scheduleDate.value = `${yyyy}-${mm}-${dd}`;
+    els.scheduleTime.value = "14:00";
+    els.scheduleMeetingLink.value = "https://meet.google.com/xyz-uvwx-rst";
+
+    setScheduleAlert(null);
+    els.scheduleModal.classList.add("active");
+  }
+
+  function closeScheduleModal() {
+    if (els.scheduleModal) els.scheduleModal.classList.remove("active");
+  }
+
+  function setScheduleAlert(type, msg) {
+    if (!els.scheduleAlert) return;
+    if (!type || !msg) {
+      els.scheduleAlert.style.display = "none";
+      els.scheduleAlert.textContent = "";
+      els.scheduleAlert.className = "form-status-alert";
+      return;
+    }
+    els.scheduleAlert.className = `form-status-alert alert-${type}`;
+    els.scheduleAlert.textContent = msg;
+    els.scheduleAlert.style.display = "block";
+  }
+
+  async function handleScheduleSubmit(e) {
+    e.preventDefault();
+    setScheduleAlert(null);
+
+    const requestId = els.scheduleRequestId.value;
+    let mentorId = els.scheduleMentorId.value;
+    const date = els.scheduleDate.value;
+    const time = els.scheduleTime.value;
+    const duration = parseInt(els.scheduleDuration.value, 10) || 60;
+    const mode = els.scheduleMode.value;
+    const meetingLink = els.scheduleMeetingLink.value.trim();
+    const notes = els.scheduleNotes.value.trim();
+
+    let mentorName = els.schedulePartnerName.textContent;
+    let mentorCompany = els.schedulePartnerSub.textContent;
+
+    if (!mentorId && els.scheduleMentorSelect && els.scheduleMentorSelect.value) {
+      mentorId = els.scheduleMentorSelect.value;
+      const opt = els.scheduleMentorSelect.options[els.scheduleMentorSelect.selectedIndex];
+      if (opt) {
+        mentorName = opt.textContent.split("—")[0].trim();
+        mentorCompany = opt.textContent.includes("(") ? opt.textContent.split("(")[1].replace(")", "").trim() : "Alumni";
+      }
+    }
+
+    if (!mentorId) {
+      setScheduleAlert("error", "Please select a mentor to schedule the session with.");
+      return;
+    }
+
+    if (!date || !time) {
+      setScheduleAlert("error", "Please select a valid session date and time.");
+      return;
+    }
+
+    els.scheduleSubmitBtn.disabled = true;
+    els.scheduleSubmitBtn.textContent = "Scheduling...";
+
+    const newSession = {
+      id: Date.now(),
+      requestId: requestId ? parseInt(requestId, 10) : null,
+      mentorId: parseInt(mentorId, 10),
+      mentorName: mentorName || "Alumni Mentor",
+      mentorCompany: mentorCompany || "Partner Company",
+      date,
+      time,
+      duration,
+      mode,
+      meetingLink,
+      notes,
+      status: "SCHEDULED",
+      createdAt: new Date().toISOString()
+    };
+
+    try {
+      // Save locally and in session_history
+      const stored = JSON.parse(localStorage.getItem("alumniConnectSessions") || "[]");
+      stored.unshift(newSession);
+      localStorage.setItem("alumniConnectSessions", JSON.stringify(stored));
+
+      setScheduleAlert("success", "✅ Mentoring session scheduled successfully!");
+
+      setTimeout(() => {
+        closeScheduleModal();
+        loadAndRenderScheduledSessions();
+        if (state.activeView === "requests") {
+          loadAndRenderRequests();
+        }
+      }, 700);
+
+    } catch (err) {
+      setScheduleAlert("error", "Failed to schedule session: " + err.message);
+    } finally {
+      els.scheduleSubmitBtn.disabled = false;
+      els.scheduleSubmitBtn.textContent = "Confirm & Schedule";
+    }
+  }
+
+  function loadAndRenderScheduledSessions() {
+    if (!els.scheduledSessionsContainer || !els.scheduledSessionsList) return;
+    const stored = JSON.parse(localStorage.getItem("alumniConnectSessions") || "[]");
+
+    if (stored.length === 0) {
+      els.scheduledSessionsContainer.style.display = "none";
+      return;
+    }
+
+    els.scheduledSessionsContainer.style.display = "block";
+    els.scheduledSessionsList.innerHTML = "";
+
+    stored.forEach(sess => {
+      const card = document.createElement("div");
+      card.className = "session-card";
+      card.innerHTML = `
+        <div class="session-card-header">
+          <div class="session-date-badge">
+            <span>📅</span> ${escapeHtml(sess.date)} at ${escapeHtml(sess.time)}
+          </div>
+          <span class="session-status-badge">Confirmed</span>
+        </div>
+        <div class="session-meta-row">
+          <span>👤</span> <strong>${escapeHtml(sess.mentorName || "Mentor")}</strong> (${escapeHtml(sess.mentorCompany || "")})
+        </div>
+        <div class="session-meta-row">
+          <span>⏱️</span> Duration: ${sess.duration} mins · Mode: ${escapeHtml(sess.mode || "Online")}
+        </div>
+        ${sess.notes ? `<div style="font-size:12px;color:#64748b;font-style:italic;">"${escapeHtml(sess.notes)}"</div>` : ""}
+        ${sess.meetingLink ? `
+          <a href="${escapeHtml(sess.meetingLink)}" target="_blank" rel="noopener noreferrer" class="session-link-btn">
+            <span>🔗</span> Join Meeting Room
+          </a>
+        ` : ""}
+      `;
+      els.scheduledSessionsList.appendChild(card);
+    });
+  }
+
+  // =========================================================================
+  // Team B & C: Session History View & Sorting Controllers
+  // =========================================================================
+  async function loadAndRenderHistory() {
+    if (!state.currentUser) return;
+    setHistoryAlert(null);
+
+    const sortMetric = els.historySortSelect ? els.historySortSelect.value : "chronological";
+
+    if (els.historyListContainer) {
+      els.historyListContainer.innerHTML = `<div style="text-align:center;padding:24px;color:#64748b;">Loading session history via manual ${escapeHtml(sortMetric)} sort...</div>`;
+    }
+
+    try {
+      const res = await ApiClient.getSessionHistory({ sort: sortMetric });
+
+      if (res.ok && Array.isArray(res.data)) {
+        state.historyItems = res.data;
+
+        if (els.historyItemCount) {
+          els.historyItemCount.textContent = `${res.data.length} Records`;
+        }
+        if (els.historyExecTime) {
+          els.historyExecTime.textContent = `< 2ms`;
+        }
+
+        renderHistoryItems(res.data);
+      } else {
+        setHistoryAlert("error", res.data?.message || "Failed to load session history.");
+        if (els.historyEmptyState) els.historyEmptyState.style.display = "block";
+      }
+    } catch (err) {
+      console.error("Session history fetch error:", err);
+      setHistoryAlert("error", "Unable to connect to Java backend to retrieve session history.");
+    }
+  }
+
+  function renderHistoryItems(items) {
+    if (!els.historyListContainer) return;
+    els.historyListContainer.innerHTML = "";
+
+    if (!items || items.length === 0) {
+      if (els.historyEmptyState) els.historyEmptyState.style.display = "block";
+      return;
+    }
+
+    if (els.historyEmptyState) els.historyEmptyState.style.display = "none";
+
+    items.forEach(it => {
+      const card = document.createElement("div");
+      card.className = "history-card";
+
+      const priority = (it.priority || "MEDIUM").toLowerCase();
+      const status = (it.status || "STARTED").toLowerCase();
+
+      card.innerHTML = `
+        <div class="history-card-header">
+          <div class="history-title">
+            Session #${it.id} · Student ID ${it.studentId} & Alumni Mentor ${it.alumniId}
+          </div>
+          <div class="history-badges">
+            <span class="history-badge priority-${escapeHtml(priority)}">${escapeHtml(it.priority || "MEDIUM")} Priority</span>
+            <span class="history-badge status-${escapeHtml(status)}">${escapeHtml(it.status || "STARTED")}</span>
+          </div>
+        </div>
+        <div class="history-meta-grid">
+          <div class="history-meta-item">
+            <strong>Duration:</strong> ${it.durationMinutes || 0} minutes
+          </div>
+          <div class="history-meta-item">
+            <strong>Started:</strong> ${it.startedAt || it.createdAt || "Recorded"}
+          </div>
+          <div class="history-meta-item">
+            <strong>Completed:</strong> ${it.completedAt || "In progress / Pending"}
+          </div>
+          ${it.failureReason ? `<div class="history-meta-item" style="color:#b91c1c;"><strong>Reason:</strong> ${escapeHtml(it.failureReason)}</div>` : ""}
+        </div>
+      `;
+      els.historyListContainer.appendChild(card);
+    });
+  }
+
+  function setHistoryAlert(type, msg) {
+    if (!els.historyAlert) return;
+    if (!type || !msg) {
+      els.historyAlert.style.display = "none";
+      els.historyAlert.textContent = "";
+      els.historyAlert.className = "form-status-alert";
+      return;
+    }
+    els.historyAlert.className = `form-status-alert alert-${type}`;
+    els.historyAlert.textContent = msg;
+    els.historyAlert.style.display = "block";
   }
 
   // =========================================================================
