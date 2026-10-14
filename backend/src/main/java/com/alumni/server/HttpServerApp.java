@@ -420,8 +420,9 @@ public class HttpServerApp {
                 return;
             }
 
+            AuthenticatedUser currentUser;
             try {
-                new AuthService().requireRole(exchange, "ADMIN");
+                currentUser = new AuthService().authenticate(exchange);
             } catch (AuthException e) {
                 HttpUtils.sendErrorResponse(exchange, e.getStatusCode(), e.getMessage());
                 return;
@@ -437,6 +438,10 @@ public class HttpServerApp {
             try {
                 JSONObject reg = registrationDAO.findRegistrationByEmail(email);
                 if (reg != null) {
+                    if (!currentUser.hasRole("ADMIN") && reg.optLong("id", -1) != currentUser.getUserId()) {
+                        HttpUtils.sendErrorResponse(exchange, 403, "Access denied: you can only view your own registration");
+                        return;
+                    }
                     JSONObject resp = new JSONObject();
                     resp.put("success", true);
                     resp.put("registration", reg);
@@ -805,24 +810,6 @@ public class HttpServerApp {
                 }
             }
 
-            if ("GET".equals(method) || "HEAD".equals(method)
-                    || "POST".equals(method) || "PUT".equals(method) || "DELETE".equals(method)) {
-                if (userId == null) {
-                    HttpUtils.sendErrorResponse(exchange, 400, "User ID is required.");
-                    return;
-                }
-                try {
-                    AuthenticatedUser current = new AuthService().authenticate(exchange);
-                    if (current.getUserId() != userId && !current.hasRole("ADMIN")) {
-                        HttpUtils.sendErrorResponse(exchange, 403, "You can only manage your own avatar.");
-                        return;
-                    }
-                } catch (AuthException e) {
-                    HttpUtils.sendErrorResponse(exchange, e.getStatusCode(), e.getMessage());
-                    return;
-                }
-            }
-
             if ("GET".equals(method) || "HEAD".equals(method)) {
                 if (userId == null) {
                     HttpUtils.sendErrorResponse(exchange, 400, "User ID is required to fetch avatar.");
@@ -902,6 +889,17 @@ public class HttpServerApp {
                         return;
                     }
 
+                    try {
+                        AuthenticatedUser current = new AuthService().authenticate(exchange);
+                        if (current.getUserId() != userId && !current.hasRole("ADMIN")) {
+                            HttpUtils.sendErrorResponse(exchange, 403, "You can only manage your own avatar.");
+                            return;
+                        }
+                    } catch (AuthException e) {
+                        HttpUtils.sendErrorResponse(exchange, e.getStatusCode(), e.getMessage());
+                        return;
+                    }
+
                     if (imageBytes == null || imageBytes.length == 0) {
                         HttpUtils.sendErrorResponse(exchange, 400, "Image data cannot be empty.");
                         return;
@@ -936,6 +934,17 @@ public class HttpServerApp {
             } else if ("DELETE".equals(method)) {
                 if (userId == null) {
                     HttpUtils.sendErrorResponse(exchange, 400, "User ID is required to remove avatar.");
+                    return;
+                }
+
+                try {
+                    AuthenticatedUser current = new AuthService().authenticate(exchange);
+                    if (current.getUserId() != userId && !current.hasRole("ADMIN")) {
+                        HttpUtils.sendErrorResponse(exchange, 403, "You can only manage your own avatar.");
+                        return;
+                    }
+                } catch (AuthException e) {
+                    HttpUtils.sendErrorResponse(exchange, e.getStatusCode(), e.getMessage());
                     return;
                 }
 
@@ -1681,8 +1690,8 @@ private static class SessionHistoryHandler implements HttpHandler {
         }
         try {
             AuthenticatedUser user = new AuthService().authenticate(exchange);
-            if (!user.hasRole("STUDENT") && !user.hasRole("ADMIN")) {
-                HttpUtils.sendErrorResponse(exchange, 403, "Student or admin role required.");
+            if (!user.hasRole("STUDENT") && !user.hasRole("ADMIN") && !user.hasRole("ALUMNI")) {
+                HttpUtils.sendErrorResponse(exchange, 403, "Student, alumni, or admin role required.");
                 return;
             }
             String path = exchange.getRequestURI().getPath();

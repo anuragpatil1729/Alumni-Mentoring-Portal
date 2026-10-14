@@ -395,8 +395,9 @@ public class ValidationTest {
         HttpResult regRes = sendHttp("POST", "/api/auth/register/alumni", payload.toString(), "application/json");
         Assertions.assertEquals(201, regRes.status);
         long userId = regRes.json.getLong("id");
+        String token = new com.alumni.security.AuthService().createToken(userId);
 
-        HttpResult getRes = sendHttp("GET", "/api/auth/registrations/" + testEmail, null, null);
+        HttpResult getRes = sendHttp("GET", "/api/auth/registrations/" + testEmail, null, null, token);
         Assertions.assertEquals(200, getRes.status);
         Assertions.assertTrue(getRes.json.getBoolean("success"));
         JSONObject regData = getRes.json.getJSONObject("registration");
@@ -640,11 +641,18 @@ public class ValidationTest {
     }
 
     private HttpResult sendHttp(String method, String path, String body, String contentType) throws Exception {
+        return sendHttp(method, path, body, contentType, null);
+    }
+
+    private HttpResult sendHttp(String method, String path, String body, String contentType, String token) throws Exception {
         URL url = URI.create("http://127.0.0.1:" + httpPort + path).toURL();
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod(method);
         conn.setConnectTimeout(3000);
         conn.setReadTimeout(3000);
+        if (token != null && !token.isEmpty()) {
+            conn.setRequestProperty("Authorization", "Bearer " + token);
+        }
 
         if (body != null) {
             conn.setDoOutput(true);

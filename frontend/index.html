@@ -38,6 +38,9 @@
             <span class="tab-icon">📬</span> Received Requests
             <span id="navRequestsBadge" class="nav-counter-badge" style="display:none;">0</span>
           </button>
+          <button type="button" id="tabHistoryBtn" class="nav-tab-btn">
+            <span class="tab-icon">📜</span> Session History
+          </button>
           <button type="button" id="tabProfileBtn" class="nav-tab-btn">
             <span class="tab-icon">👤</span> My Profile
           </button>
@@ -966,6 +969,9 @@
               </div>
             </div>
             <div class="requests-header-actions">
+              <button type="button" id="openDirectScheduleBtn" class="btn-refresh-requests" style="background: var(--primary, #3b82f6); color: #fff; border-color: var(--primary, #3b82f6);">
+                <span>📅</span> Schedule Session
+              </button>
               <button type="button" id="refreshRequestsBtn" class="btn-refresh-requests">
                 <span>🔄</span> Refresh
               </button>
@@ -1004,6 +1010,89 @@
             <div class="empty-icon">📭</div>
             <h3 id="emptyRequestsTitle">No Mentorship Requests</h3>
             <p id="emptyRequestsMsg">You don't have any mentorship requests yet. Browse the directory to connect with mentors!</p>
+          </div>
+
+          <!-- Scheduled Sessions Section (Team 1) -->
+          <div id="scheduledSessionsContainer" class="scheduled-sessions-container" style="display: none;">
+            <div class="scheduled-sessions-header">
+              <div class="scheduled-icon-badge">📅</div>
+              <div>
+                <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0;">Scheduled 1-on-1 Sessions</h2>
+                <p style="font-size: 13px; color: #64748b; margin: 0;">Confirmed mentorship appointments with scheduled time slots and meeting links</p>
+              </div>
+            </div>
+            <div id="scheduledSessionsList" class="scheduled-sessions-grid">
+              <!-- Dynamic Scheduled Session Cards -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- 5. SESSION HISTORY VIEW (TEAM B & TEAM C)                         -->
+      <!-- ================================================================= -->
+      <section id="historyView" class="view-section" style="display: none;">
+        <div class="section-container">
+          <div class="section-header-box">
+            <div class="section-title-wrap">
+              <div class="section-icon-badge">📜</div>
+              <div>
+                <h2>Mentorship Session History</h2>
+                <p>Complete lifecycle tracking with custom algorithmic sorting (chronological, duration, priority, severity)</p>
+              </div>
+            </div>
+            <div class="header-action-group">
+              <button type="button" id="refreshHistoryBtn" class="refresh-btn" title="Refresh session history">
+                🔄 Refresh
+              </button>
+            </div>
+          </div>
+
+          <!-- History Sorting Toolbar (Team D & Team C) -->
+          <div class="history-toolbar-card">
+            <div class="history-toolbar-left">
+              <div class="filter-group">
+                <label for="historySortSelect">Sort Metric (DSA Engine):</label>
+                <select id="historySortSelect" class="form-select-sm">
+                  <option value="chronological">🕒 Chronological (Started Date)</option>
+                  <option value="duration">⏱️ Duration (Minutes)</option>
+                  <option value="priority">⚡ Priority (Urgent &gt; High &gt; Medium &gt; Low)</option>
+                  <option value="severity">🚨 Severity (Failed &gt; Paused &gt; Started &gt; Done)</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="historyStatusFilter">Status Filter:</label>
+                <select id="historyStatusFilter" class="form-select-sm">
+                  <option value="ALL">All Statuses</option>
+                  <option value="STARTED">Started / In Progress</option>
+                  <option value="PAUSED">Paused</option>
+                  <option value="COMPLETED">Completed</option>
+                  <option value="FAILED">Failed</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Algorithm Telemetry Badge (Team D / Team A) -->
+            <div class="history-telemetry-badge" id="historyTelemetryBadge">
+              <span class="telemetry-chip algo-chip">Algorithm: Manual Insertion Sort</span>
+              <span class="telemetry-chip count-chip" id="historyItemCount">0 Records</span>
+              <span class="telemetry-chip time-chip" id="historyExecTime">&lt; 1ms</span>
+            </div>
+          </div>
+
+          <div id="historyAlert" class="form-status-alert" style="display: none;"></div>
+
+          <!-- History Timeline / List Container -->
+          <div id="historyListContainer" class="history-list-grid">
+            <!-- Dynamic session history items injected here -->
+          </div>
+
+          <!-- Empty State -->
+          <div id="historyEmptyState" class="requests-empty" style="display: none;">
+            <div class="empty-icon">📜</div>
+            <h3>No Session History Found</h3>
+            <p>Completed, ongoing, or recorded mentorship sessions will appear here with state transition records.</p>
           </div>
         </div>
       </section>
@@ -1083,6 +1172,128 @@
           <div class="modal-actions">
             <button type="button" id="decisionCancelBtn" class="modal-cancel-btn">Cancel</button>
             <button type="submit" id="decisionConfirmBtn" class="modal-submit-btn">Confirm</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Session Scheduling Modal (Team 1: Select Mentor, Select Date & Time) -->
+    <div id="scheduleModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="scheduleModalTitle">
+      <div class="modal-content schedule-modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2 id="scheduleModalTitle">📅 Schedule Mentorship Session</h2>
+            <p class="modal-subtitle">Select date, time, and format for your 1-on-1 mentorship session</p>
+          </div>
+          <button type="button" id="scheduleModalCloseBtn" class="modal-close-btn" title="Close modal">✕</button>
+        </div>
+
+        <!-- Status Tracking Stepper Preview inside Modal -->
+        <div class="modal-stepper-box">
+          <div class="tracker-steps">
+            <div class="tracker-step done">
+              <span class="step-num">✓</span>
+              <span class="step-title">1. Request</span>
+            </div>
+            <div class="tracker-line done"></div>
+            <div class="tracker-step done">
+              <span class="step-num">✓</span>
+              <span class="step-title">2. Approved</span>
+            </div>
+            <div class="tracker-line active"></div>
+            <div class="tracker-step active">
+              <span class="step-num">3</span>
+              <span class="step-title">3. Schedule</span>
+            </div>
+            <div class="tracker-line"></div>
+            <div class="tracker-step">
+              <span class="step-num">4</span>
+              <span class="step-title">4. Meet</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="scheduleAlert" class="form-status-alert" style="display: none;"></div>
+
+        <form id="scheduleForm" class="modal-form">
+          <input type="hidden" id="scheduleRequestId" />
+          <input type="hidden" id="scheduleMentorId" />
+          <input type="hidden" id="scheduleStudentId" />
+
+          <!-- Target Partner Meta Card -->
+          <div class="schedule-partner-card">
+            <div class="schedule-avatar" id="schedulePartnerAvatar">M</div>
+            <div class="schedule-partner-info">
+              <div class="schedule-partner-name" id="schedulePartnerName">Mentor Name</div>
+              <div class="schedule-partner-role" id="schedulePartnerSub">Role · Department</div>
+              <div class="schedule-partner-goal" id="scheduleGoalText">Goal: Career Guidance</div>
+            </div>
+          </div>
+
+          <!-- Select Mentor Dropdown (Available when scheduling directly) -->
+          <div class="form-group" id="scheduleMentorSelectGroup" style="display: none;">
+            <label for="scheduleMentorSelect">Select Mentor <span class="required">*</span></label>
+            <select id="scheduleMentorSelect">
+              <option value="">-- Choose an accepted mentor --</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="scheduleDate">Session Date <span class="required">*</span></label>
+              <input type="date" id="scheduleDate" required />
+            </div>
+            <div class="form-group">
+              <label for="scheduleTime">Start Time <span class="required">*</span></label>
+              <input type="time" id="scheduleTime" required />
+            </div>
+          </div>
+
+          <!-- Time slot preset chips -->
+          <div class="preset-slots-container">
+            <span class="preset-slots-label">Recommended Slots:</span>
+            <div class="preset-slots-chips">
+              <button type="button" class="btn-time-chip" data-time="09:00">09:00 AM</button>
+              <button type="button" class="btn-time-chip" data-time="11:00">11:00 AM</button>
+              <button type="button" class="btn-time-chip" data-time="14:00">02:00 PM</button>
+              <button type="button" class="btn-time-chip" data-time="16:00">04:00 PM</button>
+              <button type="button" class="btn-time-chip" data-time="18:30">06:30 PM</button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="scheduleDuration">Duration <span class="required">*</span></label>
+              <select id="scheduleDuration" required>
+                <option value="30">30 Minutes</option>
+                <option value="45">45 Minutes</option>
+                <option value="60" selected>60 Minutes (1 Hour)</option>
+                <option value="90">90 Minutes</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="scheduleMode">Session Mode <span class="required">*</span></label>
+              <select id="scheduleMode" required>
+                <option value="ONLINE" selected>🌐 Online (Google Meet / Zoom)</option>
+                <option value="IN_PERSON">🏫 In-Person (Campus / Office)</option>
+                <option value="PHONE">📞 Phone Call</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="scheduleMeetingLink">Meeting Link / Location <span class="required">*</span></label>
+            <input type="text" id="scheduleMeetingLink" placeholder="e.g. https://meet.google.com/xyz-uvwx-rst" required />
+          </div>
+
+          <div class="form-group">
+            <label for="scheduleNotes">Agenda & Discussion Notes (Optional):</label>
+            <textarea id="scheduleNotes" rows="3" placeholder="Topics to cover during the session..."></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="scheduleCancelBtn" class="modal-cancel-btn">Cancel</button>
+            <button type="submit" id="scheduleSubmitBtn" class="modal-submit-btn">Confirm & Schedule</button>
           </div>
         </form>
       </div>

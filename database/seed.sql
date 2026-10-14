@@ -40,3 +40,10 @@ INSERT INTO students (user_id, student_id, department, graduation_year) VALUES
 (201, 'STU-2024-001', 'Computer Engineering', 2026),
 (202, 'STU-2024-002', 'Information Technology', 2025)
 ON DUPLICATE KEY UPDATE student_id = VALUES(student_id);
+
+-- Seed Administrator and Teacher
+INSERT INTO users (id, full_name, email, mobile_number, password_hash, role) VALUES
+(1, 'System Administrator', 'admin@college.edu', '9999999999', 'sha256$ca0fc3423a78e231952620ff1f065eba$1b684c010f2eb76c5f082287f0802d283aa35ef96643871ff9801c98633bb7a8', 'admin'),
+(401, 'Prof. S. Sharma', 'teacher.sharma@college.edu', '9876599999', 'sha256$04b60d9d08cc23e4cf7c530fca9944c6$4f33f407c8a0cc63dc6c339bfbdb96dd7e08fbe273c7981bcfbd37018e98e317', 'teacher')
+ON DUPLICATE KEY UPDATE role = VALUES(role), is_active = 1;
+

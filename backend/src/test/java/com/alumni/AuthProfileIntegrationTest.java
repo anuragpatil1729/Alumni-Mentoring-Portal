@@ -37,11 +37,13 @@ public class AuthProfileIntegrationTest {
     private static String studentMobile;
     private static final String STUDENT_PASS = "StudentP@ssw0rd!2026";
     private static String studentIdStr;
+    private static String studentToken;
 
     // Alumni lifecycle state
     private static long alumniUserId;
     private static String alumniEmail;
     private static String alumniMobile;
+    private static String alumniToken;
     private static final String ALUMNI_PASS = "AlumniP@ssw0rd!2026";
 
     // 1x1 transparent PNG in base64
@@ -150,6 +152,11 @@ public class AuthProfileIntegrationTest {
         Assertions.assertTrue(res.json.getBoolean("success"));
         Assertions.assertEquals("Login successful!", res.json.getString("message"));
 
+        studentToken = res.json.optString("token", null);
+        if (studentToken == null || studentToken.isEmpty()) {
+            studentToken = new com.alumni.security.AuthService().createToken(studentUserId);
+        }
+
         JSONObject user = res.json.getJSONObject("user");
         Assertions.assertEquals(studentUserId, user.getLong("id"));
         Assertions.assertEquals("Integration Test Student", user.getString("fullName"));
@@ -162,7 +169,7 @@ public class AuthProfileIntegrationTest {
     @Test
     @Order(5)
     public void testStudentStep5_GetProfileMatchesRegistration() throws Exception {
-        HttpResult res = sendHttp("GET", "/api/profile?id=" + studentUserId, null, null);
+        HttpResult res = sendHttp("GET", "/api/profile?id=" + studentUserId, null, null, studentToken);
         Assertions.assertEquals(200, res.status);
         Assertions.assertTrue(res.json.getBoolean("success"));
 
@@ -188,13 +195,13 @@ public class AuthProfileIntegrationTest {
         updatePayload.put("department", "Information Technology");
         updatePayload.put("graduationYear", 2027);
 
-        HttpResult res = sendHttp("PUT", "/api/profile?id=" + studentUserId, updatePayload.toString(), "application/json");
+        HttpResult res = sendHttp("PUT", "/api/profile?id=" + studentUserId, updatePayload.toString(), "application/json", studentToken);
         Assertions.assertEquals(200, res.status, "Profile update must return 200 OK");
         Assertions.assertTrue(res.json.getBoolean("success"));
         Assertions.assertTrue(res.json.getString("message").contains("Profile updated successfully"));
 
         // Re-fetch profile to verify database persistence
-        HttpResult getRes = sendHttp("GET", "/api/profile?id=" + studentUserId, null, null);
+        HttpResult getRes = sendHttp("GET", "/api/profile?id=" + studentUserId, null, null, studentToken);
         Assertions.assertEquals(200, getRes.status);
         JSONObject updated = getRes.json.getJSONObject("profile");
         Assertions.assertEquals("Integration Student Updated", updated.getString("fullName"));
@@ -214,7 +221,7 @@ public class AuthProfileIntegrationTest {
         avatarPayload.put("imageData", BASE64_PNG);
         avatarPayload.put("mimeType", "image/png");
 
-        HttpResult uploadRes = sendHttp("POST", "/api/users/" + studentUserId + "/avatar", avatarPayload.toString(), "application/json");
+        HttpResult uploadRes = sendHttp("POST", "/api/users/" + studentUserId + "/avatar", avatarPayload.toString(), "application/json", studentToken);
         Assertions.assertEquals(200, uploadRes.status);
         Assertions.assertTrue(uploadRes.json.getBoolean("success"));
         Assertions.assertEquals("/api/users/" + studentUserId + "/avatar", uploadRes.json.getString("avatarUrl"));
@@ -242,7 +249,7 @@ public class AuthProfileIntegrationTest {
         Assertions.assertEquals("/api/users/" + studentUserId + "/avatar", user.getString("avatarUrl"));
 
         // Clean up avatar
-        HttpResult delRes = sendHttp("DELETE", "/api/users/" + studentUserId + "/avatar", null, null);
+        HttpResult delRes = sendHttp("DELETE", "/api/users/" + studentUserId + "/avatar", null, null, studentToken);
         Assertions.assertEquals(200, delRes.status);
         Assertions.assertTrue(delRes.json.getBoolean("deleted"));
     }
@@ -291,6 +298,11 @@ public class AuthProfileIntegrationTest {
         Assertions.assertEquals(200, res.status);
         Assertions.assertTrue(res.json.getBoolean("success"));
 
+        alumniToken = res.json.optString("token", null);
+        if (alumniToken == null || alumniToken.isEmpty()) {
+            alumniToken = new com.alumni.security.AuthService().createToken(alumniUserId);
+        }
+
         JSONObject user = res.json.getJSONObject("user");
         Assertions.assertEquals(alumniUserId, user.getLong("id"));
         Assertions.assertEquals("alumni", user.getString("role"));
@@ -301,7 +313,7 @@ public class AuthProfileIntegrationTest {
     @Test
     @Order(10)
     public void testAlumniStep3_GetProfile() throws Exception {
-        HttpResult res = sendHttp("GET", "/api/profile?id=" + alumniUserId, null, null);
+        HttpResult res = sendHttp("GET", "/api/profile?id=" + alumniUserId, null, null, alumniToken);
         Assertions.assertEquals(200, res.status);
         JSONObject data = res.json.getJSONObject("profile");
         Assertions.assertEquals("Integration Labs Corp", data.getString("company"));
@@ -327,7 +339,7 @@ public class AuthProfileIntegrationTest {
         updatePayload.put("bio", "Leading quantum engineering pipelines.");
         updatePayload.put("maxMentees", 5);
 
-        HttpResult updateRes = sendHttp("PUT", "/api/profile?id=" + alumniUserId, updatePayload.toString(), "application/json");
+        HttpResult updateRes = sendHttp("PUT", "/api/profile?id=" + alumniUserId, updatePayload.toString(), "application/json", alumniToken);
         Assertions.assertEquals(200, updateRes.status);
         Assertions.assertTrue(updateRes.json.getBoolean("success"));
 
@@ -421,12 +433,12 @@ public class AuthProfileIntegrationTest {
         badUpdate.put("department", "Information Technology");
         badUpdate.put("graduationYear", 2027);
 
-        HttpResult res = sendHttp("PUT", "/api/profile?id=" + studentUserId, badUpdate.toString(), "application/json");
+        HttpResult res = sendHttp("PUT", "/api/profile?id=" + studentUserId, badUpdate.toString(), "application/json", studentToken);
         Assertions.assertEquals(400, res.status, "Invalid update payload must return 400 Bad Request");
         Assertions.assertFalse(res.json.getBoolean("success"));
 
         // Verify profile in DB still has valid data
-        HttpResult check = sendHttp("GET", "/api/profile?id=" + studentUserId, null, null);
+        HttpResult check = sendHttp("GET", "/api/profile?id=" + studentUserId, null, null, studentToken);
         Assertions.assertEquals(200, check.status);
         JSONObject current = check.json.getJSONObject("profile");
         Assertions.assertNotEquals("12345", current.getString("mobileNumber"));
@@ -435,7 +447,8 @@ public class AuthProfileIntegrationTest {
     @Test
     @Order(16)
     public void testProfileNotFound_NonExistentUserId() throws Exception {
-        HttpResult res = sendHttp("GET", "/api/profile?id=999999999", null, null);
+        String adminToken = new com.alumni.security.AuthService().createToken(1L);
+        HttpResult res = sendHttp("GET", "/api/profile?id=999999999", null, null, adminToken);
         Assertions.assertEquals(404, res.status, "Non-existent profile ID must return 404 Not Found");
     }
 
@@ -450,11 +463,18 @@ public class AuthProfileIntegrationTest {
     }
 
     private HttpResult sendHttp(String method, String path, String body, String contentType) throws Exception {
+        return sendHttp(method, path, body, contentType, null);
+    }
+
+    private HttpResult sendHttp(String method, String path, String body, String contentType, String token) throws Exception {
         URL url = URI.create("http://127.0.0.1:" + httpPort + path).toURL();
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod(method);
         conn.setConnectTimeout(4000);
         conn.setReadTimeout(4000);
+        if (token != null && !token.isEmpty()) {
+            conn.setRequestProperty("Authorization", "Bearer " + token);
+        }
 
         if (body != null) {
             conn.setDoOutput(true);

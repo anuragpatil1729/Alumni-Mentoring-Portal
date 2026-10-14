@@ -201,7 +201,7 @@ public class SessionHistoryDAO {
                 + "started_at, paused_at, completed_at, "
                 + "duration_minutes, failure_reason, created_at "
                 + "FROM session_history"
-                + (admin ? "" : " WHERE student_id=?")
+                + (admin ? "" : " WHERE student_id=? OR alumni_id=?")
                 + " ORDER BY created_at DESC";
 
         List<JSONObject> items = new ArrayList<>();
@@ -211,6 +211,7 @@ public class SessionHistoryDAO {
 
             if (!admin) {
                 p.setLong(1, userId);
+                p.setLong(2, userId);
             }
 
             try (ResultSet r = p.executeQuery()) {
@@ -263,69 +264,21 @@ public class SessionHistoryDAO {
                 ? "chronological"
                 : sort.trim().toLowerCase(Locale.ROOT);
 
-        Comparator<JSONObject> comparator;
-
-        switch (sortKey) {
-            case "chronological":
-                comparator = Comparator.comparing(
-                        o -> o.optString("startedAt", ""));
-                break;
-
-            case "duration":
-                comparator = Comparator.comparingInt(
-                        o -> o.optInt("durationMinutes", 0));
-                break;
-
-            case "priority":
-                comparator = Comparator.comparingInt(
-                        o -> priorityWeight(o.optString("priority")));
-                break;
-
-            case "severity":
-                comparator = Comparator.comparingInt(
-                        o -> statusWeight(o.optString("status")));
-                break;
-
-            default:
-                throw new IllegalArgumentException(
-                        "Sort must be chronological, duration, "
-                        + "priority, or severity.");
+        if (!sortKey.equals("chronological") && !sortKey.equals("duration")
+                && !sortKey.equals("priority") && !sortKey.equals("severity")) {
+            throw new IllegalArgumentException(
+                    "Sort must be chronological, duration, priority, or severity.");
         }
 
-        items.sort(comparator.reversed());
+        // Team D: Execute pure manual Insertion Sort algorithm
+        com.alumni.search.SessionSorter.SortTelemetry telemetry =
+                com.alumni.search.SessionSorter.insertionSort(items, sortKey, true);
 
         JSONArray result = new JSONArray();
-
-        for (JSONObject item : items) {
+        for (JSONObject item : telemetry.getSortedList()) {
             result.put(item);
         }
 
         return result;
-    }
-
-    private int priorityWeight(String priority) {
-        switch (priority) {
-            case "URGENT":
-                return 4;
-            case "HIGH":
-                return 3;
-            case "MEDIUM":
-                return 2;
-            default:
-                return 1;
-        }
-    }
-
-    private int statusWeight(String status) {
-        switch (status) {
-            case "FAILED":
-                return 4;
-            case "PAUSED":
-                return 3;
-            case "STARTED":
-                return 2;
-            default:
-                return 1;
-        }
     }
 }
