@@ -249,6 +249,21 @@
     els.historyListContainer = document.getElementById("historyListContainer");
     els.historyEmptyState = document.getElementById("historyEmptyState");
 
+    // Admin Console Elements
+    els.tabAdminBtn = document.getElementById("tabAdminBtn");
+    els.adminView = document.getElementById("adminView");
+    els.refreshAdminBtn = document.getElementById("refreshAdminBtn");
+    els.adminAlert = document.getElementById("adminAlert");
+    els.adminTotalUsers = document.getElementById("adminTotalUsers");
+    els.adminTotalStudents = document.getElementById("adminTotalStudents");
+    els.adminTotalAlumni = document.getElementById("adminTotalAlumni");
+    els.adminTotalTeachers = document.getElementById("adminTotalTeachers");
+    els.adminTotalInactive = document.getElementById("adminTotalInactive");
+    els.adminRoleFilter = document.getElementById("adminRoleFilter");
+    els.adminStatusFilter = document.getElementById("adminStatusFilter");
+    els.adminSearchInput = document.getElementById("adminSearchInput");
+    els.adminUsersTableBody = document.getElementById("adminUsersTableBody");
+
     // Session Scheduling Elements (Team 1)
     els.scheduledSessionsContainer = document.getElementById("scheduledSessionsContainer");
     els.scheduledSessionsList = document.getElementById("scheduledSessionsList");
@@ -329,18 +344,23 @@
 
       const role = (state.currentUser.role || "student").toLowerCase();
       const isAlumni = role === "alumni";
-      els.navUserRoleBadge.textContent = isAlumni ? "Mentor" : "Student";
+      const isAdmin = role === "admin";
+      const isTeacher = role === "teacher";
+      els.navUserRoleBadge.textContent = isAdmin ? "Admin" : (isTeacher ? "Teacher" : (isAlumni ? "Mentor" : "Student"));
       els.navUserRoleBadge.className = `user-role-badge ${role}`;
 
       // Navigation Visibility:
       if (els.tabSearchBtn) {
-        els.tabSearchBtn.style.display = isAlumni ? "none" : "inline-flex";
+        els.tabSearchBtn.style.display = (isAlumni || isAdmin) ? "none" : "inline-flex";
       }
       if (els.tabRequestsBtn) {
         els.tabRequestsBtn.style.display = isAlumni ? "inline-flex" : "none";
       }
       if (els.tabHistoryBtn) {
-        els.tabHistoryBtn.style.display = "inline-flex";
+        els.tabHistoryBtn.style.display = isAdmin ? "none" : "inline-flex";
+      }
+      if (els.tabAdminBtn) {
+        els.tabAdminBtn.style.display = isAdmin ? "inline-flex" : "none";
       }
 
       // Fetch active pending requests count for mentors
@@ -356,6 +376,7 @@
       if (els.tabSearchBtn) els.tabSearchBtn.style.display = "inline-flex";
       if (els.tabRequestsBtn) els.tabRequestsBtn.style.display = "none";
       if (els.tabHistoryBtn) els.tabHistoryBtn.style.display = "none";
+      if (els.tabAdminBtn) els.tabAdminBtn.style.display = "none";
       if (els.navRequestsBadge) els.navRequestsBadge.style.display = "none";
     }
   }
@@ -365,12 +386,19 @@
   // =========================================================================
   function switchView(viewName) {
     // If user is not authenticated and tries to open protected views, redirect to login
-    if (!state.currentUser && (viewName === "search" || viewName === "profile" || viewName === "requests" || viewName === "history")) {
+    if (!state.currentUser && (viewName === "search" || viewName === "profile" || viewName === "requests" || viewName === "history" || viewName === "admin")) {
       viewName = "login";
       setLoginAlert("error", "Please sign in to access your portal account.");
     }
 
-    const isAlumni = state.currentUser && (state.currentUser.role || "").toLowerCase() === "alumni";
+    const role = state.currentUser ? (state.currentUser.role || "").toLowerCase() : "";
+    const isAlumni = role === "alumni";
+    const isAdmin = role === "admin";
+
+    // Admin redirect
+    if (isAdmin && (viewName === "search" || viewName === "requests" || viewName === "history")) {
+      viewName = "admin";
+    }
 
     // Alumni mentors only access "requests", "history", and "profile" (never explore mentors)
     if (isAlumni && viewName === "search") {
@@ -378,7 +406,7 @@
     }
 
     // Students only access "search", "history", and "profile" (never the mentor requests dashboard)
-    if (state.currentUser && !isAlumni && viewName === "requests") {
+    if (state.currentUser && !isAlumni && !isAdmin && viewName === "requests") {
       viewName = "search";
     }
 
@@ -392,6 +420,7 @@
     if (els.profileView) els.profileView.classList.remove("active");
     if (els.requestsView) els.requestsView.classList.remove("active");
     if (els.historyView) els.historyView.classList.remove("active");
+    if (els.adminView) els.adminView.classList.remove("active");
 
     // Deactivate guest & auth nav buttons
     els.navLoginBtn.classList.remove("active");
@@ -401,6 +430,7 @@
     if (els.tabProfileBtn) els.tabProfileBtn.classList.remove("active");
     if (els.tabRequestsBtn) els.tabRequestsBtn.classList.remove("active");
     if (els.tabHistoryBtn) els.tabHistoryBtn.classList.remove("active");
+    if (els.tabAdminBtn) els.tabAdminBtn.classList.remove("active");
 
     if (viewName === "login") {
       els.loginView.classList.add("active");
@@ -427,6 +457,10 @@
       if (els.historyView) els.historyView.classList.add("active");
       if (els.tabHistoryBtn) els.tabHistoryBtn.classList.add("active");
       loadAndRenderHistory();
+    } else if (viewName === "admin") {
+      if (els.adminView) els.adminView.classList.add("active");
+      if (els.tabAdminBtn) els.tabAdminBtn.classList.add("active");
+      loadAndRenderAdminUsers();
     }
   }
 
@@ -459,10 +493,12 @@
       const res = await ApiClient.login({ email, password });
 
       if (res.ok && res.data.success && res.data.user) {
-        const isAlumni = (res.data.user.role || "").toLowerCase() === "alumni";
-        const redirectMsg = isAlumni
-          ? "Login successful! Redirecting to mentorship requests..."
-          : "Login successful! Redirecting to mentors directory...";
+        const role = (res.data.user.role || "").toLowerCase();
+        const isAdmin = role === "admin";
+        const isAlumni = role === "alumni";
+        const redirectMsg = isAdmin
+          ? "Login successful! Redirecting to admin console..."
+          : (isAlumni ? "Login successful! Redirecting to mentorship requests..." : "Login successful! Redirecting to mentors directory...");
         setLoginAlert("success", redirectMsg);
         const userData = { ...res.data.user, token: res.data.token };
         saveSession(userData);
@@ -470,7 +506,13 @@
         setTimeout(() => {
           els.loginForm.reset();
           setLoginAlert(null);
-          switchView(isAlumni ? "requests" : "search");
+          if (isAdmin) {
+            switchView("admin");
+          } else if (isAlumni) {
+            switchView("requests");
+          } else {
+            switchView("search");
+          }
         }, 600);
 
       } else {
@@ -2666,6 +2708,23 @@
       });
     }
 
+    // Admin Console Controls
+    if (els.tabAdminBtn) {
+      els.tabAdminBtn.addEventListener("click", () => switchView("admin"));
+    }
+    if (els.refreshAdminBtn) {
+      els.refreshAdminBtn.addEventListener("click", () => loadAndRenderAdminUsers());
+    }
+    if (els.adminRoleFilter) {
+      els.adminRoleFilter.addEventListener("change", () => loadAndRenderAdminUsers());
+    }
+    if (els.adminStatusFilter) {
+      els.adminStatusFilter.addEventListener("change", () => loadAndRenderAdminUsers());
+    }
+    if (els.adminSearchInput) {
+      els.adminSearchInput.addEventListener("input", () => filterAdminUsersTable());
+    }
+
     // Session Scheduling Modal (Team 1)
     if (els.scheduleModalCloseBtn) {
       els.scheduleModalCloseBtn.addEventListener("click", closeScheduleModal);
@@ -3028,6 +3087,152 @@
   }
 
   // =========================================================================
+  // Admin Console Controller
+  // =========================================================================
+  async function loadAndRenderAdminUsers() {
+    if (!state.currentUser || (state.currentUser.role || "").toLowerCase() !== "admin") return;
+    setAdminAlert(null);
+
+    const role = els.adminRoleFilter ? els.adminRoleFilter.value : "";
+    const active = els.adminStatusFilter ? els.adminStatusFilter.value : "";
+
+    if (els.adminUsersTableBody) {
+      els.adminUsersTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:#64748b;">Loading platform users from database...</td></tr>`;
+    }
+
+    try {
+      const res = await ApiClient.getAdminUsers({ role, active });
+      if (res.ok && res.data && Array.isArray(res.data.users)) {
+        state.adminUsers = res.data.users;
+        updateAdminStats(res.data.users);
+        renderAdminUsers(res.data.users);
+      } else {
+        setAdminAlert("error", res.data?.message || "Failed to load platform users.");
+      }
+    } catch (err) {
+      console.error("Admin users fetch error:", err);
+      setAdminAlert("error", "Unable to connect to Java backend to retrieve users.");
+    }
+  }
+
+  function updateAdminStats(users) {
+    if (!users) return;
+    const total = users.length;
+    let students = 0, alumni = 0, teachers = 0, inactive = 0;
+    users.forEach(u => {
+      const r = (u.role || "").toLowerCase();
+      if (r === "student") students++;
+      else if (r === "alumni") alumni++;
+      else if (r === "teacher") teachers++;
+      if (!u.active) inactive++;
+    });
+
+    if (els.adminTotalUsers) els.adminTotalUsers.textContent = total;
+    if (els.adminTotalStudents) els.adminTotalStudents.textContent = students;
+    if (els.adminTotalAlumni) els.adminTotalAlumni.textContent = alumni;
+    if (els.adminTotalTeachers) els.adminTotalTeachers.textContent = teachers;
+    if (els.adminTotalInactive) els.adminTotalInactive.textContent = inactive;
+  }
+
+  function renderAdminUsers(users) {
+    if (!els.adminUsersTableBody) return;
+    els.adminUsersTableBody.innerHTML = "";
+
+    if (!users || users.length === 0) {
+      els.adminUsersTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:#64748b;">No matching users found in database.</td></tr>`;
+      return;
+    }
+
+    users.forEach(u => {
+      const tr = document.createElement("tr");
+      const r = (u.role || "").toLowerCase();
+      const isActive = !!u.active;
+
+      tr.innerHTML = `
+        <td style="font-weight:700; color:#64748b;">#${u.id}</td>
+        <td>
+          <div style="font-weight:700; color:#0f172a;">${escapeHtml(u.fullName || "User")}</div>
+          <div style="font-size:12px; color:#64748b;">${escapeHtml(u.email || "")}</div>
+        </td>
+        <td>
+          <span class="role-badge role-${escapeHtml(r)}">${escapeHtml(u.role || "student")}</span>
+        </td>
+        <td>${escapeHtml(u.mobileNumber || "—")}</td>
+        <td>
+          <span class="status-indicator-badge ${isActive ? 'is-active' : 'is-inactive'}">
+            <span class="status-dot"></span>
+            ${isActive ? 'Active' : 'Deactivated'}
+          </span>
+        </td>
+        <td style="font-size:12px; color:#64748b;">${escapeHtml(u.createdAt ? u.createdAt.split(" ")[0] : "—")}</td>
+        <td style="text-align:right;">
+          ${u.id === state.currentUser.id 
+            ? '<span style="font-size:11px; color:#94a3b8; font-weight:600;">Current Admin</span>'
+            : `<button type="button" class="btn-toggle-status ${isActive ? 'btn-deactivate' : 'btn-activate'}" data-userid="${u.id}" data-action="${isActive ? 'deactivate' : 'activate'}">
+                ${isActive ? '🚫 Deactivate' : '✓ Activate'}
+              </button>`
+          }
+        </td>
+      `;
+
+      // Attach button listener
+      const btn = tr.querySelector(".btn-toggle-status");
+      if (btn) {
+        btn.addEventListener("click", async () => {
+          const newStatus = !isActive;
+          btn.disabled = true;
+          btn.textContent = "...";
+          try {
+            const res = await ApiClient.setUserActiveStatus(u.id, newStatus);
+            if (res.ok) {
+              setAdminAlert("success", `User #${u.id} (${u.fullName}) has been ${newStatus ? 'activated' : 'deactivated'}.`);
+              loadAndRenderAdminUsers();
+            } else {
+              setAdminAlert("error", res.data?.message || "Failed to update user status.");
+              btn.disabled = false;
+            }
+          } catch (e) {
+            setAdminAlert("error", "Error updating status: " + e.message);
+            btn.disabled = false;
+          }
+        });
+      }
+
+      els.adminUsersTableBody.appendChild(tr);
+    });
+  }
+
+  function filterAdminUsersTable() {
+    if (!state.adminUsers) return;
+    const q = (els.adminSearchInput ? els.adminSearchInput.value : "").toLowerCase().trim();
+    if (!q) {
+      renderAdminUsers(state.adminUsers);
+      return;
+    }
+    const filtered = state.adminUsers.filter(u => {
+      const name = (u.fullName || "").toLowerCase();
+      const email = (u.email || "").toLowerCase();
+      const mobile = (u.mobileNumber || "").toLowerCase();
+      const idStr = String(u.id);
+      return name.includes(q) || email.includes(q) || mobile.includes(q) || idStr.includes(q);
+    });
+    renderAdminUsers(filtered);
+  }
+
+  function setAdminAlert(type, msg) {
+    if (!els.adminAlert) return;
+    if (!type || !msg) {
+      els.adminAlert.style.display = "none";
+      els.adminAlert.textContent = "";
+      els.adminAlert.className = "form-status-alert";
+      return;
+    }
+    els.adminAlert.className = `form-status-alert alert-${type}`;
+    els.adminAlert.textContent = msg;
+    els.adminAlert.style.display = "block";
+  }
+
+  // =========================================================================
   // Initialization
   // =========================================================================
   document.addEventListener("DOMContentLoaded", () => {
@@ -3037,8 +3242,14 @@
 
     // Check if user is already logged in
     if (state.currentUser) {
-      const isAlumni = (state.currentUser.role || "").toLowerCase() === "alumni";
-      switchView(isAlumni ? "requests" : "search");
+      const role = (state.currentUser.role || "").toLowerCase();
+      if (role === "admin") {
+        switchView("admin");
+      } else if (role === "alumni") {
+        switchView("requests");
+      } else {
+        switchView("search");
+      }
     } else {
       switchView("login");
     }

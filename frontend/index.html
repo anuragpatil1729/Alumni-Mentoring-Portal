@@ -41,6 +41,9 @@
           <button type="button" id="tabHistoryBtn" class="nav-tab-btn">
             <span class="tab-icon">📜</span> Session History
           </button>
+          <button type="button" id="tabAdminBtn" class="nav-tab-btn" style="display: none;">
+            <span class="tab-icon">🛡️</span> Admin Console
+          </button>
           <button type="button" id="tabProfileBtn" class="nav-tab-btn">
             <span class="tab-icon">👤</span> My Profile
           </button>
@@ -1093,6 +1096,120 @@
             <div class="empty-icon">📜</div>
             <h3>No Session History Found</h3>
             <p>Completed, ongoing, or recorded mentorship sessions will appear here with state transition records.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- 6. ADMIN CONSOLE VIEW                                            -->
+      <!-- ================================================================= -->
+      <section id="adminView" class="view-section" style="display: none;">
+        <div class="section-container">
+          <div class="section-header-box">
+            <div class="section-title-wrap">
+              <div class="section-icon-badge" style="background:#f3e8ff; color:#7e22ce;">🛡️</div>
+              <div>
+                <h2>System Administration Console</h2>
+                <p>Manage users, verify accounts, toggle active status, and audit system-wide interactions</p>
+              </div>
+            </div>
+            <div class="header-action-group">
+              <button type="button" id="refreshAdminBtn" class="refresh-btn" title="Refresh user records">
+                🔄 Refresh
+              </button>
+            </div>
+          </div>
+
+          <div id="adminAlert" class="form-status-alert" style="display: none;"></div>
+
+          <!-- System Stats Cards Grid -->
+          <div class="admin-stats-grid">
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon">👥</div>
+              <div class="admin-stat-info">
+                <span class="admin-stat-number" id="adminTotalUsers">0</span>
+                <span class="admin-stat-label">Total Accounts</span>
+              </div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon">🎓</div>
+              <div class="admin-stat-info">
+                <span class="admin-stat-number" id="adminTotalStudents">0</span>
+                <span class="admin-stat-label">Students</span>
+              </div>
+            </div>
+            <div class="admin-stat-card stat-alumni">
+              <div class="admin-stat-icon">💼</div>
+              <div class="admin-stat-info">
+                <span class="admin-stat-number" id="adminTotalAlumni">0</span>
+                <span class="admin-stat-label">Alumni Mentors</span>
+              </div>
+            </div>
+            <div class="admin-stat-card stat-teacher">
+              <div class="admin-stat-icon">👨‍🏫</div>
+              <div class="admin-stat-info">
+                <span class="admin-stat-number" id="adminTotalTeachers">0</span>
+                <span class="admin-stat-label">Faculty Teachers</span>
+              </div>
+            </div>
+            <div class="admin-stat-card stat-inactive">
+              <div class="admin-stat-icon">🚫</div>
+              <div class="admin-stat-info">
+                <span class="admin-stat-number" id="adminTotalInactive">0</span>
+                <span class="admin-stat-label">Deactivated</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin Toolbar -->
+          <div class="admin-toolbar-card">
+            <div class="admin-toolbar-filters">
+              <div class="filter-group">
+                <label for="adminRoleFilter">Filter Role:</label>
+                <select id="adminRoleFilter" class="form-select-sm">
+                  <option value="">All Roles</option>
+                  <option value="student">Students</option>
+                  <option value="alumni">Alumni Mentors</option>
+                  <option value="teacher">Faculty Teachers</option>
+                  <option value="admin">Administrators</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label for="adminStatusFilter">Filter Status:</label>
+                <select id="adminStatusFilter" class="form-select-sm">
+                  <option value="">All Statuses</option>
+                  <option value="true">Active Only</option>
+                  <option value="false">Deactivated Only</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="admin-search-wrap">
+              <input type="text" id="adminSearchInput" class="form-input-sm" placeholder="🔍 Search name, email, or mobile..." style="min-width: 260px; padding: 7px 12px; border: 1px solid #cbd5e1; border-radius: 6px;" />
+            </div>
+          </div>
+
+          <!-- User Management Table -->
+          <div class="admin-table-card">
+            <div class="admin-table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>User ID</th>
+                    <th>User Name & Email</th>
+                    <th>Role</th>
+                    <th>Mobile</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th style="text-align: right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>

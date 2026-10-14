@@ -1,388 +1,499 @@
-# AlumniConnect — Student & Alumni Mentoring Portal
+<div align="center">
 
-[![Java](https://img.shields.io/badge/Java-OpenJDK_17%2B-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![Maven](https://img.shields.io/badge/Build-Maven_3.8%2B-C71A36?logo=apache-maven&logoColor=white)](https://maven.apache.org/)
-[![Database](https://img.shields.io/badge/Database-MySQL_%2F_MariaDB-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![Frontend](https://img.shields.io/badge/Frontend-Vanilla_HTML5_%2F_CSS3_%2F_ES6-E34F26?logo=html5&logoColor=white)](frontend/)
-[![Tests](https://img.shields.io/badge/JUnit_5-129_Tests_Passing-25A162?logo=junit5&logoColor=white)](backend/src/test/)
+# 🎓 AlumniConnect — Alumni Mentoring Portal
+
+**A full-stack mentorship platform that connects students with verified industry alumni —
+built on a pure Java JDBC backend and a zero-framework Vanilla JS frontend.**
+
+[![Java](https://img.shields.io/badge/Java-17%2B-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Maven](https://img.shields.io/badge/Build-Maven-C71A36?logo=apache-maven&logoColor=white)](backend/pom.xml)
+[![MySQL](https://img.shields.io/badge/DB-MySQL%20%2F%20MariaDB-4479A1?logo=mysql&logoColor=white)](database/)
+[![Frontend](https://img.shields.io/badge/Frontend-HTML5%20%7C%20CSS3%20%7C%20ES6-E34F26?logo=html5&logoColor=white)](frontend/)
+[![Tests](https://img.shields.io/badge/JUnit%205-145%20passing-25A162?logo=junit5&logoColor=white)](backend/src/test/java/com/alumni)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**AlumniConnect** is a comprehensive, production-grade alumni mentorship portal connecting undergraduate and graduate students directly with verified industry alumni working across top technology companies, quantitative finance firms, and research institutions.
+[Features](#-features) •
+[Architecture](#-architecture) •
+[Getting Started](#-getting-started) •
+[API](#-api-overview) •
+[Database](#-database-design) •
+[Testing](#-testing) •
+[Docs](#-documentation)
 
-The platform features a **100% Java JDBC backend engine** and a **zero-dependency Vanilla HTML5/CSS3/JavaScript frontend** designed with clean, modern aesthetics, robust real-time validation, high-performance search algorithms, and a complete 1-on-1 mentorship request lifecycle.
-
----
-
-## Table of Contents
-- [Key Features](#key-features)
-  - [Mentorship Request System & Lifecycle](#-1-on-1-mentorship-request-lifecycle-week-5)
-  - [Role-Based Dashboard Separation](#-strict-role-based-dashboard-separation)
-  - [Student & Alumni Profile Management](#-profile-management--avatar-system)
-  - [Search Directory & DSA Algorithms](#-streamlined-mentor-search-directory)
-  - [Real-Time Validation & Security](#-real-time-name--password-strength-testing)
-- [Architecture & Tech Stack](#architecture--tech-stack)
-- [Project Directory Structure](#project-directory-structure)
-- [System Requirements](#system-requirements)
-- [Database Setup](#database-setup)
-- [Quick Start Guide](#quick-start-guide)
-  - [1. Start Java Backend](#1-start-java-backend)
-  - [2. Start Frontend](#2-start-frontend)
-- [Database Seed Accounts](#database-seed-accounts)
-- [API Reference](#api-reference)
-- [Terminal Image Inspection Guide](#terminal-image-inspection-guide)
-- [Search Engine & Algorithms](#search-engine--algorithms)
-- [Automated Testing Suite (87 Tests)](#automated-testing-suite)
-- [License](#license)
+</div>
 
 ---
 
-## Key Features
+## 📖 About
 
-### 📬 1-on-1 Mentorship Request Lifecycle (Week 5)
-- **End-to-End Request State Machine**: Manages request states: `PENDING` ➔ `ACCEPTED` / `REJECTED` / `CANCELLED`.
-- **Duplicate Request Protection**: Prevents duplicate pending applications to the same mentor (`HTTP 409 Conflict`).
-- **Re-Request Capabilities**: Once a previous request is resolved (`ACCEPTED` or `REJECTED`), students can submit new follow-up requests.
-- **Mentor Capacity Limits**: Automatically validates the mentor's configured `max_mentees` threshold, blocking new requests when full.
-- **Self-Request Prevention**: Validates that students cannot send mentorship requests to their own accounts.
-- **Decision Workflow**: Mentors can accept or decline requests with personalized feedback and meeting scheduling notes.
+**AlumniConnect** lets students discover alumni mentors, send 1-on-1 mentorship requests, schedule
+sessions and track their history — while alumni, teachers and admins manage events,
+opportunities, approvals and evaluations from role-specific dashboards.
 
-### 👥 Strict Role-Based Dashboard Separation
-- **Alumni Mentors**:
-  - Exclusively access the **Received Requests** (`Received Mentorship Requests`) dashboard.
-  - Review student applicants, view student department and graduation year, read goal statements, and click **Accept** or **Decline**.
-  - Receive live visual pending counters in the navigation header.
-  - Access **My Profile** to update bio, mentee capacity, company, and skills.
-  - *Explore Mentors tab is hidden to maintain a focused mentor experience.*
-- **Students**:
-  - Exclusively access **Explore Mentors** and **My Profile**.
-  - Mentor cards dynamically display request status pills (`⏳ Request Pending`, `✅ Approved · Connected`, `❌ Request Declined`).
-  - Contextual modal status banners display previous approval notes from mentors with one-click follow-up request forms.
-  - *Protected against accessing mentor-only management routes.*
-
-### 📷 Profile Management & Avatar System
-- **Database Image Storage**: Avatars are stored directly in MySQL / MariaDB as `MEDIUMBLOB` with MIME type tracking (`image/jpeg`, `image/png`, `image/webp`).
-- **Direct Image REST API**: Dedicated endpoint `GET /api/users/{id}/avatar` and `HEAD /api/users/{id}/avatar` with HTTP caching and fallback to user initials.
-- **Live Profile Editor**: Editable full name, contact details, bio, department, company, and mentee capacity.
-
-### 🎓 Student Registration & Authentication
-- **Two-Section Step Form**: Cleanly divides registration into **Personal Information** and **Academic Information**.
-- **Student ID Format Check**: Enforces standard academic IDs (`STU-2024-001`, `CS2023045`) via regex `^[a-zA-Z0-9/-]{3,20}$`.
-- **Session Persistence**: Safe session token and profile state stored in `localStorage` (`alumniConnectUser`).
-
-### 💼 Alumni Mentor Registration
-- **Comprehensive Profile Builder**: Includes company, designation, department, graduation year, years of experience, industry, comma-delimited skills, bio, and mentee capacity.
-- **LinkedIn Profile Verification**: Validates syntax (`https://linkedin.com/in/...`).
-
-### 🛡️ Real-Time Name & Password Strength Testing
-- **Full Name Validator**: Enforces 2–50 characters, letters/spaces/hyphens/periods only, prohibits numbers or consecutive whitespace with instant inline feedback.
-- **Interactive 4-Segment Password Meter**: Visual color transitions from Red (`Weak`) ➔ Orange (`Fair`) ➔ Amber (`Good`) ➔ Emerald Green (`Strong`).
-- **Live Requirement Checklist**: Real-time tick indicators for length (8+), uppercase, lowercase, numbers, and special symbols (`!@#$%^&*`).
-- **Backend Strength API**: Dedicated REST endpoint `POST /api/auth/password-strength` returning score (0–4), criterion flags, and improvement suggestions.
-
-### 🔍 Streamlined Mentor Search Directory
-- **Instant Search with Debouncing**: 280ms debounced input for fast responsive filtering across name, company, title, skills, and department.
-- **Faceted Filters**: Quick dropdowns for Department, Industry sector, and Minimum Experience.
-- **Telemetry Metrics Banner**: Real-time display of dataset pool, matched count, comparison operations, and execution latency in milliseconds.
+The project deliberately avoids heavy frameworks (no Spring, no React) to showcase
+**core Java networking, JDBC, hand-written DSA algorithms and vanilla web fundamentals**.
 
 ---
 
-## Architecture & Tech Stack
+## ✨ Features
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                 Vanilla HTML5 / CSS3 / ES6                  │
-│   (Plus Jakarta Sans, Pure CSS Grid/Flexbox, No React/JSX)   │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ HTTP Fetch (Port 5001)
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                 100% Java Backend Engine                    │
-│   • OpenJDK 17+ / Multi-Threaded HttpServerApp               │
-│   • MentorshipService & MentorshipRequestDAO                │
-│   • InputValidator & PasswordStrength Engine                │
-│   • Manual DSA Search Engine (Linear & Quicksort + Binary)   │
-│   • TCP Socket Server (Port 5002)                           │
-│   • Servlet & CGI-Style Handlers                            │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ JDBC Driver (mysql-connector-j 9.2.0)
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                 Local MySQL / MariaDB                       │
-│   • Database: alumni_mentoring_portal                       │
-│   • Tables: users, students, alumni, mentorship_requests    │
-└─────────────────────────────────────────────────────────────┘
+| Area | Highlights |
+| :--- | :--- |
+| 🔐 **Auth & Security** | Salted SHA-256 password hashing · Bearer tokens (hashed in `auth_tokens`) · Logout/revocation · Email-based password reset over SMTP · Role-based access control |
+| 👥 **4 User Roles** | `STUDENT`, `ALUMNI`, `TEACHER`, `ADMIN` — each with its own dashboard and server-enforced permissions |
+| 📝 **Registration** | Separate student / alumni flows · Live email & mobile availability check · Real-time name validation · 4-segment password strength meter (+ REST API) |
+| 🔍 **Mentor Directory** | Debounced search across name, company, skills, department · Filters (department, industry, experience) · Search telemetry (comparisons, latency) |
+| 📬 **Mentorship Requests** | `PENDING → ACCEPTED / REJECTED / CANCELLED` lifecycle · Duplicate & self-request protection · Mentor capacity (`max_mentees`) enforcement |
+| 📅 **Session Scheduling** | Schedule with a mentor by date/time · Manual interval **conflict detection** |
+| 🕘 **Session History** | Track `STARTED / PAUSED / COMPLETED / FAILED` sessions · Sort by date, duration, priority or severity using hand-written sorting algorithms |
+| 🎤 **Events** | Alumni create events (General, Judge, Guest Session, Sponsor) · Admin approval workflow |
+| 💼 **Opportunities** | Alumni post jobs/internships with deadline, eligibility & application link |
+| 🧑‍🏫 **Teacher Tools** | Event assignments (coordinator / evaluator / supervisor) · Alumni slot bookings · Internal marks entry |
+| 🖼️ **Profiles & Avatars** | Editable profiles · Avatars stored as `MEDIUMBLOB` and streamed via `/api/users/{id}/avatar` |
+
+---
+
+## 🏗 Architecture
+
+```mermaid
+flowchart LR
+    subgraph Client["🌐 Browser (port 5173)"]
+        UI["index.html<br/>styles.css"]
+        APP["app.js<br/>routing · views · state"]
+        API["api.js<br/>fetch client + Bearer token"]
+        UI --> APP --> API
+    end
+
+    subgraph Backend["☕ Java Backend (com.alumni)"]
+        HTTP["HttpServerApp<br/>REST router :5001"]
+        SOCK["SocketServer<br/>TCP JSON :5002"]
+        AUTH["AuthService<br/>tokens · roles"]
+        SVC["Services<br/>Registration · Mentorship<br/>ConflictDetector · Mailer"]
+        VAL["InputValidator"]
+        DSA["SearchAlgorithms<br/>SessionSorter"]
+        DAO["DAO layer<br/>Alumni · Request · Event<br/>Opportunity · Teacher · Admin<br/>SessionHistory · PasswordReset"]
+        DB_CONN["DBConnection<br/>(.env loader)"]
+
+        HTTP --> AUTH
+        HTTP --> SVC
+        SOCK --> SVC
+        SVC --> VAL
+        SVC --> DSA
+        SVC --> DAO
+        HTTP --> DAO
+        DAO --> DB_CONN
+    end
+
+    DB[("🐬 MySQL / MariaDB<br/>alumni_mentoring_portal")]
+    SMTP["✉️ SMTP Server"]
+
+    API -- "HTTP / JSON" --> HTTP
+    DB_CONN -- "JDBC (mysql-connector-j)" --> DB
+    SVC -. "password reset mail" .-> SMTP
 ```
 
-| Layer | Technology | Description |
-| :--- | :--- | :--- |
-| **Frontend** | HTML5, Vanilla CSS3, ES6 JavaScript | Zero build tools, native browser APIs, responsive layouts. |
-| **Backend** | Java 17+, Maven | Multi-threaded HTTP Server (`com.sun.net.httpserver`), JSON (`org.json`). |
-| **Database** | MySQL / MariaDB | Relational database accessed via `com.mysql.cj.jdbc.Driver` with foreign keys and transactions. |
-| **Network** | TCP Socket Server | Newline-delimited JSON stream server for cross-platform integration on port 5002. |
-| **Testing** | JUnit 5 (`org.junit.jupiter`) | **87 automated test cases** covering JDBC, validations, algorithms, profiles, and requests. |
+### Tech Stack
+
+| Layer | Technology |
+| :--- | :--- |
+| **Frontend** | HTML5, Vanilla CSS3, ES6 JavaScript — no build step |
+| **Backend** | Java 17, `com.sun.net.httpserver`, raw TCP sockets, Maven |
+| **Libraries** | `mysql-connector-j 9.2.0`, `org.json`, `angus-mail` (SMTP) |
+| **Database** | MySQL 8+ / MariaDB 10.5+ (InnoDB, FKs, CHECK constraints) |
+| **Testing** | JUnit 5 (`junit-jupiter 5.11`) |
 
 ---
 
-## Project Directory Structure
+## 🔄 Key Flows
 
+### Mentorship Request Lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING: Student sends request
+    PENDING --> ACCEPTED: Mentor accepts
+    PENDING --> REJECTED: Mentor declines
+    PENDING --> CANCELLED: Student cancels
+    ACCEPTED --> [*]: Session scheduled
+    REJECTED --> [*]
+    CANCELLED --> [*]
+
+    note right of PENDING
+        Blocked if: duplicate pending request,
+        self-request, or mentor at max_mentees
+    end note
 ```
-Alumni-Mentoring-Portal/
-├── backend/                              # 100% Java Backend Engine
-│   ├── pom.xml                           # Maven dependencies & build configuration
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/alumni/
-│   │   │   │   ├── Main.java             # Entry point (Starts HTTP & TCP servers)
-│   │   │   │   ├── config/
-│   │   │   │   │   └── DBConnection.java # JDBC MySQL / MariaDB connection pool manager (.env loader)
-│   │   │   │   ├── dao/
-│   │   │   │   │   ├── AlumniDAO.java    # Alumni profile queries & searches
-│   │   │   │   │   ├── MentorshipRequestDAO.java # CRUD & state queries for mentorship requests
-│   │   │   │   │   └── RegistrationDAO.java # User, student, and avatar registration
-│   │   │   │   ├── model/
-│   │   │   │   │   ├── User.java         # Base user entity
-│   │   │   │   │   ├── Student.java      # Student profile entity
-│   │   │   │   │   ├── Alumni.java       # Alumni mentor entity
-│   │   │   │   │   └── MentorshipRequest.java # Request entity with status and responses
-│   │   │   │   ├── search/
-│   │   │   │   │   ├── SearchAlgorithms.java # Manual Linear & Binary Search engine
-│   │   │   │   │   └── SearchResult.java # Telemetry & results container
-│   │   │   │   ├── server/
-│   │   │   │   │   ├── HttpServerApp.java# HTTP REST endpoints & routing
-│   │   │   │   │   └── HttpUtils.java    # CORS headers & JSON parsing
-│   │   │   │   ├── service/
-│   │   │   │   │   ├── MentorshipService.java # Business validation, capacity limits, requests
-│   │   │   │   │   ├── RegistrationService.java # Registration validation & auth
-│   │   │   │   │   └── SocketServer.java # TCP Socket server (Port 5002)
-│   │   │   │   └── validation/
-│   │   │   │       ├── InputValidator.java  # Name, password strength, RFC email validators
-│   │   │   │       ├── ValidationConstants.java # Regex patterns & constants
-│   │   │   │       └── ValidationResult.java    # Validation status & field error dictionary
-│   │   │   └── resources/
-│   │   │       └── application.properties   # Port configuration & MySQL / MariaDB defaults
-│   │   └── test/java/com/alumni/
-│   │       ├── AuthProfileIntegrationTest.java # 16 end-to-end integration tests (Auth, Profile, Search)
-│   │       ├── LoginBoundaryTest.java    # 26 boundary value analysis tests on login inputs
-│   │       ├── MentorshipRequestTest.java# 23 tests for request lifecycle & duplicate rules
-│   │       ├── ProfileTest.java          # 13 tests for avatars & profile updates
-│   │       ├── ValidationTest.java       # 28 validation & endpoint integration tests
-│   │       ├── SearchAlgorithmsTest.java # 19 linear vs binary search telemetry tests
-│   │       └── JDBCTest.java             # 4 database connectivity & CRUD tests
-│   └── .env                              # MySQL / MariaDB credentials & environment config
-├── frontend/                             # Pure Vanilla HTML/CSS/JS Frontend
-│   ├── index.html                        # Application views (Auth, Search, Profile, Requests)
-│   ├── css/
-│   │   └── styles.css                    # Design system, variables, card styles, and animations
-│   ├── js/
-│   │   ├── api.js                        # HTTP client connecting to backend on port 5001
-│   │   └── app.js                        # Routing, session, live meter, requests & search
-│   └── package.json                      # Optional static file serving script (`npm run dev`)
-├── database/
-│   ├── schema.sql                        # DDL table definitions (users, students, alumni, requests)
-│   └── seed.sql                          # Demo students and 15+ industry alumni mentors
-└── docs/
-    ├── API_Documentation.md              # Complete REST API reference
-    ├── Testing_Report.md                 # Boundary and integration testing report
-    └── SEARCH_LIFECYCLE.md               # Search engine flow and algorithm specifications
+
+### Authentication & Authorized Request
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant FE as Frontend (api.js)
+    participant BE as HttpServerApp
+    participant AS as AuthService
+    participant DB as MySQL
+
+    U->>FE: Email + password
+    FE->>BE: POST /api/auth/login
+    BE->>DB: Fetch user + password_hash
+    BE->>BE: Verify salted SHA-256
+    BE->>AS: Issue token
+    AS->>DB: Store SHA-256(token) in auth_tokens
+    BE-->>FE: { token, user, role }
+    FE->>FE: Save session in localStorage
+
+    U->>FE: Send mentorship request
+    FE->>BE: POST /api/requests (Authorization: Bearer token)
+    BE->>AS: Validate token & role
+    AS->>DB: Lookup hash, check expiry/revoked
+    BE->>DB: Validate rules & insert request
+    BE-->>FE: 201 Created / 409 Conflict
 ```
 
 ---
 
-## System Requirements
+## 🚀 Getting Started
 
-- **Java Development Kit**: OpenJDK 17 or higher
-- **Build Tool**: Apache Maven 3.8+
-- **Database**: MySQL Server 8.0+ or MariaDB 10.5+
-- **Web Browser**: Chrome, Firefox, Safari, or Edge
+### Prerequisites
 
----
+- **JDK 17+** and **Maven 3.8+**
+- **MySQL 8+** or **MariaDB 10.5+**
+- **Node.js** (optional — only for `npm run dev`; Python's `http.server` works too)
 
-## Database Setup
+### 1️⃣ Clone
 
-1. **Start your local MySQL or MariaDB service**:
-   ```bash
-   # On macOS via Homebrew (MySQL):
-   brew services start mysql
-   # Or MariaDB:
-   brew services start mariadb
-   ```
+```bash
+git clone https://github.com/anuragpatil1729/Alumni-Mentoring-Portal.git
+cd Alumni-Mentoring-Portal
+```
 
-2. **Initialize Schema & Seed Data**:
-   ```bash
-   mysql -u root -p < database/schema.sql
-   mysql -u root -p alumni_mentoring_portal < database/seed.sql
-   ```
+### 2️⃣ Set up the database
 
-3. **Verify Database Configuration**:
-   Ensure `backend/.env` contains your MySQL / MariaDB credentials:
-   ```env
-   DB_HOST=localhost
-   DB_PORT=3306
-   DB_NAME=alumni_mentoring_portal
-   DB_USER=alumni_user
-   DB_PASSWORD=alumni_password
-   PORT=5001
-   SOCKET_PORT=5002
-   ```
+```bash
+# Start the DB service (macOS / Homebrew)
+brew services start mysql        # or: brew services start mariadb
 
----
+# Base schema
+mysql -u root -p < database/schema.sql
 
-## Quick Start Guide
+# Migrations — run in order
+for f in database/migrations/00*.sql; do mysql -u root -p alumni_mentoring_portal < "$f"; done
 
-### 1. Start Java Backend
+# Demo data
+mysql -u root -p alumni_mentoring_portal < database/seed.sql
+```
+
+> 💡 `database/stored_database.sql` is a lightweight snapshot dump of the base tables and seed data.
+
+### 3️⃣ Configure the backend
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+```env
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=alumni_mentoring_portal
+DB_USER=root
+DB_PASSWORD=your_password
+PORT=5001
+
+# Optional — required only for password-reset emails
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=you@example.com
+SMTP_PASSWORD=app_password
+SMTP_FROM=you@example.com
+```
+
+> Defaults also live in [`application.properties`](backend/src/main/resources/application.properties) (HTTP `5001`, TCP socket `5002`).
+
+### 4️⃣ Run the backend
 
 ```bash
 cd backend
-mvn compile exec:java -Dexec.mainClass="com.alumni.Main"
+mvn compile exec:java
 ```
-*The backend server will start on **`http://localhost:5001`** and the TCP registration socket on port **`5002`**.*
 
-### 2. Start Frontend
+✅ REST API → `http://localhost:5001` (health check: `/api/health`)
+✅ TCP socket → `localhost:5002`
 
-In a separate terminal tab:
+### 5️⃣ Run the frontend
+
 ```bash
 cd frontend
-npm run dev
+npm run dev                      # or: python3 -m http.server 5173
 ```
-*(Or use Python's built-in static server with zero dependencies):*
-```bash
-python3 -m http.server 5173
-```
-*Open your browser and navigate to **`http://localhost:5173/`**.*
+
+Open **http://localhost:5173** 🎉
 
 ---
 
-## Database Seed Accounts
+## 🔑 Demo Accounts
 
-All accounts use cryptographically hashed passwords stored in MySQL / MariaDB:
+Loaded by [`seed.sql`](database/seed.sql):
 
-| Role | Name | Email | Password |
-| :--- | :--- | :--- | :--- |
-| **Student** | Andrew Garfield | `andrewgarfield@gmail.com` | `Password@123` |
-| **Student** | Rahul Sharma | `rahul.student@college.edu` | `Student@123` |
-| **Student** | Ananya Patel | `ananya.p@college.edu` | `Student@123` |
-| **Alumni (Mentor)** | Robert Pattinson (Tenet) | `robertpattinson@gmail.com` | `Password@123` |
-| **Alumni (Mentor)** | Anurag Patil (Microsoft) | `anurag.patil@microsoft.com` | `Alumni@123` |
-| **Alumni (Mentor)** | Rohan Mali (Google) | `rohanmali@google.com` | `Alumni@123` |
-| **Alumni (Mentor)** | Priya Sharma (Amazon) | `priya.sharma@amazon.com` | `Alumni@123` |
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| Student | `rahul.student@college.edu` | `Student@123` |
+| Student | `ananya.p@college.edu` | `Student@123` |
+| Alumni | `anurag.patil@microsoft.com` | `Alumni@123` |
+| Alumni | `rohanmali@google.com` | `Alumni@123` |
+| Alumni | `priya.sharma@amazon.com` | `Alumni@123` |
+| Teacher | `teacher.sharma@college.edu` | *(set by maintainer)* |
+| Admin | `admin@college.edu` | *(set by maintainer)* |
 
----
-
-## API Reference
-
-### Mentorship Request Endpoints (Week 5)
-
-| Method | Endpoint | Parameters / Payload | Description |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/requests` | `{"studentId": 551, "mentorId": 488, "sessionGoal": "...", "message": "..."}` | Submit a new mentorship request from student to mentor |
-| `GET`  | `/api/requests?studentId=...` | `studentId` (query) | Retrieve all mentorship requests sent by a student |
-| `GET`  | `/api/requests?mentorId=...` | `mentorId` (query) | Retrieve all mentorship requests received by a mentor |
-| `GET`  | `/api/requests?id=...` | `id` (query) | Retrieve specific mentorship request details |
-| `PUT`  | `/api/requests` | `{"requestId": 18, "status": "ACCEPTED", "mentorResponse": "..."}` | Update request status (`ACCEPTED`, `REJECTED`, `CANCELLED`) |
-
-### Profile & Avatar Endpoints
-
-| Method | Endpoint | Parameters / Payload | Description |
-| :--- | :--- | :--- | :--- |
-| `GET`  | `/api/users/:id/avatar` | `id` (path) | Stream user avatar image binary (`image/jpeg`, `image/png`) |
-| `HEAD` | `/api/users/:id/avatar` | `id` (path) | Check avatar existence and content headers |
-| `GET`  | `/api/profile?id=...` | `id` (query) | Retrieve complete user profile details |
-| `PUT`  | `/api/profile?id=...` | JSON profile payload | Update user details, bio, and mentee capacity |
-
-### Authentication & Registration Endpoints
-
-| Method | Endpoint | Description | Sample Request Payload |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/login` | Authenticate Student or Alumni | `{"email": "rahul.student@college.edu", "password": "Student@123"}` |
-| `GET`  | `/api/auth/check-availability` | Real-time Email & Mobile In-Use Check | `?email=...&mobileNumber=...` |
-| `POST` | `/api/auth/register/student` | Register a new Student | `{"fullName": "Aman Gupta", "email": "aman@college.edu", "mobileNumber": "9876543210", "password": "StrongP@ss1", "studentId": "STU-2024-042", "department": "Computer Engineering", "graduationYear": 2026}` |
-| `POST` | `/api/auth/register/alumni` | Register a new Alumni Mentor | `{"fullName": "Ritu Roy", "email": "ritu@tech.com", "mobileNumber": "9876543215", "password": "StrongP@ss1", "department": "Information Technology", "graduationYear": 2021, "company": "Apple", "designation": "Software Engineer", "industry": "Information Technology", "skills": "Swift, iOS", "maxMentees": 5}` |
-| `POST` | `/api/auth/password-strength` | Evaluate password strength | `{"password": "Password@123"}` |
-| `GET`  | `/api/auth/registrations/:email` | Retrieve safe user profile | *URL parameter: email address* |
-| `POST` | `/api/servlet/register` | Servlet-style Unified Form Endpoint | Form payload with `role: "student"` or `role: "alumni"` |
-| `POST` | `/cgi-bin/register` | CGI-style URL-Encoded Form Endpoint | URL-encoded POST body |
-| `TCP`  | `localhost:5002` | High-throughput Socket Server | Newline-delimited JSON registration message |
-
-### Mentors & Directory Endpoints
-
-| Method | Endpoint | Parameters | Description |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/mentors/search` | `query`, `department`, `industry`, `minExperience` | Search mentors with manual algorithm matching & telemetry |
-| `GET` | `/api/mentors` | — | Retrieve all alumni mentors |
-| `GET` | `/api/mentors/:id` | `id` (path) | Retrieve individual mentor details by ID |
-| `GET` | `/api/health` | — | Health check & system status |
+> Ten alumni mentors are seeded in total (Microsoft, Google, Amazon, Nvidia, Goldman Sachs, Deloitte, Apple, Meta, McKinsey).
 
 ---
 
-## Terminal Image Inspection Guide
+## 📡 API Overview
 
-To verify avatars stored in the MySQL / MariaDB `users` table directly from the terminal:
+All endpoints are served from `http://localhost:5001`. Protected routes require
+`Authorization: Bearer <token>`. Full reference → [`docs/API_Documentation.md`](docs/API_Documentation.md).
 
-### 1. View Image Metadata
-```bash
-mysql -u alumni_user -palumni_password alumni_mentoring_portal -e "
-SELECT id, full_name, role, avatar_mime_type, ROUND(LENGTH(avatar_image) / 1024, 2) AS size_kb 
-FROM users WHERE avatar_image IS NOT NULL;
-"
+<details>
+<summary><b>🔐 Auth & Registration</b></summary>
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/auth/login` | Log in, returns token |
+| `POST` | `/api/auth/logout` | Revoke current token |
+| `POST` | `/api/auth/register/student` | Register a student |
+| `POST` | `/api/auth/register/alumni` | Register an alumni mentor |
+| `GET` | `/api/auth/check-availability` | Check email / mobile availability |
+| `POST` | `/api/auth/password-strength` | Score a password (0–4) |
+| `POST` | `/api/auth/password-reset/request` | Email a reset link |
+| `POST` | `/api/auth/password-reset/confirm` | Set new password with token |
+| `GET` | `/api/auth/registrations/{email}` | Look up own registration |
+| `POST` | `/api/servlet/register`, `/cgi-bin/register` | Servlet / CGI-style registration |
+| `TCP` | `localhost:5002` | Newline-delimited JSON registration |
+
+</details>
+
+<details>
+<summary><b>🔍 Mentors, Profiles & Avatars</b></summary>
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/mentors` | List all mentors |
+| `GET` | `/api/mentors/{id}` | Mentor details |
+| `GET` | `/api/mentors/search` | Search with `query`, `department`, `industry`, `minExperience` |
+| `GET` / `PUT` | `/api/profile` | View / update own profile |
+| `GET` / `HEAD` | `/api/users/{id}/avatar` | Stream avatar (public) |
+| `POST` / `PUT` / `DELETE` | `/api/users/{id}/avatar` | Manage avatar (owner / admin) |
+
+</details>
+
+<details>
+<summary><b>📬 Requests & Sessions</b></summary>
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/requests` | Create mentorship request |
+| `GET` | `/api/requests?studentId=` / `?mentorId=` | List requests |
+| `PUT` | `/api/requests?id=` | Accept / reject / cancel |
+| `POST` | `/api/session-history` | Log a session |
+| `GET` | `/api/session-history` | List & sort sessions |
+| `PATCH` | `/api/session-history/{id}/status` | Update session status |
+
+</details>
+
+<details>
+<summary><b>🎤 Events, Opportunities, Teacher & Admin</b></summary>
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` / `POST` | `/api/events` | Browse / create events |
+| `GET` / `POST` | `/api/opportunities` | Browse / post opportunities |
+| `*` | `/api/admin/events/{id}` | Approve / reject events (admin) |
+| `*` | `/api/admin/users` | Manage users (admin) |
+| `GET` | `/api/teacher/events` | Teacher's assigned events |
+| `GET` / `POST` | `/api/teacher/bookings` | Alumni slot bookings |
+| `PATCH` | `/api/teacher/bookings/{id}/status` | Update booking status |
+| `POST` / `PUT` | `/api/teacher/events/{id}/marks[/{studentId}]` | Enter / edit internal marks |
+
+</details>
+
+---
+
+## 🗄 Database Design
+
+```mermaid
+erDiagram
+    USERS ||--o| STUDENTS : "is a"
+    USERS ||--o| ALUMNI : "is a"
+    USERS ||--o{ AUTH_TOKENS : has
+    USERS ||--o{ PASSWORD_RESETS : has
+    USERS ||--o{ MENTORSHIP_REQUESTS : "sends / receives"
+    ALUMNI ||--o{ EVENTS : organizes
+    ALUMNI ||--o{ OPPORTUNITIES : posts
+    ALUMNI ||--o{ ALUMNI_SLOT_BOOKINGS : "booked for"
+    EVENTS ||--o{ ALUMNI_SLOT_BOOKINGS : contains
+    EVENTS ||--o{ TEACHER_EVENT_ASSIGNMENTS : "staffed by"
+    EVENTS ||--o{ INTERNAL_MARKS : "graded in"
+    STUDENTS ||--o{ INTERNAL_MARKS : receives
+    STUDENTS ||--o{ SESSION_HISTORY : attends
+    ALUMNI ||--o{ SESSION_HISTORY : mentors
+    MENTORSHIP_REQUESTS ||--o{ SESSION_HISTORY : "leads to"
+
+    USERS {
+        bigint id PK
+        string full_name
+        string email UK
+        string mobile_number UK
+        string password_hash
+        enum role "student|alumni|teacher|admin"
+        blob avatar_image
+        bool is_active
+    }
+    STUDENTS {
+        bigint user_id PK,FK
+        string student_id UK
+        string department
+        int graduation_year
+    }
+    ALUMNI {
+        bigint user_id PK,FK
+        string company
+        string designation
+        int experience_years
+        string skills
+        int max_mentees
+    }
+    MENTORSHIP_REQUESTS {
+        bigint id PK
+        bigint student_id FK
+        bigint mentor_id FK
+        enum status "PENDING|ACCEPTED|REJECTED|CANCELLED"
+    }
+    SESSION_HISTORY {
+        bigint id PK
+        int duration_minutes
+        enum status "STARTED|PAUSED|COMPLETED|FAILED"
+        enum priority "LOW|MEDIUM|HIGH|URGENT"
+    }
+    EVENTS {
+        bigint id PK
+        date date
+        enum event_type "GENERAL|JUDGE|GUEST_SESSION|SPONSOR"
+        enum status "PENDING|APPROVED|REJECTED"
+    }
 ```
 
-### 2. Export & Inspect File Headers
-```bash
-mysql -u alumni_user -palumni_password alumni_mentoring_portal -N -s -r \
-  -e "SELECT avatar_image FROM users WHERE id = 488;" > /tmp/avatar.jpg && file /tmp/avatar.jpg
-```
+| Migration | Adds |
+| :--- | :--- |
+| [`001_auth_and_roles`](database/migrations/001_auth_and_roles.sql) | `teacher`/`admin` roles, `is_active`, `auth_tokens` |
+| [`002_events_and_opportunities`](database/migrations/002_events_and_opportunities.sql) | `events`, `opportunities` |
+| [`003_teacher_assignments_and_marks`](database/migrations/003_teacher_assignments_and_marks.sql) | `teacher_event_assignments`, `internal_marks` |
+| [`004_alumni_slot_bookings`](database/migrations/004_alumni_slot_bookings.sql) | `alumni_slot_bookings` |
+| [`005_password_resets_and_session_history`](database/migrations/005_password_resets_and_session_history.sql) | `password_resets`, `session_history` |
 
-### 3. Render High-Resolution Pixel Art Inside Terminal
-```bash
-mysql -u alumni_user -palumni_password alumni_mentoring_portal -N -s -r \
-  -e "SELECT avatar_image FROM users WHERE id = 488;" > /tmp/avatar.jpg && \
-  python3 -c "from PIL import Image; img = Image.open('/tmp/avatar.jpg').convert('RGB'); w = 80; h = int((img.size[1]/img.size[0])*w*0.5); img = img.resize((w, h*2), Image.Resampling.LANCZOS); [print(''.join(f'\033[38;2;{img.getpixel((x, y))[0]};{img.getpixel((x, y))[1]};{img.getpixel((x, y))[2]}m\033[48;2;{img.getpixel((x, y+1))[0]};{img.getpixel((x, y+1))[1]};{img.getpixel((x, y+1))[2]}m▀\033[0m' for x in range(w))) for y in range(0, h*2, 2)]"
-```
+A rendered ER diagram is also available at [`docs/ER_Diagram.png`](docs/ER_Diagram.png).
 
-### 4. Open in macOS Preview
-```bash
-open /tmp/avatar.jpg
+---
+
+## 🧠 Algorithms (Hand-Written, No Library Sorting)
+
+| Component | Algorithm | Complexity |
+| :--- | :--- | :--- |
+| [`SearchAlgorithms`](backend/src/main/java/com/alumni/search/SearchAlgorithms.java) | Multi-field **linear search** with token scoring | `O(n)` |
+| | **Quicksort + binary search** with boundary expansion for duplicates/prefixes | `O(n log n) + O(log n)` |
+| [`SessionSorter`](backend/src/main/java/com/alumni/search/SessionSorter.java) | **Insertion / Selection / Bubble sort** by date, duration, priority, severity | `O(n²)` |
+| [`ConflictDetector`](backend/src/main/java/com/alumni/service/ConflictDetector.java) | Interval overlap: conflict ⇔ `max(s₁, s₂) < min(e₁, e₂)` | `O(1)` per pair |
+
+Every search/sort response includes **telemetry** — comparison count and execution time (`System.nanoTime()`).
+
+---
+
+## 📁 Project Structure
+
+```text
+Alumni-Mentoring-Portal/
+├── backend/                      # Java 17 + Maven
+│   ├── pom.xml
+│   ├── .env.example
+│   └── src/
+│       ├── main/java/com/alumni/
+│       │   ├── Main.java         # Boots HTTP (5001) + TCP (5002) servers
+│       │   ├── config/           # DBConnection (.env / properties loader)
+│       │   ├── server/           # HttpServerApp (router), HttpUtils (CORS/JSON)
+│       │   ├── security/         # AuthService, AuthenticatedUser, AuthException
+│       │   ├── service/          # Registration, Mentorship, ConflictDetector, Mailer, SocketServer
+│       │   ├── dao/              # JDBC data-access objects (10 DAOs)
+│       │   ├── model/            # User, Student, Alumni, MentorshipRequest
+│       │   ├── search/           # SearchAlgorithms, SessionSorter, SearchResult
+│       │   └── validation/       # InputValidator, ValidationConstants, ValidationResult
+│       └── test/java/com/alumni/ # 9 JUnit 5 suites
+├── frontend/                     # Vanilla HTML / CSS / JS
+│   ├── index.html
+│   ├── css/styles.css
+│   └── js/{api.js, app.js}
+├── database/
+│   ├── schema.sql                # Base tables
+│   ├── migrations/               # 001 → 005 incremental migrations
+│   ├── seed.sql                  # Demo users, alumni, students, admin, teacher
+│   └── stored_database.sql       # Snapshot dump
+├── docs/                         # API, testing, flows, ER diagram
+├── images/                       # Sample avatar images
+└── LICENSE
 ```
 
 ---
 
-## Search Engine & Algorithms
-
-The backend incorporates custom Data Structures and Algorithms without relying on generic database queries:
-
-1. **Manual Multi-Field Linear Search ($O(N)$)**:
-   - Evaluates queries across `fullName`, `company`, `designation`, `skills`, `department`, and `bio`.
-   - Tokenizes multi-word queries with whole-word preference bonuses.
-2. **Manual Quicksort + Binary Search ($O(N \log N) + O(\log N)$)**:
-   - In-memory Quicksort partitioning on chosen sorted keys (`fullName`, `company`, `graduationYear`, `experienceYears`).
-   - Divide-and-conquer binary search with dual-pointer boundary expansion for duplicate keys and prefix queries.
-3. **Telemetry Benchmarking**:
-   - Operational comparison counters and high-precision execution timings (`System.nanoTime()`) returned in every search response.
-
----
-
-## Automated Testing Suite
-
-The project includes an extensive JUnit 5 test suite validating all core backend components:
+## 🧪 Testing
 
 ```bash
 cd backend
 mvn clean test
 ```
 
-### Test Coverage Breakdown (**129 Tests Run, 0 Failures**):
-- **`AuthProfileIntegrationTest` (16 tests)**: End-to-end integration workflows (Availability Pre-Check ➔ Registration ➔ Login ➔ Profile View & Update ➔ BLOB Avatar ➔ Search Discovery).
-- **`LoginBoundaryTest` (26 tests)**: Boundary Value Analysis on login inputs (empty/null bounds, 254-char RFC email limit, 128-char password limits, SQL injection resilience, unicode, whitespace normalization).
-- **`MentorshipRequestTest` (23 tests)**: Request creation, self-request prevention, duplicate request blocking (`PENDING` lock), re-requesting after approval/rejection, mentor capacity validation, status transitions (`ACCEPTED`, `REJECTED`, `CANCELLED`), and HTTP `/api/requests` endpoints.
-- **`ValidationTest` (28 tests)**: RFC email compliance, mobile number regex, full name constraints, 4-segment password strength evaluator, password mismatch, student ID regex, graduation years, HTTP registration, login flow, and password-strength REST endpoint.
-- **`SearchAlgorithmsTest` (19 tests)**: Multi-attribute Linear Search scans, case insensitivity, Quicksort ordering, exact vs prefix Binary Search, boundary expansions, and execution telemetry metrics.
-- **`ProfileTest` (13 tests)**: Profile picture uploads, avatar retrieval, MIME type verification, profile updates, and HTTP `/api/profile` endpoints.
-- **`JDBCTest` (4 tests)**: Database connectivity, connection pool stability, and transactional integrity.
+> ⚠️ Integration suites need the database running with the schema, migrations and seed applied.
 
-**Result: `Tests run: 129, Failures: 0, Errors: 0, Skipped: 0` (BUILD SUCCESS — 100% Pass Rate)**
+| Suite | Tests | Covers |
+| :--- | :---: | :--- |
+| `ValidationTest` | 28 | Email, mobile, name, password strength, student ID, registration endpoints |
+| `LoginBoundaryTest` | 26 | Boundary values, max lengths, SQL-injection resilience, unicode |
+| `MentorshipRequestTest` | 23 | Lifecycle, duplicates, self-requests, capacity, `/api/requests` |
+| `SearchAlgorithmsTest` | 19 | Linear vs binary search, quicksort, telemetry |
+| `AuthProfileIntegrationTest` | 16 | Register → login → profile → avatar → search (end-to-end) |
+| `ProfileTest` | 13 | Avatar upload/retrieval, MIME types, profile updates |
+| `ConflictDetectionTest` | 9 | Overlaps, containment, shared boundaries, zero-length slots |
+| `SessionHistorySortTest` | 7 | Sorting accuracy across all criteria |
+| `JDBCTest` | 4 | Connectivity and CRUD |
+| **Total** | **145** | ✅ `BUILD SUCCESS` |
+
+Detailed report → [`docs/test-docs/Testing_Report.md`](docs/test-docs/Testing_Report.md)
 
 ---
 
-## License
+## 📚 Documentation
 
-This project is licensed under the MIT License — see the repository for details.
+| Document | Description |
+| :--- | :--- |
+| [API_Documentation.md](docs/API_Documentation.md) | Full REST API reference |
+| [SEARCH_LIFECYCLE.md](docs/SEARCH_LIFECYCLE.md) | Search engine flow & algorithms |
+| [STATUS_TRACKING_FLOW.md](docs/STATUS_TRACKING_FLOW.md) | Request/session status state machine |
+| [WEEK_8_ALL_TEAMS_DELIVERY.md](docs/WEEK_8_ALL_TEAMS_DELIVERY.md) | Sprint delivery report |
+| [Testing_Report.md](docs/test-docs/Testing_Report.md) | Boundary & integration testing |
+| [backend/README.md](backend/README.md) | Backend-specific notes |
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repo and create a branch: `git checkout -b feature/my-feature`
+2. Add any schema changes as a **new numbered migration** in `database/migrations/`
+3. Make sure `mvn clean test` passes
+4. Open a pull request with a clear description
+
+> 🔒 Never commit `backend/.env` — it is already in `.gitignore`.
+
+---
+
+## 📄 License
+
+Released under the [MIT License](LICENSE).
