@@ -143,12 +143,31 @@ const ApiClient = {
   },
 
   /**
+   * Helper to get Authorization header from stored session.
+   */
+  getAuthHeader() {
+    try {
+      const stored = localStorage.getItem("alumniConnectUser");
+      if (stored) {
+        const u = JSON.parse(stored);
+        if (u && u.token) {
+          return { "Authorization": `Bearer ${u.token}` };
+        }
+      }
+    } catch (e) {}
+    return {};
+  },
+
+  /**
    * Retrieves full profile of current authenticated user.
    */
   async getProfile(userId) {
     const response = await fetch(`${API_BASE_URL}/api/profile?id=${userId}`, {
       method: "GET",
-      headers: { "Accept": "application/json" }
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
     });
 
     const data = await response.json().catch(() => ({}));
@@ -167,7 +186,8 @@ const ApiClient = {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "Accept": "application/json"
+        "Accept": "application/json",
+        ...this.getAuthHeader()
       },
       body: JSON.stringify(payload)
     });

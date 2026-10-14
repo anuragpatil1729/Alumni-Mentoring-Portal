@@ -252,6 +252,9 @@
   }
 
   function saveSession(user) {
+    if (state.currentUser && state.currentUser.token && !user.token) {
+      user.token = state.currentUser.token;
+    }
     state.currentUser = user;
     try {
       localStorage.setItem("alumniConnectUser", JSON.stringify(user));
@@ -413,7 +416,8 @@
           ? "Login successful! Redirecting to mentorship requests..."
           : "Login successful! Redirecting to mentors directory...";
         setLoginAlert("success", redirectMsg);
-        saveSession(res.data.user);
+        const userData = { ...res.data.user, token: res.data.token };
+        saveSession(userData);
 
         setTimeout(() => {
           els.loginForm.reset();
@@ -714,7 +718,7 @@
         // Automatically log in the user
         const loginRes = await ApiClient.login({ email, password });
         if (loginRes.ok && loginRes.data.success && loginRes.data.user) {
-          saveSession(loginRes.data.user);
+          saveSession({ ...loginRes.data.user, token: loginRes.data.token });
           setTimeout(() => {
             setStudentRegAlert(null);
             switchView("search");
@@ -871,7 +875,7 @@
 
         const loginRes = await ApiClient.login({ email, password });
         if (loginRes.ok && loginRes.data.success && loginRes.data.user) {
-          saveSession(loginRes.data.user);
+          saveSession({ ...loginRes.data.user, token: loginRes.data.token });
           setTimeout(() => {
             setRegStatusAlert(null);
             switchView("requests");
@@ -956,6 +960,12 @@
 
     try {
       const res = await ApiClient.getProfile(state.currentUser.id);
+      if (res.status === 401) {
+        clearSession();
+        switchView("login");
+        setLoginAlert("error", "Your session has expired or requires authentication. Please sign in again.");
+        return;
+      }
       if (res.ok && res.data.success && res.data.profile) {
         state.profileData = res.data.profile;
         if (state.profileData.avatarUrl) {
