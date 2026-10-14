@@ -370,6 +370,73 @@ const ApiClient = {
       ok: response.ok,
       data
     };
+  },
+
+  /**
+   * Admin: Fetch all users with optional role & active status filter
+   */
+  async getAdminUsers(params = {}) {
+    const qp = new URLSearchParams();
+    if (params.role) qp.append("role", params.role);
+    if (params.active !== undefined && params.active !== "") qp.append("active", params.active);
+    const response = await fetch(`${API_BASE_URL}/api/admin/users?${qp.toString()}`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Admin: Activate or deactivate a user account
+   */
+  async setUserActiveStatus(userId, active) {
+    const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify({ active })
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Admin: Fetch institutional events
+   */
+  async getAdminEvents() {
+    const response = await fetch(`${API_BASE_URL}/api/admin/events`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Admin: Approve or Reject event
+   */
+  async updateAdminEventStatus(eventId, status) {
+    const response = await fetch(`${API_BASE_URL}/api/admin/events/${eventId}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify({ status })
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
   }
 };
 
