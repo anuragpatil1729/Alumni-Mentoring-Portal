@@ -20,9 +20,11 @@ import com.alumni.security.AuthException;
 import com.alumni.security.AuthenticatedUser;
 import com.alumni.dao.TeacherDAO;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import com.alumni.dao.AlumniSlotBookingDAO;
 import com.alumni.dao.PasswordResetDAO;
+import com.alumni.dao.FeedbackDAO;
+import com.alumni.service.UserDuplicateService;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -73,6 +75,7 @@ public class HttpServerApp {
         server.createContext("/api/admin/events", new AdminEventsHandler());
         server.createContext("/api/teacher", new TeacherHandler());
         server.createContext("/api/session-history", new SessionHistoryHandler());
+        server.createContext("/api/feedback", new FeedbackHandler());
         server.createContext("/api/auth/password-strength", new PasswordStrengthHandler());
         server.createContext("/api/auth/check-availability", new AvailabilityCheckHandler());
         server.createContext("/api/auth/register/student", new StudentRegisterHandler());
@@ -1217,6 +1220,7 @@ public class HttpServerApp {
 
                     String role = qp.get("role");
                     String active = qp.get("active");
+                    String approval = qp.get("approval");
 
                     if (role != null && !role.isBlank()
                             && !role.matches(
@@ -1235,13 +1239,94 @@ public class HttpServerApp {
                         return;
                     }
 
+                    if (approval != null && !approval.isBlank()
+                            && !approval.matches("(?i)PENDING|APPROVED|REJECTED")) {
+                        HttpUtils.sendErrorResponse(
+                                exchange, 400, "Invalid approval status filter.");
+                        return;
+                    }
+
                     JSONObject response = new JSONObject();
                     response.put("success", true);
                     response.put("users",
-                            adminDAO.getUsers(role, active));
+                            adminDAO.getUsers(role, active, approval));
 
                     HttpUtils.sendJsonResponse(
                             exchange, 200, response.toString());
+                    return;
+                }
+
+                // GET /api/admin/duplicates
+                if ("/api/admin/duplicates".equals(path) && "GET".equalsIgnoreCase(method)) {
+                    UserDuplicateService dupService = new UserDuplicateService();
+                    JSONArray duplicates = dupService.scanAllDuplicates();
+                    JSONObject response = new JSONObject();
+                    response.put("success", true);
+                    response.put("duplicates", duplicates);
+                    response.put("totalClusters", duplicates.length());
+                    HttpUtils.sendJsonResponse(exchange, 200, response.toString());
+                    return;
+                }
+
+                // POST /api/admin/duplicates/check
+                if ("/api/admin/duplicates/check".equals(path) && "POST".equalsIgnoreCase(method)) {
+                    JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                    UserDuplicateService dupService = new UserDuplicateService();
+                    String name = body.optString("name", "");
+                    String email = body.optString("email", "");
+                    String mobile = body.optString("mobileNumber", body.optString("mobile", ""));
+                    String studentId = body.optString("studentId", "");
+                    JSONObject checkResult = dupService.checkManualDuplicate(name, email, mobile, studentId);
+                    checkResult.put("success", true);
+                    HttpUtils.sendJsonResponse(exchange, 200, checkResult.toString());
+                    return;
+                }
+
+                // POST /api/admin/users/{id}/approve or PATCH /api/admin/users/{id}/approve
+                // Body: {"approved": true}
+                if (path.matches("^/api/admin/users/\\d+/approve$")
+                        && ("POST".equalsIgnoreCase(method) || "PATCH".equalsIgnoreCase(method))) {
+
+                    long userId = Long.parseLong(path.split("/")[4]);
+                    JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                    boolean approved = body.optBoolean("approved", true);
+
+                    if (!adminDAO.approveUser(userId, approved)) {
+                        HttpUtils.sendErrorResponse(exchange, 404, "User not found.");
+                        return;
+                    }
+
+                    JSONObject response = new JSONObject();
+                    response.put("success", true);
+                    response.put("message", approved ? "User registration approved." : "User registration rejected.");
+                    HttpUtils.sendJsonResponse(exchange, 200, response.toString());
+                    return;
+                }
+
+                // DELETE /api/admin/users/{id}
+                if (path.matches("^/api/admin/users/\\d+$") && "DELETE".equalsIgnoreCase(method)) {
+                    long userId = Long.parseLong(path.split("/")[4]);
+
+                    com.alumni.security.AuthenticatedUser actor =
+                            authService.authenticate(exchange);
+
+                    if (actor.getUserId() == userId) {
+                        HttpUtils.sendErrorResponse(
+                                exchange, 400,
+                                "You cannot delete your own account.");
+                        return;
+                    }
+
+                    if (!adminDAO.deleteUser(userId)) {
+                        HttpUtils.sendErrorResponse(
+                                exchange, 404, "User not found.");
+                        return;
+                    }
+
+                    JSONObject response = new JSONObject();
+                    response.put("success", true);
+                    response.put("message", "User deleted successfully.");
+                    HttpUtils.sendJsonResponse(exchange, 200, response.toString());
                     return;
                 }
 
@@ -1734,6 +1819,101 @@ private static class SessionHistoryHandler implements HttpHandler {
             HttpUtils.sendErrorResponse(exchange, 500, "Session history database error.");
         } catch (Exception e) {
             HttpUtils.sendErrorResponse(exchange, 400, "Invalid session history request.");
+        }
+    }
+}
+
+private static class FeedbackHandler implements HttpHandler {
+    private final FeedbackDAO feedbackDAO = new FeedbackDAO();
+    private final AuthService authService = new AuthService();
+
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        HttpUtils.addCorsHeaders(exchange);
+        String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
+
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            exchange.sendResponseHeaders(204, -1);
+            return;
+        }
+
+        try {
+            // POST /api/feedback: student or admin submits feedback for a completed session
+            if ("POST".equalsIgnoreCase(method) && "/api/feedback".equals(path)) {
+                AuthenticatedUser user = authService.authenticate(exchange);
+                if (!user.hasRole("STUDENT") && !user.hasRole("ADMIN")) {
+                    HttpUtils.sendErrorResponse(exchange, 403, "Student or admin role required to submit feedback.");
+                    return;
+                }
+
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                if (!body.has("sessionId") || !body.has("rating") || !body.has("comments")) {
+                    HttpUtils.sendErrorResponse(exchange, 400, "sessionId, rating, and comments are required.");
+                    return;
+                }
+
+                long sessionId = body.getLong("sessionId");
+                int rating = body.getInt("rating");
+                String comments = body.getString("comments");
+
+                long feedbackId = feedbackDAO.saveFeedback(sessionId, user.getUserId(), rating, comments, user.hasRole("ADMIN"));
+
+                JSONObject resp = new JSONObject();
+                resp.put("success", true);
+                resp.put("message", "Feedback submitted successfully.");
+                resp.put("feedbackId", feedbackId);
+                HttpUtils.sendJsonResponse(exchange, 201, resp.toString());
+                return;
+            }
+
+            // GET /api/feedback/session/{id}
+            if ("GET".equalsIgnoreCase(method) && path.matches("^/api/feedback/session/\\d+$")) {
+                authService.authenticate(exchange);
+                long sessionId = Long.parseLong(path.split("/")[4]);
+                JSONObject feedback = feedbackDAO.getFeedbackBySession(sessionId);
+                if (feedback == null) {
+                    HttpUtils.sendErrorResponse(exchange, 404, "No feedback found for session #" + sessionId + ".");
+                    return;
+                }
+                JSONObject resp = new JSONObject();
+                resp.put("success", true);
+                resp.put("feedback", feedback);
+                HttpUtils.sendJsonResponse(exchange, 200, resp.toString());
+                return;
+            }
+
+            // GET /api/feedback/mentor/{id}
+            if ("GET".equalsIgnoreCase(method) && path.matches("^/api/feedback/mentor/\\d+$")) {
+                long mentorId = Long.parseLong(path.split("/")[4]);
+                JSONObject summary = feedbackDAO.getMentorFeedbackSummary(mentorId);
+                summary.put("success", true);
+                HttpUtils.sendJsonResponse(exchange, 200, summary.toString());
+                return;
+            }
+
+            // GET /api/feedback (admin only)
+            if ("GET".equalsIgnoreCase(method) && "/api/feedback".equals(path)) {
+                authService.requireRole(exchange, "admin");
+                JSONArray all = feedbackDAO.getAllFeedback();
+                JSONObject resp = new JSONObject();
+                resp.put("success", true);
+                resp.put("feedback", all);
+                resp.put("total", all.length());
+                HttpUtils.sendJsonResponse(exchange, 200, resp.toString());
+                return;
+            }
+
+            HttpUtils.sendErrorResponse(exchange, 404, "Feedback endpoint not found.");
+
+        } catch (AuthException e) {
+            HttpUtils.sendErrorResponse(exchange, e.getStatusCode(), e.getMessage());
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            HttpUtils.sendErrorResponse(exchange, 400, e.getMessage());
+        } catch (SQLException e) {
+            HttpUtils.sendErrorResponse(exchange, 500, "Feedback database error: " + e.getMessage());
+        } catch (Exception e) {
+            HttpUtils.sendErrorResponse(exchange, 400, "Invalid feedback request: " + e.getMessage());
         }
     }
 }
