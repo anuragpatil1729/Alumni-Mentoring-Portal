@@ -1034,7 +1034,7 @@
       <!-- ================================================================= -->
       <!-- 5. SESSION HISTORY VIEW (TEAM B & TEAM C)                         -->
       <!-- ================================================================= -->
-      <section id="historyView" class="view-section" style="display: none;">
+      <section id="historyView" class="view-section">
         <div class="section-container">
           <div class="section-header-box">
             <div class="section-title-wrap">
@@ -1103,7 +1103,7 @@
       <!-- ================================================================= -->
       <!-- 6. ADMIN CONSOLE VIEW                                            -->
       <!-- ================================================================= -->
-      <section id="adminView" class="view-section" style="display: none;">
+      <section id="adminView" class="view-section">
         <div class="section-container">
           <div class="section-header-box">
             <div class="section-title-wrap">
@@ -1113,102 +1113,194 @@
                 <p>Manage users, verify accounts, toggle active status, and audit system-wide interactions</p>
               </div>
             </div>
-            <div class="header-action-group">
-              <button type="button" id="refreshAdminBtn" class="refresh-btn" title="Refresh user records">
-                🔄 Refresh
-              </button>
-            </div>
           </div>
 
           <div id="adminAlert" class="form-status-alert" style="display: none;"></div>
 
-          <!-- System Stats Cards Grid -->
-          <div class="admin-stats-grid">
-            <div class="admin-stat-card">
-              <div class="admin-stat-icon">👥</div>
-              <div class="admin-stat-info">
-                <span class="admin-stat-number" id="adminTotalUsers">0</span>
-                <span class="admin-stat-label">Total Accounts</span>
+          <!-- Admin Sub-Navigation Tabs (Team C & A) -->
+          <div class="admin-subnav-bar">
+            <button type="button" id="adminSubtabUsersBtn" class="admin-subtab-btn active">
+              <span>👥</span> All Accounts
+            </button>
+            <button type="button" id="adminSubtabPendingBtn" class="admin-subtab-btn">
+              <span>📋</span> Registration Approvals
+              <span id="adminPendingBadge" class="admin-tab-badge">0</span>
+            </button>
+            <button type="button" id="adminSubtabDuplicatesBtn" class="admin-subtab-btn">
+              <span>🔍</span> Duplicate Detection
+              <span id="adminDuplicatesBadge" class="admin-tab-badge badge-alert" style="display:none;">0</span>
+            </button>
+            <button type="button" id="adminSubtabFeedbackBtn" class="admin-subtab-btn">
+              <span>⭐</span> Platform Feedback
+            </button>
+          </div>
+
+          <!-- PANEL 1: All Users & Account Deletion -->
+          <div id="adminPanelUsers" class="admin-panel-tab">
+            <div class="admin-toolbar-card">
+              <div class="admin-toolbar-filters">
+                <div class="filter-group">
+                  <label for="adminRoleFilter">Filter Role:</label>
+                  <select id="adminRoleFilter" class="form-select-sm">
+                    <option value="">All Roles</option>
+                    <option value="student">Students</option>
+                    <option value="alumni">Alumni Mentors</option>
+                    <option value="teacher">Faculty Teachers</option>
+                    <option value="admin">Administrators</option>
+                  </select>
+                </div>
+
+                <div class="filter-group">
+                  <label for="adminStatusFilter">Filter Status:</label>
+                  <select id="adminStatusFilter" class="form-select-sm">
+                    <option value="">All Statuses</option>
+                    <option value="true">Active Only</option>
+                    <option value="false">Deactivated Only</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="admin-search-wrap">
+                <input type="text" id="adminSearchInput" class="form-input-sm" placeholder="🔍 Search name, email, or mobile..." style="min-width: 260px; padding: 7px 12px; border: 1px solid #cbd5e1; border-radius: 6px;" />
               </div>
             </div>
-            <div class="admin-stat-card">
-              <div class="admin-stat-icon">🎓</div>
-              <div class="admin-stat-info">
-                <span class="admin-stat-number" id="adminTotalStudents">0</span>
-                <span class="admin-stat-label">Students</span>
-              </div>
-            </div>
-            <div class="admin-stat-card stat-alumni">
-              <div class="admin-stat-icon">💼</div>
-              <div class="admin-stat-info">
-                <span class="admin-stat-number" id="adminTotalAlumni">0</span>
-                <span class="admin-stat-label">Alumni Mentors</span>
-              </div>
-            </div>
-            <div class="admin-stat-card stat-teacher">
-              <div class="admin-stat-icon">👨‍🏫</div>
-              <div class="admin-stat-info">
-                <span class="admin-stat-number" id="adminTotalTeachers">0</span>
-                <span class="admin-stat-label">Faculty Teachers</span>
-              </div>
-            </div>
-            <div class="admin-stat-card stat-inactive">
-              <div class="admin-stat-icon">🚫</div>
-              <div class="admin-stat-info">
-                <span class="admin-stat-number" id="adminTotalInactive">0</span>
-                <span class="admin-stat-label">Deactivated</span>
+
+            <!-- User Management Table with Delete & Approval -->
+            <div class="admin-table-card">
+              <div class="admin-table-responsive">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>User ID</th>
+                      <th>User Name & Email</th>
+                      <th>Role</th>
+                      <th>Mobile</th>
+                      <th>Approval</th>
+                      <th>Status</th>
+                      <th>Joined</th>
+                      <th style="text-align: right;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminUsersTableBody">
+                    <!-- Injected via JavaScript -->
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
 
-          <!-- Admin Toolbar -->
-          <div class="admin-toolbar-card">
-            <div class="admin-toolbar-filters">
-              <div class="filter-group">
-                <label for="adminRoleFilter">Filter Role:</label>
-                <select id="adminRoleFilter" class="form-select-sm">
-                  <option value="">All Roles</option>
-                  <option value="student">Students</option>
-                  <option value="alumni">Alumni Mentors</option>
-                  <option value="teacher">Faculty Teachers</option>
-                  <option value="admin">Administrators</option>
-                </select>
+          <!-- PANEL 2: Registration Approvals (Team A) -->
+          <div id="adminPanelPending" class="admin-panel-tab" style="display: none;">
+            <div class="admin-toolbar-card" style="background:#fffbeb; border-color:#fde68a;">
+              <div>
+                <h3 style="font-size:16px; font-weight:700; color:#92400e; margin-bottom:4px;">Pending User Registrations</h3>
+                <p style="font-size:13px; color:#b45309; margin:0;">Review and verify student & alumni accounts before granting portal access.</p>
               </div>
-
-              <div class="filter-group">
-                <label for="adminStatusFilter">Filter Status:</label>
-                <select id="adminStatusFilter" class="form-select-sm">
-                  <option value="">All Statuses</option>
-                  <option value="true">Active Only</option>
-                  <option value="false">Deactivated Only</option>
-                </select>
-              </div>
+              <button type="button" id="refreshPendingBtn" class="refresh-btn" style="background:#ffffff;">🔄 Refresh Approvals</button>
             </div>
 
-            <div class="admin-search-wrap">
-              <input type="text" id="adminSearchInput" class="form-input-sm" placeholder="🔍 Search name, email, or mobile..." style="min-width: 260px; padding: 7px 12px; border: 1px solid #cbd5e1; border-radius: 6px;" />
+            <div class="admin-table-card">
+              <div class="admin-table-responsive">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>User ID</th>
+                      <th>Candidate Details</th>
+                      <th>Role</th>
+                      <th>Mobile</th>
+                      <th>Registered</th>
+                      <th style="text-align: right;">Decision</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminPendingTableBody">
+                    <!-- Injected via JavaScript -->
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
-          <!-- User Management Table -->
-          <div class="admin-table-card">
-            <div class="admin-table-responsive">
-              <table class="admin-table">
-                <thead>
-                  <tr>
-                    <th>User ID</th>
-                    <th>User Name & Email</th>
-                    <th>Role</th>
-                    <th>Mobile</th>
-                    <th>Status</th>
-                    <th>Joined</th>
-                    <th style="text-align: right;">Action</th>
-                  </tr>
-                </thead>
-                <tbody id="adminUsersTableBody">
-                  <!-- Injected via JavaScript -->
-                </tbody>
-              </table>
+          <!-- PANEL 3: Duplicate Detection & Audit (Team D) -->
+          <div id="adminPanelDuplicates" class="admin-panel-tab" style="display: none;">
+            <div class="duplicate-scan-header">
+              <div>
+                <h3 style="font-size:16px; font-weight:700; color:#0f172a; margin-bottom:4px;">Automated Duplicate Detection & Manual Audit</h3>
+                <p style="font-size:13px; color:#64748b; margin:0;">Identifies duplicate accounts using phone normalization, Student ID matching, and Levenshtein name similarity.</p>
+              </div>
+              <button type="button" id="runDuplicateScanBtn" class="modal-submit-btn" style="padding:10px 18px; font-size:13px; display:inline-flex; align-items:center; gap:8px;">
+                ⚡ Run System Duplicate Audit
+              </button>
+            </div>
+
+            <!-- Manual Candidate Duplicate Checker Card -->
+            <div class="admin-toolbar-card" style="margin-bottom:20px; flex-direction:column; align-items:stretch;">
+              <h4 style="font-size:14px; font-weight:700; color:#334155; margin-bottom:10px;">🔍 Manual Candidate Duplicate Check</h4>
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto; gap:12px; align-items:end;">
+                <div class="form-group" style="margin:0;">
+                  <label for="manualDupName" style="font-size:11px; margin-bottom:4px;">Full Name:</label>
+                  <input type="text" id="manualDupName" class="form-input-sm" placeholder="e.g. Rahul Sharma" style="width:100%;" />
+                </div>
+                <div class="form-group" style="margin:0;">
+                  <label for="manualDupEmail" style="font-size:11px; margin-bottom:4px;">Email:</label>
+                  <input type="text" id="manualDupEmail" class="form-input-sm" placeholder="e.g. rahul@college.edu" style="width:100%;" />
+                </div>
+                <div class="form-group" style="margin:0;">
+                  <label for="manualDupMobile" style="font-size:11px; margin-bottom:4px;">Mobile:</label>
+                  <input type="text" id="manualDupMobile" class="form-input-sm" placeholder="e.g. 9876543210" style="width:100%;" />
+                </div>
+                <div class="form-group" style="margin:0;">
+                  <label for="manualDupStudentId" style="font-size:11px; margin-bottom:4px;">Student ID:</label>
+                  <input type="text" id="manualDupStudentId" class="form-input-sm" placeholder="e.g. STU-2024-001" style="width:100%;" />
+                </div>
+                <button type="button" id="checkCandidateDupBtn" class="refresh-btn" style="height:36px; padding:0 16px; background:#2563eb; color:#fff; border:none; font-weight:600;">
+                  Check
+                </button>
+              </div>
+              <div id="manualDupResultBox" style="margin-top:12px; display:none;"></div>
+            </div>
+
+            <div id="adminDuplicatesContainer">
+              <!-- Rendered via JavaScript -->
+              <div style="text-align:center; padding:32px; color:#64748b; background:#fff; border-radius:12px; border:1px solid #e2e8f0;">
+                Click <strong>"Run System Duplicate Audit"</strong> above to scan for duplicate mobile numbers, student IDs, and similar names.
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL 4: Platform Feedback & Ratings (Team C & B) -->
+          <div id="adminPanelFeedback" class="admin-panel-tab" style="display: none;">
+            <div class="feedback-metrics-grid">
+              <div class="feedback-metric-card">
+                <div style="font-size:32px;">⭐</div>
+                <div>
+                  <div id="adminAvgRatingScore" style="font-size:24px; font-weight:800; color:#0f172a;">0.0</div>
+                  <div style="font-size:13px; color:#64748b;">Average Session Rating</div>
+                </div>
+              </div>
+              <div class="feedback-metric-card">
+                <div style="font-size:32px;">💬</div>
+                <div>
+                  <div id="adminTotalFeedbackCount" style="font-size:24px; font-weight:800; color:#0f172a;">0</div>
+                  <div style="font-size:13px; color:#64748b;">Total Reviews Submitted</div>
+                </div>
+              </div>
+              <div class="feedback-metric-card">
+                <div style="font-size:32px;">🌟</div>
+                <div>
+                  <div id="adminFiveStarPercent" style="font-size:24px; font-weight:800; color:#15803d;">0%</div>
+                  <div style="font-size:13px; color:#64748b;">5-Star Ratings</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="admin-table-card">
+              <div style="padding:16px 20px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="font-size:15px; font-weight:700; color:#0f172a; margin:0;">Recent Student Reviews</h3>
+                <button type="button" id="refreshFeedbackBtn" class="refresh-btn">🔄 Refresh Reviews</button>
+              </div>
+              <div id="adminFeedbackListContainer" style="padding:20px;">
+                <!-- Rendered via JavaScript -->
+              </div>
             </div>
           </div>
         </div>
@@ -1413,6 +1505,90 @@
             <button type="submit" id="scheduleSubmitBtn" class="modal-submit-btn">Confirm & Schedule</button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- 1. FEEDBACK FORM MODAL (Team C: Rating & Comments) -->
+    <div id="feedbackModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="feedbackModalTitle" style="display: none;">
+      <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 520px;">
+        <div class="modal-header">
+          <h2 id="feedbackModalTitle">⭐ Submit Session Feedback</h2>
+          <button type="button" id="feedbackModalCloseBtn" class="modal-close-btn" title="Close modal">✕</button>
+        </div>
+
+        <div id="feedbackAlert" class="form-status-alert" style="display: none;"></div>
+
+        <div id="feedbackSessionInfo" class="feedback-session-pill">
+          <!-- Populated dynamically via JavaScript -->
+          <span>Session #0</span>
+        </div>
+
+        <form id="feedbackForm">
+          <input type="hidden" id="feedbackSessionId" value="" />
+
+          <!-- Star Rating Component (1-5 stars) -->
+          <div class="form-group" style="text-align: center;">
+            <label style="font-size: 14px; font-weight: 700; color: #1e293b; display: block; margin-bottom: 4px;">
+              Session Rating <span class="required">*</span>
+            </label>
+            <div class="star-rating-widget" id="starRatingWidget" style="justify-content: center;">
+              <button type="button" class="star-rating-btn" data-value="1" title="1 Star - Poor">★</button>
+              <button type="button" class="star-rating-btn" data-value="2" title="2 Stars - Fair">★</button>
+              <button type="button" class="star-rating-btn" data-value="3" title="3 Stars - Good">★</button>
+              <button type="button" class="star-rating-btn" data-value="4" title="4 Stars - Very Good">★</button>
+              <button type="button" class="star-rating-btn" data-value="5" title="5 Stars - Outstanding">★</button>
+            </div>
+            <div id="starRatingLabel" class="star-rating-label">Select your rating (1 to 5 stars)</div>
+            <input type="hidden" id="feedbackRatingValue" name="rating" value="5" required />
+          </div>
+
+          <!-- Comments Field -->
+          <div class="form-group">
+            <label for="feedbackComments">
+              Feedback & Comments <span class="required">*</span>
+              <span style="font-size: 11px; font-weight: 400; color: #64748b; margin-left: 6px;">(Min 5 characters)</span>
+            </label>
+            <textarea id="feedbackComments" rows="4" placeholder="How was your mentoring session? What were your key takeaways, learning points, or advice for improvement?" required></textarea>
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-top:4px;">
+              <span>Constructive feedback helps mentors continuously improve.</span>
+              <span id="feedbackCharCount">0 chars</span>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="feedbackCancelBtn" class="modal-cancel-btn">Cancel</button>
+            <button type="submit" id="feedbackSubmitBtn" class="modal-submit-btn">⭐ Submit Feedback</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. DELETE USER CONFIRMATION MODAL (Team A) -->
+    <div id="deleteUserModal" class="modal-overlay" role="dialog" aria-modal="true" style="display: none;">
+      <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 440px;">
+        <div class="modal-header">
+          <h2 style="color: #dc2626;">🗑️ Confirm User Deletion</h2>
+          <button type="button" id="deleteUserModalCloseBtn" class="modal-close-btn" title="Close modal">✕</button>
+        </div>
+
+        <div style="padding: 10px 0;">
+          <p style="font-size: 14px; color: #334155; margin-bottom: 12px;">
+            Are you sure you want to permanently delete user account:
+          </p>
+          <div id="deleteUserDetailsBox" style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #991b1b; margin-bottom: 14px;">
+            <!-- Populated dynamically -->
+          </div>
+          <p style="font-size: 12px; color: #64748b; margin: 0;">
+            ⚠️ <strong>Warning:</strong> This operation will permanently delete their profile, active sessions, requests, and login tokens. This action cannot be undone.
+          </p>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 20px;">
+          <button type="button" id="deleteUserCancelBtn" class="modal-cancel-btn">Cancel</button>
+          <button type="button" id="confirmDeleteUserBtn" class="btn-delete-user" style="padding: 10px 18px; font-size: 13px; background: #dc2626; color: #ffffff; border: none;">
+            Yes, Permanently Delete
+          </button>
+        </div>
       </div>
     </div>
 

@@ -264,6 +264,60 @@
     els.adminSearchInput = document.getElementById("adminSearchInput");
     els.adminUsersTableBody = document.getElementById("adminUsersTableBody");
 
+    // Admin Subtabs & Panels (Team C & A)
+    els.adminSubtabUsersBtn = document.getElementById("adminSubtabUsersBtn");
+    els.adminSubtabPendingBtn = document.getElementById("adminSubtabPendingBtn");
+    els.adminSubtabDuplicatesBtn = document.getElementById("adminSubtabDuplicatesBtn");
+    els.adminSubtabFeedbackBtn = document.getElementById("adminSubtabFeedbackBtn");
+
+    els.adminPanelUsers = document.getElementById("adminPanelUsers");
+    els.adminPanelPending = document.getElementById("adminPanelPending");
+    els.adminPanelDuplicates = document.getElementById("adminPanelDuplicates");
+    els.adminPanelFeedback = document.getElementById("adminPanelFeedback");
+
+    els.adminPendingBadge = document.getElementById("adminPendingBadge");
+    els.adminDuplicatesBadge = document.getElementById("adminDuplicatesBadge");
+
+    els.adminPendingTableBody = document.getElementById("adminPendingTableBody");
+    els.refreshPendingBtn = document.getElementById("refreshPendingBtn");
+
+    els.runDuplicateScanBtn = document.getElementById("runDuplicateScanBtn");
+    els.adminDuplicatesContainer = document.getElementById("adminDuplicatesContainer");
+    els.manualDupName = document.getElementById("manualDupName");
+    els.manualDupEmail = document.getElementById("manualDupEmail");
+    els.manualDupMobile = document.getElementById("manualDupMobile");
+    els.manualDupStudentId = document.getElementById("manualDupStudentId");
+    els.checkCandidateDupBtn = document.getElementById("checkCandidateDupBtn");
+    els.manualDupResultBox = document.getElementById("manualDupResultBox");
+
+    els.adminAvgRatingScore = document.getElementById("adminAvgRatingScore");
+    els.adminTotalFeedbackCount = document.getElementById("adminTotalFeedbackCount");
+    els.adminFiveStarPercent = document.getElementById("adminFiveStarPercent");
+    els.adminFeedbackListContainer = document.getElementById("adminFeedbackListContainer");
+    els.refreshFeedbackBtn = document.getElementById("refreshFeedbackBtn");
+
+    // Delete User Modal (Team A)
+    els.deleteUserModal = document.getElementById("deleteUserModal");
+    els.deleteUserModalCloseBtn = document.getElementById("deleteUserModalCloseBtn");
+    els.deleteUserCancelBtn = document.getElementById("deleteUserCancelBtn");
+    els.confirmDeleteUserBtn = document.getElementById("confirmDeleteUserBtn");
+    els.deleteUserDetailsBox = document.getElementById("deleteUserDetailsBox");
+
+    // Feedback Modal & Rating Elements (Team C)
+    els.feedbackModal = document.getElementById("feedbackModal");
+    els.feedbackModalCloseBtn = document.getElementById("feedbackModalCloseBtn");
+    els.feedbackCancelBtn = document.getElementById("feedbackCancelBtn");
+    els.feedbackForm = document.getElementById("feedbackForm");
+    els.feedbackSubmitBtn = document.getElementById("feedbackSubmitBtn");
+    els.feedbackAlert = document.getElementById("feedbackAlert");
+    els.feedbackSessionId = document.getElementById("feedbackSessionId");
+    els.feedbackSessionInfo = document.getElementById("feedbackSessionInfo");
+    els.starRatingWidget = document.getElementById("starRatingWidget");
+    els.starRatingLabel = document.getElementById("starRatingLabel");
+    els.feedbackRatingValue = document.getElementById("feedbackRatingValue");
+    els.feedbackComments = document.getElementById("feedbackComments");
+    els.feedbackCharCount = document.getElementById("feedbackCharCount");
+
     // Session Scheduling Elements (Team 1)
     els.scheduledSessionsContainer = document.getElementById("scheduledSessionsContainer");
     els.scheduledSessionsList = document.getElementById("scheduledSessionsList");
@@ -413,14 +467,22 @@
     state.activeView = viewName;
 
     // Hide all views
-    els.loginView.classList.remove("active");
-    els.studentRegisterView.classList.remove("active");
-    els.registerView.classList.remove("active");
-    els.searchView.classList.remove("active");
-    if (els.profileView) els.profileView.classList.remove("active");
-    if (els.requestsView) els.requestsView.classList.remove("active");
-    if (els.historyView) els.historyView.classList.remove("active");
-    if (els.adminView) els.adminView.classList.remove("active");
+    const allViews = [
+      els.loginView,
+      els.studentRegisterView,
+      els.registerView,
+      els.searchView,
+      els.profileView,
+      els.requestsView,
+      els.historyView,
+      els.adminView
+    ];
+    allViews.forEach(v => {
+      if (v) {
+        v.classList.remove("active");
+        v.style.display = "none";
+      }
+    });
 
     // Deactivate guest & auth nav buttons
     els.navLoginBtn.classList.remove("active");
@@ -434,33 +496,50 @@
 
     if (viewName === "login") {
       els.loginView.classList.add("active");
+      els.loginView.style.display = "block";
       els.navLoginBtn.classList.add("active");
     } else if (viewName === "studentRegister") {
       els.studentRegisterView.classList.add("active");
+      els.studentRegisterView.style.display = "block";
       els.navStudentRegBtn.classList.add("active");
     } else if (viewName === "alumniRegister") {
       els.registerView.classList.add("active");
+      els.registerView.style.display = "block";
       els.navAlumniRegBtn.classList.add("active");
     } else if (viewName === "search") {
       els.searchView.classList.add("active");
+      els.searchView.style.display = "block";
       els.tabSearchBtn.classList.add("active");
       performSearch();
     } else if (viewName === "profile") {
-      if (els.profileView) els.profileView.classList.add("active");
+      if (els.profileView) {
+        els.profileView.classList.add("active");
+        els.profileView.style.display = "block";
+      }
       if (els.tabProfileBtn) els.tabProfileBtn.classList.add("active");
       loadAndRenderProfile();
     } else if (viewName === "requests") {
-      if (els.requestsView) els.requestsView.classList.add("active");
+      if (els.requestsView) {
+        els.requestsView.classList.add("active");
+        els.requestsView.style.display = "block";
+      }
       if (els.tabRequestsBtn) els.tabRequestsBtn.classList.add("active");
       loadAndRenderRequests();
     } else if (viewName === "history") {
-      if (els.historyView) els.historyView.classList.add("active");
+      if (els.historyView) {
+        els.historyView.classList.add("active");
+        els.historyView.style.display = "block";
+      }
       if (els.tabHistoryBtn) els.tabHistoryBtn.classList.add("active");
       loadAndRenderHistory();
     } else if (viewName === "admin") {
-      if (els.adminView) els.adminView.classList.add("active");
+      if (els.adminView) {
+        els.adminView.classList.add("active");
+        els.adminView.style.display = "block";
+      }
       if (els.tabAdminBtn) els.tabAdminBtn.classList.add("active");
-      loadAndRenderAdminUsers();
+      switchAdminSubtab("users");
+      loadAndRenderPendingUsers();
     }
   }
 
@@ -2725,6 +2804,103 @@
       els.adminSearchInput.addEventListener("input", () => filterAdminUsersTable());
     }
 
+    // Admin Subtabs (Team C & A)
+    if (els.adminSubtabUsersBtn) {
+      els.adminSubtabUsersBtn.addEventListener("click", () => switchAdminSubtab("users"));
+    }
+    if (els.adminSubtabPendingBtn) {
+      els.adminSubtabPendingBtn.addEventListener("click", () => switchAdminSubtab("pending"));
+    }
+    if (els.adminSubtabDuplicatesBtn) {
+      els.adminSubtabDuplicatesBtn.addEventListener("click", () => switchAdminSubtab("duplicates"));
+    }
+    if (els.adminSubtabFeedbackBtn) {
+      els.adminSubtabFeedbackBtn.addEventListener("click", () => switchAdminSubtab("feedback"));
+    }
+
+    if (els.refreshPendingBtn) {
+      els.refreshPendingBtn.addEventListener("click", () => loadAndRenderPendingUsers());
+    }
+    if (els.runDuplicateScanBtn) {
+      els.runDuplicateScanBtn.addEventListener("click", () => loadAndRenderDuplicates());
+    }
+    if (els.checkCandidateDupBtn) {
+      els.checkCandidateDupBtn.addEventListener("click", handleCandidateDuplicateCheck);
+    }
+    if (els.refreshFeedbackBtn) {
+      els.refreshFeedbackBtn.addEventListener("click", () => loadAndRenderAdminFeedback());
+    }
+
+    // Delete User Modal Events
+    if (els.deleteUserModalCloseBtn) {
+      els.deleteUserModalCloseBtn.addEventListener("click", closeDeleteUserModal);
+    }
+    if (els.deleteUserCancelBtn) {
+      els.deleteUserCancelBtn.addEventListener("click", closeDeleteUserModal);
+    }
+    if (els.deleteUserModal) {
+      els.deleteUserModal.addEventListener("click", (e) => {
+        if (e.target === els.deleteUserModal) closeDeleteUserModal();
+      });
+    }
+    if (els.confirmDeleteUserBtn) {
+      els.confirmDeleteUserBtn.addEventListener("click", handleConfirmDeleteUser);
+    }
+
+    // Feedback Form Modal Events (Team C)
+    if (els.feedbackModalCloseBtn) {
+      els.feedbackModalCloseBtn.addEventListener("click", closeFeedbackModal);
+    }
+    if (els.feedbackCancelBtn) {
+      els.feedbackCancelBtn.addEventListener("click", closeFeedbackModal);
+    }
+    if (els.feedbackModal) {
+      els.feedbackModal.addEventListener("click", (e) => {
+        if (e.target === els.feedbackModal) closeFeedbackModal();
+      });
+    }
+    if (els.feedbackForm) {
+      els.feedbackForm.addEventListener("submit", handleFeedbackSubmit);
+    }
+    if (els.feedbackComments && els.feedbackCharCount) {
+      els.feedbackComments.addEventListener("input", () => {
+        const len = els.feedbackComments.value.trim().length;
+        els.feedbackCharCount.textContent = `${len} chars`;
+      });
+    }
+
+    // Star rating buttons inside feedback modal
+    const starRatingLabels = {
+      1: "★ Poor (1/5)",
+      2: "★★ Fair (2/5)",
+      3: "★★★ Good (3/5)",
+      4: "★★★★ Very Good (4/5)",
+      5: "★★★★★ Outstanding / Exceptional (5/5)"
+    };
+    if (els.starRatingWidget) {
+      const starBtns = els.starRatingWidget.querySelectorAll(".star-rating-btn");
+      starBtns.forEach(btn => {
+        const val = parseInt(btn.getAttribute("data-value"), 10);
+        btn.addEventListener("mouseenter", () => {
+          starBtns.forEach(b => {
+            const bVal = parseInt(b.getAttribute("data-value"), 10);
+            b.classList.toggle("hover-active", bVal <= val);
+          });
+        });
+        btn.addEventListener("mouseleave", () => {
+          starBtns.forEach(b => b.classList.remove("hover-active"));
+        });
+        btn.addEventListener("click", () => {
+          if (els.feedbackRatingValue) els.feedbackRatingValue.value = val;
+          if (els.starRatingLabel) els.starRatingLabel.textContent = starRatingLabels[val] || `${val}/5 Stars`;
+          starBtns.forEach(b => {
+            const bVal = parseInt(b.getAttribute("data-value"), 10);
+            b.classList.toggle("active", bVal <= val);
+          });
+        });
+      });
+    }
+
     // Session Scheduling Modal (Team 1)
     if (els.scheduleModalCloseBtn) {
       els.scheduleModalCloseBtn.addEventListener("click", closeScheduleModal);
@@ -3043,8 +3219,7 @@
       const card = document.createElement("div");
       card.className = "history-card";
 
-      const priority = (it.priority || "MEDIUM").toLowerCase();
-      const status = (it.status || "STARTED").toLowerCase();
+      const isCompleted = (status === "completed");
 
       card.innerHTML = `
         <div class="history-card-header">
@@ -3068,9 +3243,118 @@
           </div>
           ${it.failureReason ? `<div class="history-meta-item" style="color:#b91c1c;"><strong>Reason:</strong> ${escapeHtml(it.failureReason)}</div>` : ""}
         </div>
+        ${isCompleted ? `
+          <div style="margin-top:12px; padding-top:10px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:12px; color:#64748b;">✨ Session completed</span>
+            <button type="button" class="btn-give-feedback" data-sessionid="${it.id}">
+              ⭐ Rate & Review Session
+            </button>
+          </div>
+        ` : ""}
       `;
+
+      if (isCompleted) {
+        const fbBtn = card.querySelector(".btn-give-feedback");
+        if (fbBtn) {
+          fbBtn.addEventListener("click", () => openFeedbackModal(it));
+        }
+      }
+
       els.historyListContainer.appendChild(card);
     });
+  }
+
+  function openFeedbackModal(session) {
+    if (!els.feedbackModal) return;
+    setFeedbackAlert(null);
+
+    if (els.feedbackSessionId) els.feedbackSessionId.value = session.id;
+    if (els.feedbackSessionInfo) {
+      els.feedbackSessionInfo.innerHTML = `
+        <span>🎯 <strong>Session #${session.id}</strong> with Mentor #${session.alumniId} · Completed Duration: ${session.durationMinutes || 0}m</span>
+      `;
+    }
+
+    // Default to 5 stars
+    if (els.feedbackRatingValue) els.feedbackRatingValue.value = "5";
+    if (els.starRatingLabel) els.starRatingLabel.textContent = "★★★★★ Outstanding / Exceptional (5/5)";
+    if (els.starRatingWidget) {
+      els.starRatingWidget.querySelectorAll(".star-rating-btn").forEach(btn => btn.classList.add("active"));
+    }
+
+    if (els.feedbackComments) {
+      els.feedbackComments.value = "";
+    }
+    if (els.feedbackCharCount) {
+      els.feedbackCharCount.textContent = "0 chars";
+    }
+
+    els.feedbackModal.style.display = "flex";
+  }
+
+  function closeFeedbackModal() {
+    if (els.feedbackModal) {
+      els.feedbackModal.style.display = "none";
+    }
+  }
+
+  async function handleFeedbackSubmit(e) {
+    e.preventDefault();
+    setFeedbackAlert(null);
+
+    const sessionId = parseInt(els.feedbackSessionId.value, 10);
+    const rating = parseInt(els.feedbackRatingValue.value, 10);
+    const comments = (els.feedbackComments ? els.feedbackComments.value : "").trim();
+
+    if (!sessionId) {
+      setFeedbackAlert("error", "Invalid session reference.");
+      return;
+    }
+    if (isNaN(rating) || rating < 1 || rating > 5) {
+      setFeedbackAlert("error", "Please select a rating between 1 and 5 stars.");
+      return;
+    }
+    if (comments.length < 5) {
+      setFeedbackAlert("error", "Please enter comments of at least 5 characters.");
+      return;
+    }
+
+    const btn = els.feedbackSubmitBtn;
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Submitting...";
+    }
+
+    try {
+      const res = await ApiClient.submitFeedback({ sessionId, rating, comments });
+      if (res.ok) {
+        closeFeedbackModal();
+        setHistoryAlert("success", "⭐ Thank you! Your feedback has been recorded successfully.");
+        loadAndRenderHistory();
+      } else {
+        setFeedbackAlert("error", res.data?.message || "Failed to submit feedback.");
+      }
+    } catch (err) {
+      setFeedbackAlert("error", "Network error submitting feedback: " + err.message);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "⭐ Submit Feedback";
+      }
+    }
+  }
+
+  function setFeedbackAlert(type, msg) {
+    if (!els.feedbackAlert) return;
+    if (!type || !msg) {
+      els.feedbackAlert.style.display = "none";
+      els.feedbackAlert.textContent = "";
+      els.feedbackAlert.className = "form-status-alert";
+      return;
+    }
+    els.feedbackAlert.className = `form-status-alert alert-${type}`;
+    els.feedbackAlert.textContent = msg;
+    els.feedbackAlert.style.display = "block";
   }
 
   function setHistoryAlert(type, msg) {
@@ -3134,12 +3418,37 @@
     if (els.adminTotalInactive) els.adminTotalInactive.textContent = inactive;
   }
 
+  // =========================================================================
+  // Admin Subtabs & Panels Controller (Team C & A)
+  // =========================================================================
+  function switchAdminSubtab(tab) {
+    state.activeAdminSubtab = tab;
+
+    const tabs = [
+      { id: "users", btn: els.adminSubtabUsersBtn, panel: els.adminPanelUsers },
+      { id: "pending", btn: els.adminSubtabPendingBtn, panel: els.adminPanelPending },
+      { id: "duplicates", btn: els.adminSubtabDuplicatesBtn, panel: els.adminPanelDuplicates },
+      { id: "feedback", btn: els.adminSubtabFeedbackBtn, panel: els.adminPanelFeedback }
+    ];
+
+    tabs.forEach(t => {
+      const isActive = (t.id === tab);
+      if (t.btn) t.btn.classList.toggle("active", isActive);
+      if (t.panel) t.panel.style.display = isActive ? "block" : "none";
+    });
+
+    if (tab === "users") loadAndRenderAdminUsers();
+    else if (tab === "pending") loadAndRenderPendingUsers();
+    else if (tab === "duplicates") loadAndRenderDuplicates();
+    else if (tab === "feedback") loadAndRenderAdminFeedback();
+  }
+
   function renderAdminUsers(users) {
     if (!els.adminUsersTableBody) return;
     els.adminUsersTableBody.innerHTML = "";
 
     if (!users || users.length === 0) {
-      els.adminUsersTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:#64748b;">No matching users found in database.</td></tr>`;
+      els.adminUsersTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">No matching users found in database.</td></tr>`;
       return;
     }
 
@@ -3147,6 +3456,7 @@
       const tr = document.createElement("tr");
       const r = (u.role || "").toLowerCase();
       const isActive = !!u.active;
+      const approval = (u.approvalStatus || "APPROVED").toUpperCase();
 
       tr.innerHTML = `
         <td style="font-weight:700; color:#64748b;">#${u.id}</td>
@@ -3159,6 +3469,11 @@
         </td>
         <td>${escapeHtml(u.mobileNumber || "—")}</td>
         <td>
+          <span class="approval-badge approval-${escapeHtml(approval)}">
+            ${approval === 'APPROVED' ? '✓' : approval === 'PENDING' ? '⏳' : '✕'} ${escapeHtml(approval)}
+          </span>
+        </td>
+        <td>
           <span class="status-indicator-badge ${isActive ? 'is-active' : 'is-inactive'}">
             <span class="status-dot"></span>
             ${isActive ? 'Active' : 'Deactivated'}
@@ -3168,20 +3483,24 @@
         <td style="text-align:right;">
           ${u.id === state.currentUser.id 
             ? '<span style="font-size:11px; color:#94a3b8; font-weight:600;">Current Admin</span>'
-            : `<button type="button" class="btn-toggle-status ${isActive ? 'btn-deactivate' : 'btn-activate'}" data-userid="${u.id}" data-action="${isActive ? 'deactivate' : 'activate'}">
-                ${isActive ? '🚫 Deactivate' : '✓ Activate'}
-              </button>`
+            : `<div class="admin-action-btn-group">
+                <button type="button" class="btn-toggle-status ${isActive ? 'btn-deactivate' : 'btn-activate'}" data-userid="${u.id}">
+                  ${isActive ? '🚫 Deactivate' : '✓ Activate'}
+                </button>
+                <button type="button" class="btn-delete-user" data-userid="${u.id}" title="Permanently delete user">
+                  🗑️
+                </button>
+              </div>`
           }
         </td>
       `;
 
-      // Attach button listener
-      const btn = tr.querySelector(".btn-toggle-status");
-      if (btn) {
-        btn.addEventListener("click", async () => {
+      const toggleBtn = tr.querySelector(".btn-toggle-status");
+      if (toggleBtn) {
+        toggleBtn.addEventListener("click", async () => {
           const newStatus = !isActive;
-          btn.disabled = true;
-          btn.textContent = "...";
+          toggleBtn.disabled = true;
+          toggleBtn.textContent = "...";
           try {
             const res = await ApiClient.setUserActiveStatus(u.id, newStatus);
             if (res.ok) {
@@ -3189,16 +3508,422 @@
               loadAndRenderAdminUsers();
             } else {
               setAdminAlert("error", res.data?.message || "Failed to update user status.");
-              btn.disabled = false;
+              toggleBtn.disabled = false;
             }
           } catch (e) {
             setAdminAlert("error", "Error updating status: " + e.message);
-            btn.disabled = false;
+            toggleBtn.disabled = false;
           }
         });
       }
 
+      const delBtn = tr.querySelector(".btn-delete-user");
+      if (delBtn) {
+        delBtn.addEventListener("click", () => openDeleteUserModal(u));
+      }
+
       els.adminUsersTableBody.appendChild(tr);
+    });
+  }
+
+  // Delete User Modal Functions (Team A)
+  function openDeleteUserModal(user) {
+    if (!els.deleteUserModal) return;
+    state.userToDelete = user;
+    if (els.deleteUserDetailsBox) {
+      els.deleteUserDetailsBox.innerHTML = `
+        <div style="font-weight:700; font-size:14px; margin-bottom:4px;">#${user.id} — ${escapeHtml(user.fullName)}</div>
+        <div><strong>Email:</strong> ${escapeHtml(user.email)}</div>
+        <div><strong>Role:</strong> ${escapeHtml(user.role)} · <strong>Mobile:</strong> ${escapeHtml(user.mobileNumber || "—")}</div>
+      `;
+    }
+    els.deleteUserModal.style.display = "flex";
+  }
+
+  function closeDeleteUserModal() {
+    if (els.deleteUserModal) els.deleteUserModal.style.display = "none";
+    state.userToDelete = null;
+  }
+
+  async function handleConfirmDeleteUser() {
+    if (!state.userToDelete) return;
+    const u = state.userToDelete;
+    const btn = els.confirmDeleteUserBtn;
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Deleting...";
+    }
+    try {
+      const res = await ApiClient.deleteAdminUser(u.id);
+      if (res.ok) {
+        closeDeleteUserModal();
+        setAdminAlert("success", `User #${u.id} (${u.fullName}) has been permanently deleted.`);
+        loadAndRenderAdminUsers();
+      } else {
+        setAdminAlert("error", res.data?.message || "Failed to delete user.");
+      }
+    } catch (e) {
+      setAdminAlert("error", "Error deleting user: " + e.message);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "Yes, Permanently Delete";
+      }
+    }
+  }
+
+  // Registration Approvals Controller (Team A)
+  async function loadAndRenderPendingUsers() {
+    if (!els.adminPendingTableBody) return;
+    els.adminPendingTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:#64748b;">Checking pending user registrations...</td></tr>`;
+
+    try {
+      const res = await ApiClient.getAdminUsers({ approval: "PENDING" });
+      if (res.ok && res.data && Array.isArray(res.data.users)) {
+        const pendingUsers = res.data.users;
+        if (els.adminPendingBadge) {
+          els.adminPendingBadge.textContent = pendingUsers.length;
+          els.adminPendingBadge.style.display = pendingUsers.length > 0 ? "inline-block" : "none";
+        }
+        renderPendingUsers(pendingUsers);
+      } else {
+        els.adminPendingTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:#dc2626;">Failed to load pending users.</td></tr>`;
+      }
+    } catch (err) {
+      console.error("Pending users error:", err);
+      els.adminPendingTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:#dc2626;">Network error loading pending registrations.</td></tr>`;
+    }
+  }
+
+  function renderPendingUsers(users) {
+    if (!els.adminPendingTableBody) return;
+    els.adminPendingTableBody.innerHTML = "";
+
+    if (!users || users.length === 0) {
+      els.adminPendingTableBody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center;padding:32px;color:#64748b;">
+            ✨ No pending registrations! All user accounts are approved and verified.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    users.forEach(u => {
+      const tr = document.createElement("tr");
+      const r = (u.role || "").toLowerCase();
+
+      tr.innerHTML = `
+        <td style="font-weight:700; color:#64748b;">#${u.id}</td>
+        <td>
+          <div style="font-weight:700; color:#0f172a;">${escapeHtml(u.fullName || "Applicant")}</div>
+          <div style="font-size:12px; color:#64748b;">${escapeHtml(u.email || "")}</div>
+        </td>
+        <td>
+          <span class="role-badge role-${escapeHtml(r)}">${escapeHtml(u.role || "student")}</span>
+        </td>
+        <td>${escapeHtml(u.mobileNumber || "—")}</td>
+        <td style="font-size:12px; color:#64748b;">${escapeHtml(u.createdAt ? u.createdAt.split(" ")[0] : "—")}</td>
+        <td style="text-align:right;">
+          <div class="admin-action-btn-group">
+            <button type="button" class="btn-approve-user" data-userid="${u.id}">
+              ✓ Approve
+            </button>
+            <button type="button" class="btn-reject-user" data-userid="${u.id}">
+              ✕ Reject
+            </button>
+            <button type="button" class="btn-toggle-status" data-userid="${u.id}" style="background:#f3e8ff; color:#7e22ce; border-color:#e9d5ff;" title="Check if candidate is duplicate">
+              🔍 Audit
+            </button>
+          </div>
+        </td>
+      `;
+
+      const appBtn = tr.querySelector(".btn-approve-user");
+      if (appBtn) {
+        appBtn.addEventListener("click", async () => {
+          appBtn.disabled = true;
+          appBtn.textContent = "...";
+          try {
+            const res = await ApiClient.approveAdminUser(u.id, true);
+            if (res.ok) {
+              setAdminAlert("success", `Registration for ${u.fullName} (#${u.id}) has been APPROVED.`);
+              loadAndRenderPendingUsers();
+              loadAndRenderAdminUsers();
+            } else {
+              setAdminAlert("error", res.data?.message || "Failed to approve registration.");
+              appBtn.disabled = false;
+            }
+          } catch (e) {
+            setAdminAlert("error", "Approval error: " + e.message);
+            appBtn.disabled = false;
+          }
+        });
+      }
+
+      const rejBtn = tr.querySelector(".btn-reject-user");
+      if (rejBtn) {
+        rejBtn.addEventListener("click", async () => {
+          rejBtn.disabled = true;
+          rejBtn.textContent = "...";
+          try {
+            const res = await ApiClient.approveAdminUser(u.id, false);
+            if (res.ok) {
+              setAdminAlert("success", `Registration for ${u.fullName} (#${u.id}) has been REJECTED.`);
+              loadAndRenderPendingUsers();
+              loadAndRenderAdminUsers();
+            } else {
+              setAdminAlert("error", res.data?.message || "Failed to reject registration.");
+              rejBtn.disabled = false;
+            }
+          } catch (e) {
+            setAdminAlert("error", "Rejection error: " + e.message);
+            rejBtn.disabled = false;
+          }
+        });
+      }
+
+      const auditBtn = tr.querySelector("button[title*='duplicate']");
+      if (auditBtn) {
+        auditBtn.addEventListener("click", () => {
+          switchAdminSubtab("duplicates");
+          if (els.manualDupName) els.manualDupName.value = u.fullName || "";
+          if (els.manualDupEmail) els.manualDupEmail.value = u.email || "";
+          if (els.manualDupMobile) els.manualDupMobile.value = u.mobileNumber || "";
+          handleCandidateDuplicateCheck();
+        });
+      }
+
+      els.adminPendingTableBody.appendChild(tr);
+    });
+  }
+
+  // Duplicate Detection Controller (Team D)
+  async function loadAndRenderDuplicates() {
+    if (!els.adminDuplicatesContainer) return;
+    els.adminDuplicatesContainer.innerHTML = `<div style="text-align:center;padding:28px;color:#64748b;">Running duplicate algorithms across normalized phone numbers, Student IDs, and Levenshtein name similarity...</div>`;
+
+    const btn = els.runDuplicateScanBtn;
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "⚡ Auditing Duplicates...";
+    }
+
+    try {
+      const res = await ApiClient.getAdminDuplicates();
+      if (res.ok && res.data && Array.isArray(res.data.duplicates)) {
+        const groups = res.data.duplicates;
+        if (els.adminDuplicatesBadge) {
+          els.adminDuplicatesBadge.textContent = groups.length;
+          els.adminDuplicatesBadge.style.display = groups.length > 0 ? "inline-block" : "none";
+        }
+        renderDuplicateClusters(groups);
+      } else {
+        els.adminDuplicatesContainer.innerHTML = `<div style="text-align:center;padding:24px;color:#dc2626;">Failed to execute duplicate scan.</div>`;
+      }
+    } catch (err) {
+      console.error("Duplicate scan error:", err);
+      els.adminDuplicatesContainer.innerHTML = `<div style="text-align:center;padding:24px;color:#dc2626;">Network error running duplicate scan.</div>`;
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "⚡ Run System Duplicate Audit";
+      }
+    }
+  }
+
+  function renderDuplicateClusters(clusters) {
+    if (!els.adminDuplicatesContainer) return;
+    els.adminDuplicatesContainer.innerHTML = "";
+
+    if (!clusters || clusters.length === 0) {
+      els.adminDuplicatesContainer.innerHTML = `
+        <div style="text-align:center; padding:32px; color:#15803d; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px;">
+          <div style="font-size:24px; margin-bottom:8px;">✅</div>
+          <div style="font-weight:700; font-size:15px;">Zero Duplicate Records Detected!</div>
+          <div style="font-size:13px; color:#166534; margin-top:4px;">All phone numbers, student IDs, and user names are strictly unique.</div>
+        </div>
+      `;
+      return;
+    }
+
+    clusters.forEach((g, idx) => {
+      const card = document.createElement("div");
+      card.className = "duplicate-cluster-card";
+
+      const conf = (g.confidence || "MEDIUM").toUpperCase();
+
+      let usersHtml = "";
+      (g.users || []).forEach(u => {
+        usersHtml += `
+          <div class="duplicate-user-box">
+            <div class="dup-user-header">
+              <span>#${u.id} · ${escapeHtml(u.fullName || "User")}</span>
+              <span class="role-badge role-${escapeHtml((u.role || "student").toLowerCase())}">${escapeHtml(u.role || "student")}</span>
+            </div>
+            <div>📧 ${escapeHtml(u.email || "—")}</div>
+            <div>📱 ${escapeHtml(u.mobileNumber || "—")}</div>
+            ${u.studentId ? `<div>🎓 ID: ${escapeHtml(u.studentId)}</div>` : ""}
+            <div style="font-size:11px; color:#64748b; margin-top:4px;">Joined: ${escapeHtml(u.createdAt ? u.createdAt.split(" ")[0] : "—")}</div>
+            <div style="margin-top:6px; display:flex; gap:6px;">
+              <button type="button" class="btn-delete-user" data-userid="${u.id}" style="padding:4px 8px; font-size:11px;">
+                🗑️ Delete
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      card.innerHTML = `
+        <div class="duplicate-cluster-header">
+          <div class="duplicate-type-title">
+            <span>⚠️ Cluster #${idx + 1}: ${escapeHtml(g.duplicateType || "Duplicate Detected")}</span>
+          </div>
+          <span class="confidence-badge confidence-${escapeHtml(conf)}">${escapeHtml(conf)} Confidence</span>
+        </div>
+        <div class="duplicate-reason-text">
+          ${escapeHtml(g.reason || "Potential collision detected.")}
+        </div>
+        <div class="duplicate-users-grid">
+          ${usersHtml}
+        </div>
+      `;
+
+      // Attach delete listeners inside cluster card
+      card.querySelectorAll(".btn-delete-user").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const uid = parseInt(btn.getAttribute("data-userid"), 10);
+          const found = (g.users || []).find(it => it.id === uid);
+          if (found) openDeleteUserModal(found);
+        });
+      });
+
+      els.adminDuplicatesContainer.appendChild(card);
+    });
+  }
+
+  async function handleCandidateDuplicateCheck() {
+    if (!els.manualDupResultBox) return;
+
+    const name = (els.manualDupName ? els.manualDupName.value : "").trim();
+    const email = (els.manualDupEmail ? els.manualDupEmail.value : "").trim();
+    const mobileNumber = (els.manualDupMobile ? els.manualDupMobile.value : "").trim();
+    const studentId = (els.manualDupStudentId ? els.manualDupStudentId.value : "").trim();
+
+    if (!name && !email && !mobileNumber && !studentId) {
+      els.manualDupResultBox.style.display = "block";
+      els.manualDupResultBox.innerHTML = `<div style="padding:10px; background:#fee2e2; color:#b91c1c; border-radius:6px; font-size:13px;">Please enter at least one field to check for duplicates.</div>`;
+      return;
+    }
+
+    els.manualDupResultBox.style.display = "block";
+    els.manualDupResultBox.innerHTML = `<div style="padding:10px; background:#eff6ff; color:#1d4ed8; border-radius:6px; font-size:13px;">Checking candidate details against existing user base...</div>`;
+
+    try {
+      const res = await ApiClient.checkAdminDuplicates({ name, email, mobileNumber, studentId });
+      if (res.ok && res.data) {
+        if (!res.data.hasDuplicates) {
+          els.manualDupResultBox.innerHTML = `
+            <div style="padding:12px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; color:#15803d; font-size:13px;">
+              ✅ <strong>No Duplicates Found:</strong> No matching or conflicting accounts exist with this name, email, or mobile.
+            </div>
+          `;
+        } else {
+          let matchesHtml = "";
+          (res.data.matches || []).forEach(m => {
+            const reasons = (m.matchReasons || []).join(", ");
+            matchesHtml += `
+              <div style="background:#fff; border:1px solid #fecaca; border-radius:6px; padding:10px; margin-top:8px;">
+                <div style="font-weight:700; color:#991b1b;">⚠️ #${m.id} — ${escapeHtml(m.fullName)} (${escapeHtml(m.email)})</div>
+                <div style="font-size:12px; color:#475569; margin:4px 0;"><strong>Match Trigger:</strong> ${escapeHtml(reasons)}</div>
+                <div style="font-size:11px; color:#64748b;">Role: ${escapeHtml(m.role)} · Mobile: ${escapeHtml(m.mobileNumber)}</div>
+              </div>
+            `;
+          });
+          els.manualDupResultBox.innerHTML = `
+            <div style="padding:12px; background:#fef2f2; border:1px solid #fecaca; border-radius:6px; color:#991b1b; font-size:13px;">
+              <strong>⚠️ ${res.data.duplicateCount} Potential Duplicate(s) Found:</strong>
+              ${matchesHtml}
+            </div>
+          `;
+        }
+      } else {
+        els.manualDupResultBox.innerHTML = `<div style="padding:10px; background:#fee2e2; color:#b91c1c; border-radius:6px; font-size:13px;">Candidate duplicate check failed.</div>`;
+      }
+    } catch (e) {
+      els.manualDupResultBox.innerHTML = `<div style="padding:10px; background:#fee2e2; color:#b91c1c; border-radius:6px; font-size:13px;">Network error: ${escapeHtml(e.message)}</div>`;
+    }
+  }
+
+  // Platform Feedback Controller (Team C & B)
+  async function loadAndRenderAdminFeedback() {
+    if (!els.adminFeedbackListContainer) return;
+    els.adminFeedbackListContainer.innerHTML = `<div style="text-align:center;padding:24px;color:#64748b;">Loading student reviews and rating metrics...</div>`;
+
+    try {
+      const res = await ApiClient.getAllFeedback();
+      if (res.ok && res.data && Array.isArray(res.data.feedback)) {
+        const feedbackList = res.data.feedback;
+        const total = feedbackList.length;
+
+        let sumRating = 0;
+        let fiveStarCount = 0;
+        feedbackList.forEach(fb => {
+          sumRating += (fb.rating || 0);
+          if (fb.rating === 5) fiveStarCount++;
+        });
+
+        const avg = total > 0 ? (sumRating / total).toFixed(1) : "0.0";
+        const fiveStarPct = total > 0 ? Math.round((fiveStarCount / total) * 100) : 0;
+
+        if (els.adminAvgRatingScore) els.adminAvgRatingScore.textContent = `${avg} / 5.0`;
+        if (els.adminTotalFeedbackCount) els.adminTotalFeedbackCount.textContent = total;
+        if (els.adminFiveStarPercent) els.adminFiveStarPercent.textContent = `${fiveStarPct}% (${fiveStarCount})`;
+
+        renderAdminFeedbackList(feedbackList);
+      } else {
+        els.adminFeedbackListContainer.innerHTML = `<div style="text-align:center;padding:20px;color:#dc2626;">Failed to load feedback records.</div>`;
+      }
+    } catch (err) {
+      console.error("Feedback fetch error:", err);
+      els.adminFeedbackListContainer.innerHTML = `<div style="text-align:center;padding:20px;color:#dc2626;">Network error retrieving feedback.</div>`;
+    }
+  }
+
+  function renderAdminFeedbackList(feedbackList) {
+    if (!els.adminFeedbackListContainer) return;
+    els.adminFeedbackListContainer.innerHTML = "";
+
+    if (!feedbackList || feedbackList.length === 0) {
+      els.adminFeedbackListContainer.innerHTML = `<div style="text-align:center;padding:32px;color:#64748b;">No feedback reviews recorded yet.</div>`;
+      return;
+    }
+
+    feedbackList.forEach(fb => {
+      const card = document.createElement("div");
+      card.className = "feedback-review-card";
+
+      const stars = "★".repeat(fb.rating || 5) + "☆".repeat(Math.max(0, 5 - (fb.rating || 5)));
+
+      card.innerHTML = `
+        <div class="feedback-review-header">
+          <div>
+            <strong style="color:#0f172a; font-size:14px;">${escapeHtml(fb.studentName || "Student")}</strong>
+            <span style="font-size:12px; color:#64748b; margin:0 6px;">reviewed mentor</span>
+            <strong style="color:#2563eb; font-size:14px;">${escapeHtml(fb.mentorName || "Mentor")}</strong>
+            <span style="font-size:11px; color:#94a3b8; margin-left:8px;">(Session #${fb.sessionId})</span>
+          </div>
+          <div class="feedback-review-stars">${stars}</div>
+        </div>
+        <div class="feedback-review-comments">
+          "${escapeHtml(fb.comments || "No comments provided.")}"
+        </div>
+        <div style="font-size:11px; color:#94a3b8; margin-top:8px; text-align:right;">
+          ${escapeHtml(fb.createdAt ? fb.createdAt.split(".")[0] : "")}
+        </div>
+      `;
+      els.adminFeedbackListContainer.appendChild(card);
     });
   }
 

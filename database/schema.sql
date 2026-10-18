@@ -8,9 +8,11 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(254) NOT NULL,
   mobile_number VARCHAR(20) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
-  role ENUM('student', 'alumni') NOT NULL,
+  role ENUM('student', 'alumni', 'teacher', 'admin') NOT NULL,
   avatar_image MEDIUMBLOB NULL,
   avatar_mime_type VARCHAR(50) NULL,
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  approval_status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'APPROVED',
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uq_users_email (email)
 ) ENGINE=InnoDB;
@@ -54,5 +56,23 @@ CREATE TABLE IF NOT EXISTS mentorship_requests (
   INDEX idx_mr_student (student_id),
   INDEX idx_mr_mentor (mentor_id),
   INDEX idx_mr_status (status)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS feedback (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  session_id BIGINT UNSIGNED NOT NULL,
+  student_id BIGINT UNSIGNED NOT NULL,
+  mentor_id BIGINT UNSIGNED NOT NULL,
+  rating TINYINT UNSIGNED NOT NULL,
+  comments TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_feedback_session FOREIGN KEY (session_id) REFERENCES session_history(id) ON DELETE CASCADE,
+  CONSTRAINT fk_feedback_student FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_feedback_mentor FOREIGN KEY (mentor_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT uq_feedback_session UNIQUE (session_id),
+  CONSTRAINT chk_feedback_rating CHECK (rating >= 1 AND rating <= 5),
+  INDEX idx_feedback_mentor (mentor_id, rating),
+  INDEX idx_feedback_student (student_id)
 ) ENGINE=InnoDB;
 

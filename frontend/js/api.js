@@ -373,12 +373,13 @@ const ApiClient = {
   },
 
   /**
-   * Admin: Fetch all users with optional role & active status filter
+   * Admin: Fetch all users with optional role, active status, or approval filter
    */
   async getAdminUsers(params = {}) {
     const qp = new URLSearchParams();
     if (params.role) qp.append("role", params.role);
     if (params.active !== undefined && params.active !== "") qp.append("active", params.active);
+    if (params.approval) qp.append("approval", params.approval);
     const response = await fetch(`${API_BASE_URL}/api/admin/users?${qp.toString()}`, {
       method: "GET",
       headers: {
@@ -402,6 +403,70 @@ const ApiClient = {
         ...this.getAuthHeader()
       },
       body: JSON.stringify({ active })
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Admin: Approve or Reject a user registration
+   */
+  async approveAdminUser(userId, approved = true) {
+    const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/approve`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify({ approved })
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Admin: Permanently delete a user account
+   */
+  async deleteAdminUser(userId) {
+    const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
+      method: "DELETE",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Admin: Scan all users for potential duplicates
+   */
+  async getAdminDuplicates() {
+    const response = await fetch(`${API_BASE_URL}/api/admin/duplicates`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Admin: Check specific candidate details for duplicates
+   */
+  async checkAdminDuplicates(payload) {
+    const response = await fetch(`${API_BASE_URL}/api/admin/duplicates/check`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify(payload)
     });
     const data = await response.json().catch(() => ({}));
     return { status: response.status, ok: response.ok, data };
@@ -434,6 +499,71 @@ const ApiClient = {
         ...this.getAuthHeader()
       },
       body: JSON.stringify({ status })
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  // ==========================================
+  // Feedback Module APIs (Team B & C)
+  // ==========================================
+
+  /**
+   * Submit feedback for a completed session
+   */
+  async submitFeedback({ sessionId, rating, comments }) {
+    const response = await fetch(`${API_BASE_URL}/api/feedback`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify({ sessionId, rating, comments })
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Fetch feedback for a specific session
+   */
+  async getSessionFeedback(sessionId) {
+    const response = await fetch(`${API_BASE_URL}/api/feedback/session/${sessionId}`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Fetch reviews & rating summary for a mentor
+   */
+  async getMentorFeedback(mentorId) {
+    const response = await fetch(`${API_BASE_URL}/api/feedback/mentor/${mentorId}`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Admin: Fetch all platform feedback
+   */
+  async getAllFeedback() {
+    const response = await fetch(`${API_BASE_URL}/api/feedback`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
     });
     const data = await response.json().catch(() => ({}));
     return { status: response.status, ok: response.ok, data };
