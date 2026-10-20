@@ -17,6 +17,32 @@ CREATE TABLE IF NOT EXISTS users (
   UNIQUE KEY uq_users_email (email)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS auth_tokens (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT UNSIGNED NOT NULL,
+  token_hash CHAR(64) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  revoked_at DATETIME NULL,
+  UNIQUE KEY uq_auth_tokens_hash (token_hash),
+  INDEX idx_auth_tokens_user (user_id),
+  INDEX idx_auth_tokens_expiry (expires_at),
+  CONSTRAINT fk_auth_tokens_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS password_resets (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT UNSIGNED NOT NULL,
+  token_hash CHAR(64) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  used_at DATETIME NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_password_resets_token_hash (token_hash),
+  INDEX idx_password_resets_user (user_id),
+  INDEX idx_password_resets_expiry (expires_at),
+  CONSTRAINT fk_password_resets_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS students (
   user_id BIGINT UNSIGNED PRIMARY KEY,
   student_id VARCHAR(20) NOT NULL,
@@ -56,6 +82,28 @@ CREATE TABLE IF NOT EXISTS mentorship_requests (
   INDEX idx_mr_student (student_id),
   INDEX idx_mr_mentor (mentor_id),
   INDEX idx_mr_status (status)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS session_history (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  student_id BIGINT UNSIGNED NOT NULL,
+  alumni_id BIGINT UNSIGNED NOT NULL,
+  mentorship_request_id BIGINT UNSIGNED NULL,
+  started_at DATETIME NULL,
+  paused_at DATETIME NULL,
+  completed_at DATETIME NULL,
+  duration_minutes INT UNSIGNED NOT NULL DEFAULT 0,
+  status ENUM('STARTED', 'PAUSED', 'COMPLETED', 'FAILED') NOT NULL DEFAULT 'STARTED',
+  priority ENUM('LOW', 'MEDIUM', 'HIGH', 'URGENT') NOT NULL DEFAULT 'MEDIUM',
+  failure_reason VARCHAR(1000) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_session_student FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_session_alumni FOREIGN KEY (alumni_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_session_request FOREIGN KEY (mentorship_request_id) REFERENCES mentorship_requests(id) ON DELETE SET NULL,
+  INDEX idx_session_student (student_id),
+  INDEX idx_session_alumni (alumni_id),
+  INDEX idx_session_status (status)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS feedback (
