@@ -381,6 +381,19 @@
     updateAuthHeader();
   }
 
+  function handleUnauthorized(msg) {
+    if (typeof closeConnectModal === "function") closeConnectModal();
+    if (typeof closeDecisionModal === "function") closeDecisionModal();
+    if (typeof closeScheduleModal === "function") closeScheduleModal();
+    clearSession();
+    switchView("login");
+    setLoginAlert("error", msg || "Your session has expired. Please sign in again.");
+  }
+
+  ApiClient.onUnauthorized = (data) => {
+    handleUnauthorized((data && data.message) ? data.message : "Your session has expired. Please sign in again.");
+  };
+
   function updateAuthHeader() {
     if (state.currentUser) {
       // User is logged in
@@ -1920,6 +1933,20 @@
       return;
     }
 
+    if (connectMsg.length < 10) {
+      if (els.connectAlert) {
+        els.connectAlert.className = "form-status-alert error";
+        els.connectAlert.textContent = "Message must be at least 10 characters.";
+        els.connectAlert.style.display = "block";
+      }
+      return;
+    }
+
+    if (!state.currentUser || !state.currentUser.id) {
+      handleUnauthorized("Please sign in to request a mentorship session.");
+      return;
+    }
+
     if (els.connectAlert) els.connectAlert.style.display = "none";
     if (els.modalSubmitBtn) {
       els.modalSubmitBtn.disabled = true;
@@ -1936,6 +1963,11 @@
         sessionGoal,
         message: connectMsg
       });
+
+      if (res.status === 401) {
+        handleUnauthorized("Your session has expired. Please sign in again.");
+        return;
+      }
 
       if (res.ok && res.data && res.data.success) {
         els.connectForm.style.display = "none";
@@ -1963,7 +1995,16 @@
           closeConnectModal();
         }, 2200);
       } else {
-        const errMsg = (res.data && res.data.message) ? res.data.message : `Failed to send request (HTTP ${res.status})`;
+        let errMsg = "Failed to send request";
+        if (res.data) {
+          if (res.data.errors && typeof res.data.errors === "object") {
+            errMsg = Object.values(res.data.errors).join(". ");
+          } else if (res.data.message) {
+            errMsg = res.data.message;
+          }
+        } else if (res.status) {
+          errMsg += ` (HTTP ${res.status})`;
+        }
         if (els.connectAlert) {
           els.connectAlert.className = "form-status-alert error";
           els.connectAlert.textContent = errMsg;
@@ -3967,6 +4008,18 @@
 
     // Check if user is already logged in
     if (state.currentUser) {
+      if (!state.currentUser.token) {
+        handleUnauthorized("Your session has expired. Please sign in again.");
+        return;
+      }
+      if (state.currentUser.id) {
+        ApiClient.getProfile(state.currentUser.id).then(res => {
+          if (res.status === 401) {
+            handleUnauthorized("Your session has expired. Please sign in again.");
+          }
+        }).catch(() => {});
+      }
+
       const role = (state.currentUser.role || "").toLowerCase();
       if (role === "admin") {
         switchView("admin");

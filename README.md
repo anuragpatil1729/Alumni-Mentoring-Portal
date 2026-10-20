@@ -243,8 +243,8 @@ Loaded by [`seed.sql`](database/seed.sql):
 | Alumni | `anurag.patil@microsoft.com` | `Alumni@123` |
 | Alumni | `rohanmali@google.com` | `Alumni@123` |
 | Alumni | `priya.sharma@amazon.com` | `Alumni@123` |
-| Teacher | `teacher.sharma@college.edu` | *(set by maintainer)* |
-| Admin | `admin@college.edu` | *(set by maintainer)* |
+| Teacher | `teacher.sharma@college.edu` | `Teacher@123` |
+| Admin | `admin@college.edu` | `Admin@123` |
 
 > Ten alumni mentors are seeded in total (Microsoft, Google, Amazon, Nvidia, Goldman Sachs, Deloitte, Apple, Meta, McKinsey).
 

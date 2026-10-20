@@ -142,6 +142,20 @@ const ApiClient = {
     };
   },
 
+  onUnauthorized: null,
+
+  async handleResponse(response) {
+    const data = await response.json().catch(() => ({}));
+    if (response.status === 401 && typeof this.onUnauthorized === "function") {
+      this.onUnauthorized(data);
+    }
+    return {
+      status: response.status,
+      ok: response.ok,
+      data
+    };
+  },
+
   /**
    * Helper to get Authorization header from stored session.
    */
@@ -170,12 +184,7 @@ const ApiClient = {
       }
     });
 
-    const data = await response.json().catch(() => ({}));
-    return {
-      status: response.status,
-      ok: response.ok,
-      data
-    };
+    return this.handleResponse(response);
   },
 
   /**
@@ -192,12 +201,7 @@ const ApiClient = {
       body: JSON.stringify(payload)
     });
 
-    const data = await response.json().catch(() => ({}));
-    return {
-      status: response.status,
-      ok: response.ok,
-      data
-    };
+    return this.handleResponse(response);
   },
 
   /**
@@ -256,12 +260,7 @@ const ApiClient = {
       body: JSON.stringify(payload)
     });
 
-    const data = await response.json().catch(() => ({}));
-    return {
-      status: response.status,
-      ok: response.ok,
-      data
-    };
+    return this.handleResponse(response);
   },
 
   /**
@@ -276,12 +275,7 @@ const ApiClient = {
       }
     });
 
-    const data = await response.json().catch(() => ({}));
-    return {
-      status: response.status,
-      ok: response.ok,
-      data
-    };
+    return this.handleResponse(response);
   },
 
   /**
@@ -296,12 +290,7 @@ const ApiClient = {
       }
     });
 
-    const data = await response.json().catch(() => ({}));
-    return {
-      status: response.status,
-      ok: response.ok,
-      data
-    };
+    return this.handleResponse(response);
   },
 
   /**
@@ -318,12 +307,7 @@ const ApiClient = {
       body: JSON.stringify(payload)
     });
 
-    const data = await response.json().catch(() => ({}));
-    return {
-      status: response.status,
-      ok: response.ok,
-      data
-    };
+    return this.handleResponse(response);
   },
 
   /**
