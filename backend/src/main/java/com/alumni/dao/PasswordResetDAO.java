@@ -47,33 +47,41 @@ public final class PasswordResetDAO {
     }
 
     public boolean consumeTokenAndChangePassword(String rawToken, String newPasswordHash) throws Exception {
+        return consumeTokenAndChangePasswordWithEmail(rawToken, newPasswordHash) != null;
+    }
+
+    public String consumeTokenAndChangePasswordWithEmail(String rawToken, String newPasswordHash) throws Exception {
         String tokenHash = sha256(rawToken);
         try (Connection c = DBConnection.getConnection()) {
             c.setAutoCommit(false);
             try {
                 long userId;
+                String userEmail = null;
                 try (PreparedStatement p = c.prepareStatement(
-                        "SELECT user_id FROM password_resets WHERE token_hash=? AND used_at IS NULL AND expires_at>NOW() FOR UPDATE")) {
+                        "SELECT pr.user_id, u.email FROM password_resets pr " +
+                        "JOIN users u ON u.id = pr.user_id " +
+                        "WHERE pr.token_hash=? AND pr.used_at IS NULL AND pr.expires_at>NOW() AND u.is_active=TRUE FOR UPDATE")) {
                     p.setString(1, tokenHash);
                     try (ResultSet rs = p.executeQuery()) {
-                        if (!rs.next()) { c.rollback(); return false; }
+                        if (!rs.next()) { c.rollback(); return null; }
                         userId = rs.getLong(1);
+                        userEmail = rs.getString(2);
                     }
                 }
                 try (PreparedStatement p = c.prepareStatement("UPDATE users SET password_hash=? WHERE id=? AND is_active=TRUE")) {
                     p.setString(1, newPasswordHash); p.setLong(2, userId);
-                    if (p.executeUpdate() != 1) { c.rollback(); return false; }
+                    if (p.executeUpdate() != 1) { c.rollback(); return null; }
                 }
                 try (PreparedStatement p = c.prepareStatement("UPDATE password_resets SET used_at=NOW() WHERE token_hash=? AND used_at IS NULL")) {
                     p.setString(1, tokenHash);
-                    if (p.executeUpdate() != 1) { c.rollback(); return false; }
+                    if (p.executeUpdate() != 1) { c.rollback(); return null; }
                 }
                 // Password change invalidates every active API token for this user.
                 try (PreparedStatement p = c.prepareStatement("UPDATE auth_tokens SET revoked_at=NOW() WHERE user_id=? AND revoked_at IS NULL")) {
                     p.setLong(1, userId); p.executeUpdate();
                 }
                 c.commit();
-                return true;
+                return userEmail;
             } catch (Exception e) { c.rollback(); throw e; }
             finally { c.setAutoCommit(true); }
         }

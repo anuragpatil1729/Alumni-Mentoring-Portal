@@ -44,6 +44,9 @@
           <button type="button" id="tabAdminBtn" class="nav-tab-btn" style="display: none;">
             <span class="tab-icon">🛡️</span> Admin Console
           </button>
+          <button type="button" id="tabTeacherBtn" class="nav-tab-btn" style="display: none;">
+            <span class="tab-icon">👨‍🏫</span> Faculty Portal
+          </button>
           <button type="button" id="tabProfileBtn" class="nav-tab-btn">
             <span class="tab-icon">👤</span> My Profile
           </button>
@@ -1133,6 +1136,10 @@
             <button type="button" id="adminSubtabFeedbackBtn" class="admin-subtab-btn">
               <span>⭐</span> Platform Feedback
             </button>
+            <button type="button" id="adminSubtabEventsBtn" class="admin-subtab-btn">
+              <span>📅</span> Event Approvals
+              <span id="adminEventsBadge" class="admin-tab-badge" style="display:none;">0</span>
+            </button>
           </div>
 
           <!-- PANEL 1: All Users & Account Deletion -->
@@ -1300,6 +1307,185 @@
               </div>
               <div id="adminFeedbackListContainer" style="padding:20px;">
                 <!-- Rendered via JavaScript -->
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL 5: Institutional Events Approvals (System Architecture) -->
+          <div id="adminPanelEvents" class="admin-panel-tab" style="display: none;">
+            <div class="admin-toolbar-card" style="background:#f0fdf4; border-color:#bbf7d0;">
+              <div>
+                <h3 style="font-size:16px; font-weight:700; color:#166534; margin-bottom:4px;">Institutional Events & Approvals</h3>
+                <p style="font-size:13px; color:#15803d; margin:0;">Review, verify, and approve or reject campus and alumni guest sessions, judging panels, and hackathons.</p>
+              </div>
+              <button type="button" id="refreshAdminEventsBtn" class="refresh-btn" style="background:#ffffff;">🔄 Refresh Events</button>
+            </div>
+
+            <div class="admin-table-card">
+              <div class="admin-table-responsive">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Event ID</th>
+                      <th>Title & Description</th>
+                      <th>Type</th>
+                      <th>Organizer Alumni</th>
+                      <th>Date & Time</th>
+                      <th>Venue</th>
+                      <th>Status</th>
+                      <th style="text-align: right;">Decision</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminEventsTableBody">
+                    <!-- Injected via JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- 7. FACULTY & TEACHER PORTAL VIEW (System Architecture)            -->
+      <!-- ================================================================= -->
+      <section id="teacherView" class="view-section" style="display: none;">
+        <div class="section-container">
+          <div class="section-header-box">
+            <div class="section-title-wrap">
+              <div class="section-icon-badge" style="background:#fef3c7; color:#b45309;">👨‍🏫</div>
+              <div>
+                <h2>Faculty & Teacher Portal</h2>
+                <p>Manage event assignments, evaluate student internal marks, oversee alumni slot bookings, and monitor mentorship</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="teacherAlert" class="form-status-alert" style="display: none;"></div>
+
+          <!-- Teacher Sub-Navigation Tabs -->
+          <div class="admin-subnav-bar">
+            <button type="button" id="teacherSubtabMarksBtn" class="admin-subtab-btn active">
+              <span>📝</span> Assigned Events & Marks
+            </button>
+            <button type="button" id="teacherSubtabBookingsBtn" class="admin-subtab-btn">
+              <span>📅</span> Alumni Slot Bookings
+            </button>
+            <button type="button" id="teacherSubtabDirectoryBtn" class="admin-subtab-btn">
+              <span>👥</span> Students & Mentors Overview
+            </button>
+          </div>
+
+          <!-- TEACHER PANEL 1: Assigned Events & Student Marks -->
+          <div id="teacherPanelMarks" class="admin-panel-tab">
+            <div class="admin-toolbar-card">
+              <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <label for="teacherEventSelect" style="font-weight:600; font-size:14px; color:#1e293b;">Assigned Event:</label>
+                <select id="teacherEventSelect" class="form-select-sm" style="min-width:240px; padding:8px 12px; border-radius:6px; border:1px solid #cbd5e1;">
+                  <option value="">Loading assigned events...</option>
+                </select>
+                <button type="button" id="refreshTeacherMarksBtn" class="refresh-btn">🔄 Refresh</button>
+              </div>
+              <button type="button" id="openAddMarkModalBtn" class="modal-submit-btn" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
+                ➕ Enter Student Marks
+              </button>
+            </div>
+
+            <div id="teacherEventInfoCard" style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px 20px; margin-bottom:16px;">
+              <h3 id="assignedEventTitle" style="font-size:16px; font-weight:700; color:#0f172a; margin:0 0 6px 0;"></h3>
+              <p id="assignedEventDesc" style="font-size:13px; color:#475569; margin:0 0 8px 0;"></p>
+              <div id="assignedEventMeta" style="font-size:12px; color:#64748b; display:flex; gap:16px; flex-wrap:wrap;"></div>
+            </div>
+
+            <div class="admin-table-card">
+              <div class="admin-table-responsive">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Student ID</th>
+                      <th>Student Details</th>
+                      <th>Marks</th>
+                      <th>Max Marks</th>
+                      <th>Percentage</th>
+                      <th>Remarks</th>
+                      <th>Updated At</th>
+                      <th style="text-align: right;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="teacherMarksTableBody">
+                    <tr><td colspan="8" style="text-align:center; padding:24px; color:#64748b;">Select an assigned event above to load and evaluate student marks.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- TEACHER PANEL 2: Alumni Slot Bookings -->
+          <div id="teacherPanelBookings" class="admin-panel-tab" style="display: none;">
+            <div class="admin-toolbar-card">
+              <div>
+                <h3 style="font-size:15px; font-weight:700; color:#0f172a; margin:0 0 4px 0;">Alumni Event Slot Bookings</h3>
+                <p style="font-size:13px; color:#64748b; margin:0;">Book alumni mentors for judging, guest lectures, and sponsorships with conflict detection.</p>
+              </div>
+              <div style="display:flex; gap:10px;">
+                <button type="button" id="refreshTeacherBookingsBtn" class="refresh-btn">🔄 Refresh</button>
+                <button type="button" id="openNewBookingBtn" class="modal-submit-btn" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
+                  ➕ Book Alumni Slot
+                </button>
+              </div>
+            </div>
+
+            <div class="admin-table-card">
+              <div class="admin-table-responsive">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Booking ID</th>
+                      <th>Event ID</th>
+                      <th>Alumni Mentor</th>
+                      <th>Slot Date & Time</th>
+                      <th>Purpose</th>
+                      <th>Status</th>
+                      <th>Notes</th>
+                      <th style="text-align: right;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="teacherBookingsTableBody">
+                    <tr><td colspan="8" style="text-align:center; padding:24px; color:#64748b;">Loading alumni slot bookings...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- TEACHER PANEL 3: Directory & Activities Overview -->
+          <div id="teacherPanelDirectory" class="admin-panel-tab" style="display: none;">
+            <div class="admin-toolbar-card">
+              <div>
+                <h3 style="font-size:15px; font-weight:700; color:#0f172a; margin:0 0 4px 0;">Students & Mentors Portal Directory</h3>
+                <p style="font-size:13px; color:#64748b; margin:0;">Monitor students and alumni participants, view profiles, and observe mentoring engagement.</p>
+              </div>
+              <button type="button" id="refreshTeacherDirectoryBtn" class="refresh-btn">🔄 Refresh</button>
+            </div>
+
+            <div class="admin-table-card">
+              <div class="admin-table-responsive">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Full Name & Email</th>
+                      <th>Role</th>
+                      <th>Department / Details</th>
+                      <th>Mobile</th>
+                      <th>Approval</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="teacherDirectoryTableBody">
+                    <tr><td colspan="7" style="text-align:center; padding:24px; color:#64748b;">Loading portal directory...</td></tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -1589,6 +1775,113 @@
             Yes, Permanently Delete
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- 3. TEACHER ENTER / UPDATE STUDENT MARKS MODAL (System Architecture) -->
+    <div id="teacherMarkModal" class="modal-overlay" role="dialog" aria-modal="true" style="display: none;">
+      <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 480px;">
+        <div class="modal-header">
+          <h2 id="teacherMarkModalTitle">📝 Evaluate Student Marks</h2>
+          <button type="button" id="teacherMarkModalCloseBtn" class="modal-close-btn" title="Close modal">✕</button>
+        </div>
+
+        <form id="teacherMarkForm" class="modal-form">
+          <div id="teacherMarkModalAlert" class="form-status-alert" style="display: none;"></div>
+
+          <div class="form-group">
+            <label for="markEventTitleDisplay">Event:</label>
+            <input type="text" id="markEventTitleDisplay" class="form-input" readonly style="background:#f1f5f9;" />
+            <input type="hidden" id="markEventId" />
+          </div>
+
+          <div class="form-group">
+            <label for="markStudentId">Student User ID: <span class="required">*</span></label>
+            <input type="number" id="markStudentId" class="form-input" placeholder="e.g. 201" required />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label for="markScore">Marks Awarded: <span class="required">*</span></label>
+              <input type="number" step="0.25" min="0" id="markScore" class="form-input" placeholder="e.g. 85.50" required />
+            </div>
+            <div class="form-group">
+              <label for="markMaxScore">Max Marks:</label>
+              <input type="number" step="0.25" min="1" id="markMaxScore" class="form-input" value="100.00" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="markRemarks">Remarks / Evaluation Feedback:</label>
+            <textarea id="markRemarks" class="form-textarea" rows="3" placeholder="Provide feedback or performance comments for this event..."></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="teacherMarkCancelBtn" class="modal-cancel-btn">Cancel</button>
+            <button type="submit" id="saveMarkBtn" class="modal-submit-btn">💾 Save Marks</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 4. TEACHER BOOK ALUMNI SLOT MODAL (System Architecture) -->
+    <div id="teacherBookingModal" class="modal-overlay" role="dialog" aria-modal="true" style="display: none;">
+      <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 500px;">
+        <div class="modal-header">
+          <h2>📅 Book Alumni Mentor Slot</h2>
+          <button type="button" id="teacherBookingModalCloseBtn" class="modal-close-btn" title="Close modal">✕</button>
+        </div>
+
+        <form id="teacherBookingForm" class="modal-form">
+          <div id="teacherBookingModalAlert" class="form-status-alert" style="display: none;"></div>
+
+          <div class="form-group">
+            <label for="bookingEventId">Select Event: <span class="required">*</span></label>
+            <select id="bookingEventId" class="form-select" required>
+              <option value="">Select Event...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="bookingAlumniId">Alumni Mentor User ID: <span class="required">*</span></label>
+            <input type="number" id="bookingAlumniId" class="form-input" placeholder="e.g. 101" required />
+          </div>
+
+          <div class="form-group">
+            <label for="bookingDate">Slot Date: <span class="required">*</span></label>
+            <input type="date" id="bookingDate" class="form-input" required />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label for="bookingStartTime">Start Time: <span class="required">*</span></label>
+              <input type="time" id="bookingStartTime" class="form-input" required />
+            </div>
+            <div class="form-group">
+              <label for="bookingEndTime">End Time: <span class="required">*</span></label>
+              <input type="time" id="bookingEndTime" class="form-input" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="bookingPurpose">Purpose / Role: <span class="required">*</span></label>
+            <select id="bookingPurpose" class="form-select" required>
+              <option value="JUDGE">Project Judge / Evaluator</option>
+              <option value="GUEST_SESSION">Guest Lecture / Workshop</option>
+              <option value="SPONSOR">Event Sponsor / Partner</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="bookingNotes">Notes & Instructions:</label>
+            <textarea id="bookingNotes" class="form-textarea" rows="2" placeholder="Details about topic, hall, schedule..."></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="teacherBookingCancelBtn" class="modal-cancel-btn">Cancel</button>
+            <button type="submit" id="saveBookingBtn" class="modal-submit-btn">📅 Confirm Booking</button>
+          </div>
+        </form>
       </div>
     </div>
 

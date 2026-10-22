@@ -44,6 +44,33 @@ public final class PasswordResetMailer {
         Transport.send(message);
     }
 
+    public static void sendRecoveryNotification(String recipient) throws Exception {
+        String host = required("SMTP_HOST");
+        String username = required("SMTP_USERNAME");
+        String password = required("SMTP_PASSWORD");
+        String from = System.getenv().getOrDefault("SMTP_FROM", username);
+        String port = System.getenv().getOrDefault("SMTP_PORT", "587");
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2 TLSv1.3");
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+        MimeMessage message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(from));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient, false));
+        message.setSubject("Your Alumni Mentoring Portal password has been recovered", "UTF-8");
+        message.setText("Hello,\n\nYour password for Alumni Mentoring Portal was successfully reset and your account has been recovered.\n\n"
+                + "If you did not perform this action, please contact your portal administrator immediately.", "UTF-8");
+        Transport.send(message);
+    }
+
     private static String required(String name) {
         String value = System.getenv(name);
         if (value == null || value.isBlank()) throw new IllegalStateException("Missing environment variable: " + name);

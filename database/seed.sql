@@ -47,3 +47,27 @@ INSERT INTO users (id, full_name, email, mobile_number, password_hash, role) VAL
 (401, 'Prof. S. Sharma', 'teacher.sharma@college.edu', '9876599999', 'sha256$04b60d9d08cc23e4cf7c530fca9944c6$4f33f407c8a0cc63dc6c339bfbdb96dd7e08fbe273c7981bcfbd37018e98e317', 'teacher')
 ON DUPLICATE KEY UPDATE role = VALUES(role), is_active = 1;
 
+-- Seed Institutional Events
+INSERT INTO events (id, title, description, date, start_time, end_time, venue, organizer_alumni_id, event_type, status) VALUES
+(1, 'Annual Tech Symposium 2026', 'Flagship college project exhibition, technical papers, and industry judging panels.', '2026-11-15', '09:00:00', '17:00:00', 'Main Auditorium & CS Labs', 101, 'JUDGE', 'APPROVED'),
+(2, 'Cloud & AI Architecture Workshop', 'Hands-on session covering Azure microservices and LLM pipeline deployment.', '2026-11-20', '14:00:00', '16:30:00', 'Seminar Hall B', 102, 'GUEST_SESSION', 'APPROVED'),
+(3, 'FinTech Hackathon Mentorship', '24-hour algorithmic trading and decentralized finance challenge.', '2026-12-05', '10:00:00', '18:00:00', 'Innovation Center', 106, 'SPONSOR', 'PENDING')
+ON DUPLICATE KEY UPDATE title = VALUES(title), status = VALUES(status);
+
+-- Seed Teacher Event Assignments
+INSERT INTO teacher_event_assignments (id, teacher_id, event_id, assignment_role, assigned_by) VALUES
+(1, 401, 1, 'COORDINATOR', 1),
+(2, 401, 2, 'EVENT_SUPERVISOR', 1)
+ON DUPLICATE KEY UPDATE assignment_role = VALUES(assignment_role);
+
+-- Seed Internal Marks
+INSERT INTO internal_marks (id, student_id, event_id, teacher_id, marks, max_marks, remarks) VALUES
+(1, 201, 1, 401, 92.50, 100.00, 'Excellent distributed systems architecture presentation and working demo.')
+ON DUPLICATE KEY UPDATE marks = VALUES(marks);
+
+-- Seed Opportunities
+INSERT INTO opportunities (id, alumni_id, title, description, organization, opportunity_type, location, eligibility, deadline, application_link, status) VALUES
+(1, 101, 'AI Systems Engineering Internship', 'Summer internship working on large-scale model optimization and cloud deployment.', 'Microsoft', 'Internship', 'Hyderabad / Hybrid', 'Final and pre-final year CS/IT students', '2026-12-31', 'https://careers.microsoft.com', 'OPEN'),
+(2, 103, 'Graduate Software Engineer - Core Infrastructure', 'Full-time entry role on Google core infrastructure and network monitoring.', 'Google', 'Full-time', 'Bangalore', 'Graduating batches with strong algorithms and OS fundamentals', '2026-12-15', 'https://careers.google.com', 'OPEN')
+ON DUPLICATE KEY UPDATE title = VALUES(title), status = VALUES(status);
+

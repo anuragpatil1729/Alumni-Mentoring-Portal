@@ -126,6 +126,118 @@ CREATE TABLE IF NOT EXISTS feedback (
   INDEX idx_feedback_student (student_id)
 ) ENGINE=InnoDB;
 
+-- =====================================================
+-- ALUMNI EVENTS & OPPORTUNITIES (System Architecture)
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS events (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(200) NOT NULL,
+  description TEXT NOT NULL,
+  date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  venue VARCHAR(255) NOT NULL,
+  organizer_alumni_id BIGINT UNSIGNED NOT NULL,
+  event_type ENUM('GENERAL', 'JUDGE', 'GUEST_SESSION', 'SPONSOR') NOT NULL DEFAULT 'GENERAL',
+  status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_events_organizer FOREIGN KEY (organizer_alumni_id) REFERENCES alumni(user_id) ON DELETE RESTRICT,
+  INDEX idx_events_date_status (date, status),
+  INDEX idx_events_organizer (organizer_alumni_id),
+  INDEX idx_events_type_status (event_type, status),
+  CONSTRAINT chk_events_valid_time CHECK (end_time > start_time)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS opportunities (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  alumni_id BIGINT UNSIGNED NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  description TEXT NOT NULL,
+  organization VARCHAR(200) NOT NULL,
+  opportunity_type VARCHAR(50) NOT NULL,
+  location VARCHAR(200) NULL,
+  eligibility TEXT NULL,
+  deadline DATE NULL,
+  application_link VARCHAR(2048) NULL,
+  status ENUM('OPEN', 'CLOSED', 'CANCELLED') NOT NULL DEFAULT 'OPEN',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_opportunities_alumni FOREIGN KEY (alumni_id) REFERENCES alumni(user_id) ON DELETE RESTRICT,
+  INDEX idx_opportunities_alumni (alumni_id),
+  INDEX idx_opportunities_status_deadline (status, deadline),
+  INDEX idx_opportunities_type (opportunity_type)
+) ENGINE=InnoDB;
+
+-- =====================================================
+-- TEACHER ASSIGNMENTS & INTERNAL MARKS (System Architecture)
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS teacher_event_assignments (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  teacher_id BIGINT UNSIGNED NOT NULL,
+  event_id BIGINT UNSIGNED NOT NULL,
+  assignment_role ENUM('COORDINATOR', 'INTERNAL_EVALUATOR', 'EVENT_SUPERVISOR') NOT NULL DEFAULT 'COORDINATOR',
+  assigned_by BIGINT UNSIGNED NOT NULL,
+  assigned_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_tea_teacher FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_tea_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+  CONSTRAINT fk_tea_assigned_by FOREIGN KEY (assigned_by) REFERENCES users(id) ON DELETE RESTRICT,
+  CONSTRAINT uq_teacher_event_role UNIQUE (teacher_id, event_id, assignment_role),
+  INDEX idx_tea_event (event_id),
+  INDEX idx_tea_teacher (teacher_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS internal_marks (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  student_id BIGINT UNSIGNED NOT NULL,
+  event_id BIGINT UNSIGNED NOT NULL,
+  teacher_id BIGINT UNSIGNED NOT NULL,
+  marks DECIMAL(5,2) NOT NULL,
+  max_marks DECIMAL(5,2) NOT NULL DEFAULT 100.00,
+  remarks VARCHAR(1000) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_marks_student FOREIGN KEY (student_id) REFERENCES students(user_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_marks_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+  CONSTRAINT fk_marks_teacher FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE RESTRICT,
+  CONSTRAINT uq_marks_student_event UNIQUE (student_id, event_id),
+  CONSTRAINT chk_marks_nonnegative CHECK (marks >= 0),
+  CONSTRAINT chk_marks_max_positive CHECK (max_marks > 0),
+  CONSTRAINT chk_marks_within_max CHECK (marks <= max_marks),
+  INDEX idx_marks_student (student_id),
+  INDEX idx_marks_event (event_id),
+  INDEX idx_marks_teacher (teacher_id)
+) ENGINE=InnoDB;
+
+-- =====================================================
+-- ALUMNI SLOT BOOKINGS (System Architecture)
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS alumni_slot_bookings (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  event_id BIGINT UNSIGNED NOT NULL,
+  alumni_id BIGINT UNSIGNED NOT NULL,
+  booked_by BIGINT UNSIGNED NOT NULL,
+  slot_date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  booking_purpose ENUM('JUDGE', 'GUEST_SESSION', 'SPONSOR') NOT NULL,
+  status ENUM('BOOKED', 'CANCELLED', 'COMPLETED') NOT NULL DEFAULT 'BOOKED',
+  notes VARCHAR(1000) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_asb_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+  CONSTRAINT fk_asb_alumni FOREIGN KEY (alumni_id) REFERENCES alumni(user_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_asb_booked_by FOREIGN KEY (booked_by) REFERENCES users(id) ON DELETE RESTRICT,
+  CONSTRAINT chk_asb_valid_time CHECK (end_time > start_time),
+  CONSTRAINT uq_asb_exact_booking UNIQUE (event_id, alumni_id, slot_date, start_time, end_time),
+  INDEX idx_asb_alumni_schedule (alumni_id, slot_date, start_time, end_time, status),
+  INDEX idx_asb_event_status (event_id, status),
+  INDEX idx_asb_booked_by (booked_by)
+) ENGINE=InnoDB;
+
 -- Seed data
 USE alumni_mentoring_portal;
 
@@ -138,7 +250,7 @@ INSERT INTO users (id, full_name, email, mobile_number, password_hash, role) VAL
 (106, 'Sneha Deshmukh', 'sneha.d@goldmansachs.com', '9876543215', 'sha256$81898e984259b7e7c11daaf1f9b721d3$eb19a20dddcf7caa40c9ca43696674cfab2d5cda09e5be8eeda3b0b7d37c2549', 'alumni'),
 (107, 'Tanvi Joshi', 'tanvi.j@deloitte.com', '9876543216', 'sha256$91872292192f29dc015d14d7e61fda16$0b82b876db7a011497ff412f20b1469122796cfe559f042a3876f0009bdbc01a', 'alumni'),
 (108, 'Kunal Verma', 'kunal.verma@apple.com', '9876543217', 'sha256$9e1fe8a352c1285d52251127b7ea8dc9$f496ef1298ab223f7dced53a4b62e4206d692049967fbd8074512d10a91a2d4d', 'alumni'),
-(109, 'Aarav Mehta', 'aarav.meeta@meta.com', '9876543218', 'sha256$1d1afff546350ef0d67afedadb277595$f1cee8901e14e47e139e80dd3619dd7c609e993c1d1d765db9d42cb375005b7e', 'alumni'),
+(109, 'Aarav Mehta', 'aarav.mehta@meta.com', '9876543218', 'sha256$1d1afff546350ef0d67afedadb277595$f1cee8901e14e47e139e80dd3619dd7c609e993c1d1d765db9d42cb375005b7e', 'alumni'),
 (110, 'Neha Nair', 'neha.nair@mckinsey.com', '9876543219', 'sha256$b49164c09b0addf4526f60c4a746eacd$af728aa1cc225f532b56bd11333ab8f939303486d64636a76bcde25f4a7a1bad', 'alumni')
 ON DUPLICATE KEY UPDATE full_name = VALUES(full_name), password_hash = VALUES(password_hash);
 
@@ -170,5 +282,29 @@ INSERT INTO users (id, full_name, email, mobile_number, password_hash, role) VAL
 (1, 'System Administrator', 'admin@college.edu', '9999999999', 'sha256$ca0fc3423a78e231952620ff1f065eba$1b684c010f2eb76c5f082287f0802d283aa35ef96643871ff9801c98633bb7a8', 'admin'),
 (401, 'Prof. S. Sharma', 'teacher.sharma@college.edu', '9876599999', 'sha256$04b60d9d08cc23e4cf7c530fca9944c6$4f33f407c8a0cc63dc6c339bfbdb96dd7e08fbe273c7981bcfbd37018e98e317', 'teacher')
 ON DUPLICATE KEY UPDATE role = VALUES(role), is_active = 1;
+
+-- Seed Institutional Events
+INSERT INTO events (id, title, description, date, start_time, end_time, venue, organizer_alumni_id, event_type, status) VALUES
+(1, 'Annual Tech Symposium 2026', 'Flagship college project exhibition, technical papers, and industry judging panels.', '2026-11-15', '09:00:00', '17:00:00', 'Main Auditorium & CS Labs', 101, 'JUDGE', 'APPROVED'),
+(2, 'Cloud & AI Architecture Workshop', 'Hands-on session covering Azure microservices and LLM pipeline deployment.', '2026-11-20', '14:00:00', '16:30:00', 'Seminar Hall B', 102, 'GUEST_SESSION', 'APPROVED'),
+(3, 'FinTech Hackathon Mentorship', '24-hour algorithmic trading and decentralized finance challenge.', '2026-12-05', '10:00:00', '18:00:00', 'Innovation Center', 106, 'SPONSOR', 'PENDING')
+ON DUPLICATE KEY UPDATE title = VALUES(title), status = VALUES(status);
+
+-- Seed Teacher Event Assignments
+INSERT INTO teacher_event_assignments (id, teacher_id, event_id, assignment_role, assigned_by) VALUES
+(1, 401, 1, 'COORDINATOR', 1),
+(2, 401, 2, 'EVENT_SUPERVISOR', 1)
+ON DUPLICATE KEY UPDATE assignment_role = VALUES(assignment_role);
+
+-- Seed Internal Marks
+INSERT INTO internal_marks (id, student_id, event_id, teacher_id, marks, max_marks, remarks) VALUES
+(1, 201, 1, 401, 92.50, 100.00, 'Excellent distributed systems architecture presentation and working demo.')
+ON DUPLICATE KEY UPDATE marks = VALUES(marks);
+
+-- Seed Opportunities
+INSERT INTO opportunities (id, alumni_id, title, description, organization, opportunity_type, location, eligibility, deadline, application_link, status) VALUES
+(1, 101, 'AI Systems Engineering Internship', 'Summer internship working on large-scale model optimization and cloud deployment.', 'Microsoft', 'Internship', 'Hyderabad / Hybrid', 'Final and pre-final year CS/IT students', '2026-12-31', 'https://careers.microsoft.com', 'OPEN'),
+(2, 103, 'Graduate Software Engineer - Core Infrastructure', 'Full-time entry role on Google core infrastructure and network monitoring.', 'Google', 'Full-time', 'Bangalore', 'Graduating batches with strong algorithms and OS fundamentals', '2026-12-15', 'https://careers.google.com', 'OPEN')
+ON DUPLICATE KEY UPDATE title = VALUES(title), status = VALUES(status);
 
 -- End of stored dump

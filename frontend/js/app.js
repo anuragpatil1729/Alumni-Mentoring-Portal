@@ -269,11 +269,69 @@
     els.adminSubtabPendingBtn = document.getElementById("adminSubtabPendingBtn");
     els.adminSubtabDuplicatesBtn = document.getElementById("adminSubtabDuplicatesBtn");
     els.adminSubtabFeedbackBtn = document.getElementById("adminSubtabFeedbackBtn");
+    els.adminSubtabEventsBtn = document.getElementById("adminSubtabEventsBtn");
+    els.adminEventsBadge = document.getElementById("adminEventsBadge");
 
     els.adminPanelUsers = document.getElementById("adminPanelUsers");
     els.adminPanelPending = document.getElementById("adminPanelPending");
     els.adminPanelDuplicates = document.getElementById("adminPanelDuplicates");
     els.adminPanelFeedback = document.getElementById("adminPanelFeedback");
+    els.adminPanelEvents = document.getElementById("adminPanelEvents");
+    els.refreshAdminEventsBtn = document.getElementById("refreshAdminEventsBtn");
+    els.adminEventsTableBody = document.getElementById("adminEventsTableBody");
+
+    // Teacher / Faculty Portal Elements (System Architecture)
+    els.tabTeacherBtn = document.getElementById("tabTeacherBtn");
+    els.teacherView = document.getElementById("teacherView");
+    els.teacherAlert = document.getElementById("teacherAlert");
+    els.teacherSubtabMarksBtn = document.getElementById("teacherSubtabMarksBtn");
+    els.teacherSubtabBookingsBtn = document.getElementById("teacherSubtabBookingsBtn");
+    els.teacherSubtabDirectoryBtn = document.getElementById("teacherSubtabDirectoryBtn");
+    els.teacherPanelMarks = document.getElementById("teacherPanelMarks");
+    els.teacherPanelBookings = document.getElementById("teacherPanelBookings");
+    els.teacherPanelDirectory = document.getElementById("teacherPanelDirectory");
+    els.teacherEventSelect = document.getElementById("teacherEventSelect");
+    els.refreshTeacherMarksBtn = document.getElementById("refreshTeacherMarksBtn");
+    els.openAddMarkModalBtn = document.getElementById("openAddMarkModalBtn");
+    els.teacherEventInfoCard = document.getElementById("teacherEventInfoCard");
+    els.assignedEventTitle = document.getElementById("assignedEventTitle");
+    els.assignedEventDesc = document.getElementById("assignedEventDesc");
+    els.assignedEventMeta = document.getElementById("assignedEventMeta");
+    els.teacherMarksTableBody = document.getElementById("teacherMarksTableBody");
+    els.refreshTeacherBookingsBtn = document.getElementById("refreshTeacherBookingsBtn");
+    els.openNewBookingBtn = document.getElementById("openNewBookingBtn");
+    els.teacherBookingsTableBody = document.getElementById("teacherBookingsTableBody");
+    els.refreshTeacherDirectoryBtn = document.getElementById("refreshTeacherDirectoryBtn");
+    els.teacherDirectoryTableBody = document.getElementById("teacherDirectoryTableBody");
+
+    // Teacher Modals
+    els.teacherMarkModal = document.getElementById("teacherMarkModal");
+    els.teacherMarkModalTitle = document.getElementById("teacherMarkModalTitle");
+    els.teacherMarkModalCloseBtn = document.getElementById("teacherMarkModalCloseBtn");
+    els.teacherMarkCancelBtn = document.getElementById("teacherMarkCancelBtn");
+    els.teacherMarkForm = document.getElementById("teacherMarkForm");
+    els.teacherMarkModalAlert = document.getElementById("teacherMarkModalAlert");
+    els.markEventTitleDisplay = document.getElementById("markEventTitleDisplay");
+    els.markEventId = document.getElementById("markEventId");
+    els.markStudentId = document.getElementById("markStudentId");
+    els.markScore = document.getElementById("markScore");
+    els.markMaxScore = document.getElementById("markMaxScore");
+    els.markRemarks = document.getElementById("markRemarks");
+    els.saveMarkBtn = document.getElementById("saveMarkBtn");
+
+    els.teacherBookingModal = document.getElementById("teacherBookingModal");
+    els.teacherBookingModalCloseBtn = document.getElementById("teacherBookingModalCloseBtn");
+    els.teacherBookingCancelBtn = document.getElementById("teacherBookingCancelBtn");
+    els.teacherBookingForm = document.getElementById("teacherBookingForm");
+    els.teacherBookingModalAlert = document.getElementById("teacherBookingModalAlert");
+    els.bookingEventId = document.getElementById("bookingEventId");
+    els.bookingAlumniId = document.getElementById("bookingAlumniId");
+    els.bookingDate = document.getElementById("bookingDate");
+    els.bookingStartTime = document.getElementById("bookingStartTime");
+    els.bookingEndTime = document.getElementById("bookingEndTime");
+    els.bookingPurpose = document.getElementById("bookingPurpose");
+    els.bookingNotes = document.getElementById("bookingNotes");
+    els.saveBookingBtn = document.getElementById("saveBookingBtn");
 
     els.adminPendingBadge = document.getElementById("adminPendingBadge");
     els.adminDuplicatesBadge = document.getElementById("adminDuplicatesBadge");
@@ -413,25 +471,33 @@
       const isAlumni = role === "alumni";
       const isAdmin = role === "admin";
       const isTeacher = role === "teacher";
+      const isStudent = role === "student";
       els.navUserRoleBadge.textContent = isAdmin ? "Admin" : (isTeacher ? "Teacher" : (isAlumni ? "Mentor" : "Student"));
       els.navUserRoleBadge.className = `user-role-badge ${role}`;
 
       // Navigation Visibility:
       if (els.tabSearchBtn) {
-        els.tabSearchBtn.style.display = (isAlumni || isAdmin) ? "none" : "inline-flex";
+        els.tabSearchBtn.style.display = (isAdmin) ? "none" : "inline-flex";
       }
       if (els.tabRequestsBtn) {
-        els.tabRequestsBtn.style.display = isAlumni ? "inline-flex" : "none";
+        els.tabRequestsBtn.style.display = (isAlumni || isStudent) ? "inline-flex" : "none";
+        const iconSpan = els.tabRequestsBtn.querySelector(".tab-icon");
+        if (iconSpan && iconSpan.nextSibling) {
+          iconSpan.nextSibling.textContent = isStudent ? " My Requests" : " Received Requests";
+        }
       }
       if (els.tabHistoryBtn) {
         els.tabHistoryBtn.style.display = isAdmin ? "none" : "inline-flex";
+      }
+      if (els.tabTeacherBtn) {
+        els.tabTeacherBtn.style.display = (isTeacher || isAdmin) ? "inline-flex" : "none";
       }
       if (els.tabAdminBtn) {
         els.tabAdminBtn.style.display = isAdmin ? "inline-flex" : "none";
       }
 
-      // Fetch active pending requests count for mentors
-      if (isAlumni) {
+      // Fetch active pending requests count for mentors and students
+      if (isAlumni || isStudent) {
         updatePendingBadge();
       } else if (els.navRequestsBadge) {
         els.navRequestsBadge.style.display = "none";
@@ -443,6 +509,7 @@
       if (els.tabSearchBtn) els.tabSearchBtn.style.display = "inline-flex";
       if (els.tabRequestsBtn) els.tabRequestsBtn.style.display = "none";
       if (els.tabHistoryBtn) els.tabHistoryBtn.style.display = "none";
+      if (els.tabTeacherBtn) els.tabTeacherBtn.style.display = "none";
       if (els.tabAdminBtn) els.tabAdminBtn.style.display = "none";
       if (els.navRequestsBadge) els.navRequestsBadge.style.display = "none";
     }
@@ -453,7 +520,7 @@
   // =========================================================================
   function switchView(viewName) {
     // If user is not authenticated and tries to open protected views, redirect to login
-    if (!state.currentUser && (viewName === "search" || viewName === "profile" || viewName === "requests" || viewName === "history" || viewName === "admin")) {
+    if (!state.currentUser && (viewName === "search" || viewName === "profile" || viewName === "requests" || viewName === "history" || viewName === "admin" || viewName === "teacher")) {
       viewName = "login";
       setLoginAlert("error", "Please sign in to access your portal account.");
     }
@@ -461,19 +528,20 @@
     const role = state.currentUser ? (state.currentUser.role || "").toLowerCase() : "";
     const isAlumni = role === "alumni";
     const isAdmin = role === "admin";
+    const isTeacher = role === "teacher";
 
-    // Admin redirect
+    // Admin redirect if requesting student/alumni only panels
     if (isAdmin && (viewName === "search" || viewName === "requests" || viewName === "history")) {
       viewName = "admin";
     }
 
-    // Alumni mentors only access "requests", "history", and "profile" (never explore mentors)
+    // Alumni mentors default to requests view rather than explore mentors
     if (isAlumni && viewName === "search") {
       viewName = "requests";
     }
 
-    // Students only access "search", "history", and "profile" (never the mentor requests dashboard)
-    if (state.currentUser && !isAlumni && !isAdmin && viewName === "requests") {
+    // Non-teachers/non-admins cannot access teacher portal
+    if (viewName === "teacher" && !isTeacher && !isAdmin) {
       viewName = "search";
     }
 
@@ -488,7 +556,8 @@
       els.profileView,
       els.requestsView,
       els.historyView,
-      els.adminView
+      els.adminView,
+      els.teacherView
     ];
     allViews.forEach(v => {
       if (v) {
@@ -505,6 +574,7 @@
     if (els.tabProfileBtn) els.tabProfileBtn.classList.remove("active");
     if (els.tabRequestsBtn) els.tabRequestsBtn.classList.remove("active");
     if (els.tabHistoryBtn) els.tabHistoryBtn.classList.remove("active");
+    if (els.tabTeacherBtn) els.tabTeacherBtn.classList.remove("active");
     if (els.tabAdminBtn) els.tabAdminBtn.classList.remove("active");
 
     if (viewName === "login") {
@@ -545,6 +615,13 @@
       }
       if (els.tabHistoryBtn) els.tabHistoryBtn.classList.add("active");
       loadAndRenderHistory();
+    } else if (viewName === "teacher") {
+      if (els.teacherView) {
+        els.teacherView.classList.add("active");
+        els.teacherView.style.display = "block";
+      }
+      if (els.tabTeacherBtn) els.tabTeacherBtn.classList.add("active");
+      loadTeacherPortal();
     } else if (viewName === "admin") {
       if (els.adminView) {
         els.adminView.classList.add("active");
@@ -2030,13 +2107,17 @@
   // =========================================================================
   async function updatePendingBadge() {
     if (!state.currentUser || !els.navRequestsBadge) return;
-    const isAlumni = (state.currentUser.role || "").toLowerCase() === "alumni";
-    if (!isAlumni) {
+    const role = (state.currentUser.role || "").toLowerCase();
+    const isAlumni = role === "alumni";
+    const isStudent = role === "student";
+    if (!isAlumni && !isStudent) {
       els.navRequestsBadge.style.display = "none";
       return;
     }
     try {
-      const res = await ApiClient.getRequestsByMentor(state.currentUser.id);
+      const res = isAlumni
+        ? await ApiClient.getRequestsByMentor(state.currentUser.id)
+        : await ApiClient.getRequestsByStudent(state.currentUser.id);
       if (res.ok && res.data && res.data.requests) {
         const pendingCount = res.data.requests.filter(r => r.status === "PENDING").length;
         if (pendingCount > 0) {
@@ -2054,9 +2135,11 @@
   async function loadAndRenderRequests() {
     if (!state.currentUser) return;
 
-    const isMentor = (state.currentUser.role || "").toLowerCase() === "alumni";
-    if (!isMentor) {
-      // Students cannot access the mentor dashboard
+    const role = (state.currentUser.role || "").toLowerCase();
+    const isMentor = role === "alumni";
+    const isStudent = role === "student";
+
+    if (!isMentor && !isStudent) {
       switchView("search");
       return;
     }
@@ -2065,13 +2148,22 @@
     els.requestsList.innerHTML = "<div style='text-align:center; padding: 40px; color:#64748b;'>Loading requests...</div>";
     els.requestsEmptyState.style.display = "none";
 
-    els.requestsTitle.textContent = "Received Mentorship Requests";
-    els.requestsSubtitle.textContent = "Review students who have requested to connect with you, accept sessions, or decline.";
-    els.emptyRequestsTitle.textContent = "No Requests Received Yet";
-    els.emptyRequestsMsg.textContent = "When students discover your profile and request mentorship, their applications will show up here.";
+    if (isMentor) {
+      els.requestsTitle.textContent = "Received Mentorship Requests";
+      els.requestsSubtitle.textContent = "Review students who have requested to connect with you, accept sessions, or decline.";
+      els.emptyRequestsTitle.textContent = "No Requests Received Yet";
+      els.emptyRequestsMsg.textContent = "When students discover your profile and request mentorship, their applications will show up here.";
+    } else {
+      els.requestsTitle.textContent = "My Mentorship Requests";
+      els.requestsSubtitle.textContent = "Track requests you have sent to alumni mentors, check statuses, and manage sessions.";
+      els.emptyRequestsTitle.textContent = "No Mentorship Requests Sent Yet";
+      els.emptyRequestsMsg.textContent = "Browse our alumni mentor directory and send connection requests to start your mentorship journey!";
+    }
 
     try {
-      const res = await ApiClient.getRequestsByMentor(state.currentUser.id);
+      const res = isMentor
+        ? await ApiClient.getRequestsByMentor(state.currentUser.id)
+        : await ApiClient.getRequestsByStudent(state.currentUser.id);
 
       if (!res.ok || !res.data || !res.data.requests) {
         throw new Error(res.data?.message || `Failed to fetch requests (HTTP ${res.status})`);
@@ -2858,6 +2950,77 @@
     if (els.adminSubtabFeedbackBtn) {
       els.adminSubtabFeedbackBtn.addEventListener("click", () => switchAdminSubtab("feedback"));
     }
+    if (els.adminSubtabEventsBtn) {
+      els.adminSubtabEventsBtn.addEventListener("click", () => switchAdminSubtab("events"));
+    }
+    if (els.refreshAdminEventsBtn) {
+      els.refreshAdminEventsBtn.addEventListener("click", () => loadAndRenderAdminEvents());
+    }
+
+    // Teacher / Faculty Portal Subtabs & Actions
+    if (els.tabTeacherBtn) {
+      els.tabTeacherBtn.addEventListener("click", () => switchView("teacher"));
+    }
+    if (els.teacherSubtabMarksBtn) {
+      els.teacherSubtabMarksBtn.addEventListener("click", () => switchTeacherSubtab("marks"));
+    }
+    if (els.teacherSubtabBookingsBtn) {
+      els.teacherSubtabBookingsBtn.addEventListener("click", () => switchTeacherSubtab("bookings"));
+    }
+    if (els.teacherSubtabDirectoryBtn) {
+      els.teacherSubtabDirectoryBtn.addEventListener("click", () => switchTeacherSubtab("directory"));
+    }
+    if (els.refreshTeacherMarksBtn) {
+      els.refreshTeacherMarksBtn.addEventListener("click", () => {
+        const evId = els.teacherEventSelect ? els.teacherEventSelect.value : null;
+        if (evId) loadTeacherMarks(evId);
+      });
+    }
+    if (els.teacherEventSelect) {
+      els.teacherEventSelect.addEventListener("change", (e) => {
+        if (e.target.value) loadTeacherMarks(e.target.value);
+      });
+    }
+    if (els.openAddMarkModalBtn) {
+      els.openAddMarkModalBtn.addEventListener("click", () => openTeacherMarkModal());
+    }
+    if (els.teacherMarkModalCloseBtn) {
+      els.teacherMarkModalCloseBtn.addEventListener("click", closeTeacherMarkModal);
+    }
+    if (els.teacherMarkCancelBtn) {
+      els.teacherMarkCancelBtn.addEventListener("click", closeTeacherMarkModal);
+    }
+    if (els.teacherMarkModal) {
+      els.teacherMarkModal.addEventListener("click", (e) => {
+        if (e.target === els.teacherMarkModal) closeTeacherMarkModal();
+      });
+    }
+    if (els.teacherMarkForm) {
+      els.teacherMarkForm.addEventListener("submit", handleTeacherMarkSubmit);
+    }
+    if (els.refreshTeacherBookingsBtn) {
+      els.refreshTeacherBookingsBtn.addEventListener("click", loadTeacherBookings);
+    }
+    if (els.openNewBookingBtn) {
+      els.openNewBookingBtn.addEventListener("click", openTeacherBookingModal);
+    }
+    if (els.teacherBookingModalCloseBtn) {
+      els.teacherBookingModalCloseBtn.addEventListener("click", closeTeacherBookingModal);
+    }
+    if (els.teacherBookingCancelBtn) {
+      els.teacherBookingCancelBtn.addEventListener("click", closeTeacherBookingModal);
+    }
+    if (els.teacherBookingModal) {
+      els.teacherBookingModal.addEventListener("click", (e) => {
+        if (e.target === els.teacherBookingModal) closeTeacherBookingModal();
+      });
+    }
+    if (els.teacherBookingForm) {
+      els.teacherBookingForm.addEventListener("submit", handleTeacherBookingSubmit);
+    }
+    if (els.refreshTeacherDirectoryBtn) {
+      els.refreshTeacherDirectoryBtn.addEventListener("click", loadTeacherDirectory);
+    }
 
     if (els.refreshPendingBtn) {
       els.refreshPendingBtn.addEventListener("click", () => loadAndRenderPendingUsers());
@@ -3469,7 +3632,8 @@
       { id: "users", btn: els.adminSubtabUsersBtn, panel: els.adminPanelUsers },
       { id: "pending", btn: els.adminSubtabPendingBtn, panel: els.adminPanelPending },
       { id: "duplicates", btn: els.adminSubtabDuplicatesBtn, panel: els.adminPanelDuplicates },
-      { id: "feedback", btn: els.adminSubtabFeedbackBtn, panel: els.adminPanelFeedback }
+      { id: "feedback", btn: els.adminSubtabFeedbackBtn, panel: els.adminPanelFeedback },
+      { id: "events", btn: els.adminSubtabEventsBtn, panel: els.adminPanelEvents }
     ];
 
     tabs.forEach(t => {
@@ -3482,6 +3646,7 @@
     else if (tab === "pending") loadAndRenderPendingUsers();
     else if (tab === "duplicates") loadAndRenderDuplicates();
     else if (tab === "feedback") loadAndRenderAdminFeedback();
+    else if (tab === "events") loadAndRenderAdminEvents();
   }
 
   function renderAdminUsers(users) {
@@ -3999,6 +4164,587 @@
   }
 
   // =========================================================================
+  // Admin Events Approvals Controller (System Architecture)
+  // =========================================================================
+  async function loadAndRenderAdminEvents() {
+    if (!els.adminEventsTableBody) return;
+    els.adminEventsTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">Loading institutional events...</td></tr>`;
+
+    try {
+      const res = await ApiClient.getAdminEvents();
+      if (!res.ok || !Array.isArray(res.data)) {
+        throw new Error(res.data?.message || "Failed to fetch events.");
+      }
+
+      const events = res.data;
+      const pendingCount = events.filter(e => (e.status || "").toUpperCase() === "PENDING").length;
+      if (els.adminEventsBadge) {
+        if (pendingCount > 0) {
+          els.adminEventsBadge.textContent = pendingCount;
+          els.adminEventsBadge.style.display = "inline-flex";
+        } else {
+          els.adminEventsBadge.style.display = "none";
+        }
+      }
+
+      if (events.length === 0) {
+        els.adminEventsTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">No events recorded in system.</td></tr>`;
+        return;
+      }
+
+      els.adminEventsTableBody.innerHTML = "";
+      events.forEach(ev => {
+        const tr = document.createElement("tr");
+        const st = (ev.status || "PENDING").toUpperCase();
+        const isPending = st === "PENDING";
+        const isApproved = st === "APPROVED";
+
+        tr.innerHTML = `
+          <td style="font-weight:700; color:#64748b;">#${ev.id}</td>
+          <td>
+            <div style="font-weight:700; color:#0f172a;">${escapeHtml(ev.title || "Untitled Event")}</div>
+            <div style="font-size:12px; color:#64748b; max-width:320px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">
+              ${escapeHtml(ev.description || "")}
+            </div>
+          </td>
+          <td><span class="role-badge role-alumni">${escapeHtml(ev.eventType || ev.event_type || "GENERAL")}</span></td>
+          <td><span style="font-size:12px; font-weight:600; color:#334155;">Mentor #${ev.organizerAlumniId || ev.organizer_alumni_id || "—"}</span></td>
+          <td>
+            <div style="font-weight:600; color:#0f172a; font-size:12px;">📅 ${escapeHtml(ev.date || "")}</div>
+            <div style="font-size:11px; color:#64748b;">⏰ ${escapeHtml(ev.startTime || ev.start_time || "")} - ${escapeHtml(ev.endTime || ev.end_time || "")}</div>
+          </td>
+          <td style="font-size:12px; color:#64748b;">${escapeHtml(ev.venue || "Campus")}</td>
+          <td>
+            <span class="approval-badge approval-${escapeHtml(st)}">
+              ${isApproved ? '✓ APPROVED' : isPending ? '⏳ PENDING' : '✕ REJECTED'}
+            </span>
+          </td>
+          <td style="text-align:right;">
+            ${isPending ? `
+              <div class="admin-action-btn-group" style="justify-content:flex-end;">
+                <button type="button" class="btn-approve-user" data-eventid="${ev.id}" style="background:#15803d; color:#fff; border:none; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">
+                  ✓ Approve
+                </button>
+                <button type="button" class="btn-reject-user" data-eventid="${ev.id}" style="background:#dc2626; color:#fff; border:none; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">
+                  ✕ Reject
+                </button>
+              </div>
+            ` : `<span style="font-size:12px; color:#94a3b8; font-weight:600;">Decided</span>`}
+          </td>
+        `;
+
+        const approveBtn = tr.querySelector(".btn-approve-user");
+        if (approveBtn) {
+          approveBtn.addEventListener("click", () => handleAdminEventDecision(ev.id, "APPROVED"));
+        }
+        const rejectBtn = tr.querySelector(".btn-reject-user");
+        if (rejectBtn) {
+          rejectBtn.addEventListener("click", () => handleAdminEventDecision(ev.id, "REJECTED"));
+        }
+
+        els.adminEventsTableBody.appendChild(tr);
+      });
+    } catch (err) {
+      els.adminEventsTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#dc2626;">Error: ${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  async function handleAdminEventDecision(eventId, status) {
+    if (!confirm(`Are you sure you want to mark Event #${eventId} as ${status}?`)) return;
+    try {
+      const res = await ApiClient.updateAdminEventStatus(eventId, status);
+      if (res.ok) {
+        setAdminAlert("success", `Event #${eventId} was successfully updated to ${status}.`);
+        loadAndRenderAdminEvents();
+      } else {
+        setAdminAlert("error", res.data?.message || "Failed to update event status.");
+      }
+    } catch (err) {
+      setAdminAlert("error", err.message || "Failed to update event status.");
+    }
+  }
+
+  // =========================================================================
+  // Teacher / Faculty Portal Controller (System Architecture)
+  // =========================================================================
+  let currentTeacherEvents = [];
+  let selectedTeacherEvent = null;
+
+  function setTeacherAlert(type, msg) {
+    if (!els.teacherAlert) return;
+    if (!type || !msg) {
+      els.teacherAlert.style.display = "none";
+      els.teacherAlert.textContent = "";
+      els.teacherAlert.className = "form-status-alert";
+      return;
+    }
+    els.teacherAlert.className = `form-status-alert alert-${type}`;
+    els.teacherAlert.textContent = msg;
+    els.teacherAlert.style.display = "block";
+  }
+
+  function switchTeacherSubtab(tab) {
+    const tabs = [
+      { id: "marks", btn: els.teacherSubtabMarksBtn, panel: els.teacherPanelMarks },
+      { id: "bookings", btn: els.teacherSubtabBookingsBtn, panel: els.teacherPanelBookings },
+      { id: "directory", btn: els.teacherSubtabDirectoryBtn, panel: els.teacherPanelDirectory }
+    ];
+
+    tabs.forEach(t => {
+      const isActive = (t.id === tab);
+      if (t.btn) t.btn.classList.toggle("active", isActive);
+      if (t.panel) t.panel.style.display = isActive ? "block" : "none";
+    });
+
+    if (tab === "marks") {
+      loadTeacherEvents();
+    } else if (tab === "bookings") {
+      loadTeacherBookings();
+    } else if (tab === "directory") {
+      loadTeacherDirectory();
+    }
+  }
+
+  async function loadTeacherPortal() {
+    switchTeacherSubtab("marks");
+  }
+
+  async function loadTeacherEvents() {
+    if (!els.teacherEventSelect) return;
+    els.teacherEventSelect.innerHTML = `<option value="">Loading assigned events...</option>`;
+
+    try {
+      const res = await ApiClient.getTeacherEvents();
+      if (!res.ok || !Array.isArray(res.data)) {
+        els.teacherEventSelect.innerHTML = `<option value="">No assigned events available</option>`;
+        return;
+      }
+
+      currentTeacherEvents = res.data;
+      if (currentTeacherEvents.length === 0) {
+        els.teacherEventSelect.innerHTML = `<option value="">No events assigned to you yet</option>`;
+        if (els.teacherMarksTableBody) {
+          els.teacherMarksTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">No events currently assigned to your faculty profile.</td></tr>`;
+        }
+        return;
+      }
+
+      els.teacherEventSelect.innerHTML = currentTeacherEvents.map(e => 
+        `<option value="${e.id}">${escapeHtml(e.title)} (${e.assignmentRole || e.assignment_role || 'Assigned'})</option>`
+      ).join("");
+
+      // Also populate bookingEventId select
+      if (els.bookingEventId) {
+        els.bookingEventId.innerHTML = `<option value="">Select Event...</option>` + currentTeacherEvents.map(e =>
+          `<option value="${e.id}">${escapeHtml(e.title)}</option>`
+        ).join("");
+      }
+
+      const firstId = currentTeacherEvents[0].id;
+      loadTeacherMarks(firstId);
+    } catch (err) {
+      els.teacherEventSelect.innerHTML = `<option value="">Error loading events</option>`;
+      setTeacherAlert("error", "Unable to load assigned events: " + err.message);
+    }
+  }
+
+  async function loadTeacherMarks(eventId) {
+    if (!eventId) {
+      if (els.teacherMarksTableBody) {
+        els.teacherMarksTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">Select an event above to view internal marks.</td></tr>`;
+      }
+      return;
+    }
+
+    selectedTeacherEvent = currentTeacherEvents.find(e => String(e.id) === String(eventId)) || null;
+
+    if (els.teacherEventInfoCard && selectedTeacherEvent) {
+      els.assignedEventTitle.textContent = selectedTeacherEvent.title || "Event Details";
+      els.assignedEventDesc.textContent = selectedTeacherEvent.description || "";
+      els.assignedEventMeta.innerHTML = `
+        <span>📅 Date: <strong>${escapeHtml(selectedTeacherEvent.date || 'TBD')}</strong></span>
+        <span>⏰ Time: <strong>${escapeHtml(selectedTeacherEvent.startTime || '')} - ${escapeHtml(selectedTeacherEvent.endTime || '')}</strong></span>
+        <span>📍 Venue: <strong>${escapeHtml(selectedTeacherEvent.venue || 'Campus')}</strong></span>
+        <span>🛡️ Your Role: <strong>${escapeHtml(selectedTeacherEvent.assignmentRole || selectedTeacherEvent.assignment_role || 'Faculty Coordinator')}</strong></span>
+      `;
+      els.teacherEventInfoCard.style.display = "block";
+    }
+
+    if (!els.teacherMarksTableBody) return;
+    els.teacherMarksTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">Loading marks for event #${eventId}...</td></tr>`;
+
+    try {
+      const res = await ApiClient.getTeacherEventMarks(eventId);
+      if (!res.ok || !Array.isArray(res.data)) {
+        throw new Error(res.data?.message || "Failed to load marks.");
+      }
+
+      const marks = res.data;
+      if (marks.length === 0) {
+        els.teacherMarksTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">No internal marks recorded for this event yet. Click "Enter Student Marks" above to evaluate students.</td></tr>`;
+        return;
+      }
+
+      els.teacherMarksTableBody.innerHTML = "";
+      marks.forEach(m => {
+        const tr = document.createElement("tr");
+        const score = Number(m.marks || 0);
+        const maxScore = Number(m.maxMarks || m.max_marks || 100);
+        const pct = maxScore > 0 ? ((score / maxScore) * 100).toFixed(1) : "0.0";
+
+        tr.innerHTML = `
+          <td style="font-weight:700; color:#64748b;">STU #${m.studentId || m.student_id}</td>
+          <td>
+            <div style="font-weight:700; color:#0f172a;">${escapeHtml(m.studentName || m.student_name || `Student #${m.studentId || m.student_id}`)}</div>
+            <div style="font-size:12px; color:#64748b;">${escapeHtml(m.studentDepartment || m.department || "")}</div>
+          </td>
+          <td style="font-weight:800; color:#1e293b; font-size:14px;">${score.toFixed(2)}</td>
+          <td style="color:#64748b;">${maxScore.toFixed(2)}</td>
+          <td>
+            <span style="display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; background:${pct >= 75 ? '#dcfce7;color:#15803d;' : pct >= 50 ? '#fef3c7;color:#b45309;' : '#fee2e2;color:#b91c1c;'}">
+              ${pct}%
+            </span>
+          </td>
+          <td style="font-size:12px; color:#475569; max-width:240px;">${escapeHtml(m.remarks || "—")}</td>
+          <td style="font-size:12px; color:#64748b;">${escapeHtml(m.updatedAt ? m.updatedAt.split(" ")[0] : "—")}</td>
+          <td style="text-align:right;">
+            <button type="button" class="btn-edit-mark" style="padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; cursor:pointer;">
+              ✏️ Edit
+            </button>
+          </td>
+        `;
+
+        const editBtn = tr.querySelector(".btn-edit-mark");
+        if (editBtn) {
+          editBtn.addEventListener("click", () => {
+            openTeacherMarkModal({
+              eventId: eventId,
+              studentId: m.studentId || m.student_id,
+              marks: score,
+              maxMarks: maxScore,
+              remarks: m.remarks || "",
+              isUpdate: true
+            });
+          });
+        }
+
+        els.teacherMarksTableBody.appendChild(tr);
+      });
+    } catch (err) {
+      els.teacherMarksTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#dc2626;">Error loading marks: ${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  function openTeacherMarkModal(markData) {
+    if (!els.teacherMarkModal) return;
+    if (els.teacherMarkModalAlert) els.teacherMarkModalAlert.style.display = "none";
+
+    const evId = markData?.eventId || (els.teacherEventSelect ? els.teacherEventSelect.value : null);
+    if (!evId) {
+      alert("Please select an assigned event first.");
+      return;
+    }
+
+    const eventObj = currentTeacherEvents.find(e => String(e.id) === String(evId));
+    if (els.markEventTitleDisplay) {
+      els.markEventTitleDisplay.value = eventObj ? eventObj.title : `Event #${evId}`;
+    }
+    if (els.markEventId) els.markEventId.value = evId;
+
+    if (markData) {
+      if (els.markStudentId) {
+        els.markStudentId.value = markData.studentId;
+        els.markStudentId.readOnly = !!markData.isUpdate;
+      }
+      if (els.markScore) els.markScore.value = markData.marks;
+      if (els.markMaxScore) els.markMaxScore.value = markData.maxMarks || 100;
+      if (els.markRemarks) els.markRemarks.value = markData.remarks || "";
+      state.isUpdatingTeacherMark = !!markData.isUpdate;
+      if (els.teacherMarkModalTitle) {
+        els.teacherMarkModalTitle.textContent = markData.isUpdate ? "✏️ Edit Student Internal Marks" : "📝 Enter Student Internal Marks";
+      }
+    } else {
+      if (els.markStudentId) {
+        els.markStudentId.value = "";
+        els.markStudentId.readOnly = false;
+      }
+      if (els.markScore) els.markScore.value = "";
+      if (els.markMaxScore) els.markMaxScore.value = "100.00";
+      if (els.markRemarks) els.markRemarks.value = "";
+      state.isUpdatingTeacherMark = false;
+      if (els.teacherMarkModalTitle) {
+        els.teacherMarkModalTitle.textContent = "📝 Enter Student Internal Marks";
+      }
+    }
+
+    els.teacherMarkModal.style.display = "flex";
+  }
+
+  function closeTeacherMarkModal() {
+    if (els.teacherMarkModal) els.teacherMarkModal.style.display = "none";
+  }
+
+  async function handleTeacherMarkSubmit(e) {
+    e.preventDefault();
+    const eventId = els.markEventId.value;
+    const studentId = els.markStudentId.value.trim();
+    const marks = els.markScore.value.trim();
+    const maxMarks = els.markMaxScore.value.trim() || "100.00";
+    const remarks = els.markRemarks.value.trim();
+
+    if (!eventId || !studentId || marks === "") {
+      if (els.teacherMarkModalAlert) {
+        els.teacherMarkModalAlert.className = "form-status-alert alert-error";
+        els.teacherMarkModalAlert.textContent = "Event, Student ID, and Marks are required.";
+        els.teacherMarkModalAlert.style.display = "block";
+      }
+      return;
+    }
+
+    try {
+      if (els.saveMarkBtn) els.saveMarkBtn.disabled = true;
+
+      const payload = {
+        studentId: Number(studentId),
+        marks: Number(marks),
+        maxMarks: Number(maxMarks),
+        remarks: remarks || null
+      };
+
+      const res = state.isUpdatingTeacherMark
+        ? await ApiClient.updateInternalMark(eventId, studentId, payload)
+        : await ApiClient.submitInternalMark(eventId, payload);
+
+      if (res.ok) {
+        closeTeacherMarkModal();
+        setTeacherAlert("success", "Student internal marks saved successfully.");
+        loadTeacherMarks(eventId);
+      } else {
+        if (els.teacherMarkModalAlert) {
+          els.teacherMarkModalAlert.className = "form-status-alert alert-error";
+          els.teacherMarkModalAlert.textContent = res.data?.message || "Failed to record marks.";
+          els.teacherMarkModalAlert.style.display = "block";
+        }
+      }
+    } catch (err) {
+      if (els.teacherMarkModalAlert) {
+        els.teacherMarkModalAlert.className = "form-status-alert alert-error";
+        els.teacherMarkModalAlert.textContent = err.message || "Failed to save marks.";
+        els.teacherMarkModalAlert.style.display = "block";
+      }
+    } finally {
+      if (els.saveMarkBtn) els.saveMarkBtn.disabled = false;
+    }
+  }
+
+  async function loadTeacherBookings() {
+    if (!els.teacherBookingsTableBody) return;
+    els.teacherBookingsTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">Loading alumni slot bookings...</td></tr>`;
+
+    try {
+      const res = await ApiClient.getTeacherBookings();
+      if (!res.ok || !Array.isArray(res.data)) {
+        throw new Error(res.data?.message || "Failed to fetch bookings.");
+      }
+
+      const bookings = res.data;
+      if (bookings.length === 0) {
+        els.teacherBookingsTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">No alumni slot bookings found. Click "Book Alumni Slot" above to coordinate an alumni visit.</td></tr>`;
+        return;
+      }
+
+      els.teacherBookingsTableBody.innerHTML = "";
+      bookings.forEach(b => {
+        const tr = document.createElement("tr");
+        const st = (b.status || "BOOKED").toUpperCase();
+        const isBooked = st === "BOOKED";
+
+        tr.innerHTML = `
+          <td style="font-weight:700; color:#64748b;">#${b.id}</td>
+          <td><span style="font-weight:600; color:#0f172a;">Event #${b.eventId || b.event_id}</span></td>
+          <td>
+            <div style="font-weight:700; color:#0f172a;">${escapeHtml(b.alumniName || b.alumni_name || `Alumni #${b.alumniId || b.alumni_id}`)}</div>
+            <div style="font-size:12px; color:#64748b;">${escapeHtml(b.company || "")}</div>
+          </td>
+          <td>
+            <div style="font-weight:600; color:#0f172a; font-size:12px;">📅 ${escapeHtml(b.slotDate || b.slot_date || "")}</div>
+            <div style="font-size:11px; color:#64748b;">⏰ ${escapeHtml(b.startTime || b.start_time || "")} - ${escapeHtml(b.endTime || b.end_time || "")}</div>
+          </td>
+          <td><span class="role-badge role-teacher">${escapeHtml(b.purpose || b.booking_purpose || "GUEST_SESSION")}</span></td>
+          <td>
+            <span class="approval-badge approval-${escapeHtml(st)}">
+              ${st === 'COMPLETED' ? '✓ COMPLETED' : st === 'BOOKED' ? '📅 BOOKED' : '✕ CANCELLED'}
+            </span>
+          </td>
+          <td style="font-size:12px; color:#475569; max-width:200px;">${escapeHtml(b.notes || "—")}</td>
+          <td style="text-align:right;">
+            ${isBooked ? `
+              <div class="admin-action-btn-group" style="justify-content:flex-end;">
+                <button type="button" class="btn-complete-booking" data-bookingid="${b.id}" style="background:#15803d; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">
+                  ✓ Done
+                </button>
+                <button type="button" class="btn-cancel-booking" data-bookingid="${b.id}" style="background:#dc2626; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">
+                  ✕ Cancel
+                </button>
+              </div>
+            ` : `<span style="font-size:11px; color:#94a3b8; font-weight:600;">${st}</span>`}
+          </td>
+        `;
+
+        const completeBtn = tr.querySelector(".btn-complete-booking");
+        if (completeBtn) {
+          completeBtn.addEventListener("click", () => handleTeacherBookingStatus(b.id, "COMPLETED"));
+        }
+        const cancelBtn = tr.querySelector(".btn-cancel-booking");
+        if (cancelBtn) {
+          cancelBtn.addEventListener("click", () => handleTeacherBookingStatus(b.id, "CANCELLED"));
+        }
+
+        els.teacherBookingsTableBody.appendChild(tr);
+      });
+    } catch (err) {
+      els.teacherBookingsTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#dc2626;">Error: ${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  function openTeacherBookingModal() {
+    if (!els.teacherBookingModal) return;
+    if (els.teacherBookingModalAlert) els.teacherBookingModalAlert.style.display = "none";
+    if (els.teacherBookingForm) els.teacherBookingForm.reset();
+    els.teacherBookingModal.style.display = "flex";
+  }
+
+  function closeTeacherBookingModal() {
+    if (els.teacherBookingModal) els.teacherBookingModal.style.display = "none";
+  }
+
+  async function handleTeacherBookingSubmit(e) {
+    e.preventDefault();
+    const eventId = els.bookingEventId.value;
+    const alumniId = els.bookingAlumniId.value.trim();
+    const slotDate = els.bookingDate.value;
+    const startTime = els.bookingStartTime.value;
+    const endTime = els.bookingEndTime.value;
+    const purpose = els.bookingPurpose.value;
+    const notes = els.bookingNotes.value.trim();
+
+    if (!eventId || !alumniId || !slotDate || !startTime || !endTime) {
+      if (els.teacherBookingModalAlert) {
+        els.teacherBookingModalAlert.className = "form-status-alert alert-error";
+        els.teacherBookingModalAlert.textContent = "Please fill in all required booking fields.";
+        els.teacherBookingModalAlert.style.display = "block";
+      }
+      return;
+    }
+
+    try {
+      if (els.saveBookingBtn) els.saveBookingBtn.disabled = true;
+
+      const payload = {
+        eventId: Number(eventId),
+        alumniId: Number(alumniId),
+        slotDate: slotDate,
+        startTime: startTime,
+        endTime: endTime,
+        purpose: purpose,
+        notes: notes || null
+      };
+
+      const res = await ApiClient.createTeacherBooking(payload);
+      if (res.ok) {
+        closeTeacherBookingModal();
+        setTeacherAlert("success", "Alumni slot booked successfully!");
+        loadTeacherBookings();
+      } else {
+        if (els.teacherBookingModalAlert) {
+          els.teacherBookingModalAlert.className = "form-status-alert alert-error";
+          els.teacherBookingModalAlert.textContent = res.data?.message || "Booking failed or conflicting slot exists.";
+          els.teacherBookingModalAlert.style.display = "block";
+        }
+      }
+    } catch (err) {
+      if (els.teacherBookingModalAlert) {
+        els.teacherBookingModalAlert.className = "form-status-alert alert-error";
+        els.teacherBookingModalAlert.textContent = err.message || "Failed to book slot.";
+        els.teacherBookingModalAlert.style.display = "block";
+      }
+    } finally {
+      if (els.saveBookingBtn) els.saveBookingBtn.disabled = false;
+    }
+  }
+
+  async function handleTeacherBookingStatus(bookingId, status) {
+    if (!confirm(`Are you sure you want to change booking #${bookingId} to ${status}?`)) return;
+    try {
+      const res = await ApiClient.updateTeacherBookingStatus(bookingId, status);
+      if (res.ok) {
+        setTeacherAlert("success", `Booking #${bookingId} status updated to ${status}.`);
+        loadTeacherBookings();
+      } else {
+        setTeacherAlert("error", res.data?.message || "Failed to update booking status.");
+      }
+    } catch (err) {
+      setTeacherAlert("error", err.message || "Failed to update booking status.");
+    }
+  }
+
+  async function loadTeacherDirectory() {
+    if (!els.teacherDirectoryTableBody) return;
+    els.teacherDirectoryTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:#64748b;">Loading directory...</td></tr>`;
+
+    try {
+      const res = await ApiClient.getAdminUsers();
+      if (!res.ok || !Array.isArray(res.data)) {
+        throw new Error(res.data?.message || "Failed to load directory.");
+      }
+
+      const users = res.data.filter(u => {
+        const r = (u.role || "").toLowerCase();
+        return r === "student" || r === "alumni";
+      });
+
+      if (users.length === 0) {
+        els.teacherDirectoryTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:#64748b;">No students or alumni found.</td></tr>`;
+        return;
+      }
+
+      els.teacherDirectoryTableBody.innerHTML = "";
+      users.forEach(u => {
+        const tr = document.createElement("tr");
+        const r = (u.role || "").toLowerCase();
+        const approval = (u.approvalStatus || "APPROVED").toUpperCase();
+        const isActive = !!u.active;
+
+        tr.innerHTML = `
+          <td style="font-weight:700; color:#64748b;">#${u.id}</td>
+          <td>
+            <div style="font-weight:700; color:#0f172a;">${escapeHtml(u.fullName || "User")}</div>
+            <div style="font-size:12px; color:#64748b;">${escapeHtml(u.email || "")}</div>
+          </td>
+          <td><span class="role-badge role-${escapeHtml(r)}">${escapeHtml(u.role || "student")}</span></td>
+          <td style="font-size:12px; color:#334155;">${escapeHtml(u.department || u.company || "—")}</td>
+          <td>${escapeHtml(u.mobileNumber || "—")}</td>
+          <td>
+            <span class="approval-badge approval-${escapeHtml(approval)}">
+              ${approval === 'APPROVED' ? '✓' : approval === 'PENDING' ? '⏳' : '✕'} ${escapeHtml(approval)}
+            </span>
+          </td>
+          <td>
+            <span class="status-indicator-badge ${isActive ? 'is-active' : 'is-inactive'}">
+              <span class="status-dot"></span>
+              ${isActive ? 'Active' : 'Inactive'}
+            </span>
+          </td>
+        `;
+
+        els.teacherDirectoryTableBody.appendChild(tr);
+      });
+    } catch (err) {
+      els.teacherDirectoryTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:#dc2626;">Error loading directory: ${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  // =========================================================================
   // Initialization
   // =========================================================================
   document.addEventListener("DOMContentLoaded", () => {
@@ -4023,6 +4769,8 @@
       const role = (state.currentUser.role || "").toLowerCase();
       if (role === "admin") {
         switchView("admin");
+      } else if (role === "teacher") {
+        switchView("teacher");
       } else if (role === "alumni") {
         switchView("requests");
       } else {
