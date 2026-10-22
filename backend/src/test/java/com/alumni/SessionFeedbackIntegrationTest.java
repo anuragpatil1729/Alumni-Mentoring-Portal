@@ -110,6 +110,12 @@ public class SessionFeedbackIntegrationTest {
                  ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     adminUserId = rs.getLong("id");
+                    String hash = RegistrationDAO.hashPassword("Admin@123");
+                    try (PreparedStatement upd = con.prepareStatement("UPDATE users SET password_hash = ?, is_active = TRUE WHERE id = ?")) {
+                        upd.setString(1, hash);
+                        upd.setLong(2, adminUserId);
+                        upd.executeUpdate();
+                    }
                 } else {
                     String hash = RegistrationDAO.hashPassword("Admin@123");
                     String insert = "INSERT INTO users (full_name, email, mobile_number, password_hash, role) " +

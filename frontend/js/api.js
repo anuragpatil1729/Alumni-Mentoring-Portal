@@ -551,6 +551,200 @@ const ApiClient = {
     });
     const data = await response.json().catch(() => ({}));
     return { status: response.status, ok: response.ok, data };
+  },
+
+  // ==========================================
+  // Events & Opportunities APIs (System Architecture)
+  // ==========================================
+
+  /**
+   * Fetch approved public events
+   */
+  async getEvents() {
+    const response = await fetch(`${API_BASE_URL}/api/events`, {
+      method: "GET",
+      headers: { "Accept": "application/json" }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Alumni: Create new event for administrative approval
+   */
+  async createEvent(payload) {
+    const response = await fetch(`${API_BASE_URL}/api/events`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Fetch open opportunities
+   */
+  async getOpportunities() {
+    const response = await fetch(`${API_BASE_URL}/api/opportunities`, {
+      method: "GET",
+      headers: { "Accept": "application/json" }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Alumni: Create new opportunity
+   */
+  async createOpportunity(payload) {
+    const response = await fetch(`${API_BASE_URL}/api/opportunities`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  // ==========================================
+  // Teacher (Faculty) Module APIs (System Architecture)
+  // ==========================================
+
+  /**
+   * Teacher: Fetch assigned institutional events
+   */
+  async getTeacherEvents() {
+    const response = await fetch(`${API_BASE_URL}/api/teacher/events`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Teacher: Fetch event details
+   */
+  async getTeacherEventDetails(eventId) {
+    const response = await fetch(`${API_BASE_URL}/api/teacher/events/${eventId}`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Teacher: Fetch student internal marks for an event
+   */
+  async getTeacherEventMarks(eventId) {
+    const response = await fetch(`${API_BASE_URL}/api/teacher/events/${eventId}/marks`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Teacher: Record internal marks for a student
+   */
+  async submitInternalMark(eventId, payload) {
+    const response = await fetch(`${API_BASE_URL}/api/teacher/events/${eventId}/marks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Teacher: Update existing internal marks for a student
+   */
+  async updateInternalMark(eventId, studentId, payload) {
+    const response = await fetch(`${API_BASE_URL}/api/teacher/events/${eventId}/marks/${studentId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Teacher / Admin: Fetch alumni slot bookings
+   */
+  async getTeacherBookings() {
+    const response = await fetch(`${API_BASE_URL}/api/teacher/bookings`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Teacher / Admin: Book an alumni slot for an event
+   */
+  async createTeacherBooking(payload) {
+    const response = await fetch(`${API_BASE_URL}/api/teacher/bookings`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Teacher / Admin: Update booking status (COMPLETED / CANCELLED)
+   */
+  async updateTeacherBookingStatus(bookingId, status) {
+    const response = await fetch(`${API_BASE_URL}/api/teacher/bookings/${bookingId}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify({ status })
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
   }
 };
 

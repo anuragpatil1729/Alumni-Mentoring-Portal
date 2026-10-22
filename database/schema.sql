@@ -124,3 +124,115 @@ CREATE TABLE IF NOT EXISTS feedback (
   INDEX idx_feedback_student (student_id)
 ) ENGINE=InnoDB;
 
+-- =====================================================
+-- ALUMNI EVENTS & OPPORTUNITIES (System Architecture)
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS events (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(200) NOT NULL,
+  description TEXT NOT NULL,
+  date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  venue VARCHAR(255) NOT NULL,
+  organizer_alumni_id BIGINT UNSIGNED NOT NULL,
+  event_type ENUM('GENERAL', 'JUDGE', 'GUEST_SESSION', 'SPONSOR') NOT NULL DEFAULT 'GENERAL',
+  status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_events_organizer FOREIGN KEY (organizer_alumni_id) REFERENCES alumni(user_id) ON DELETE RESTRICT,
+  INDEX idx_events_date_status (date, status),
+  INDEX idx_events_organizer (organizer_alumni_id),
+  INDEX idx_events_type_status (event_type, status),
+  CONSTRAINT chk_events_valid_time CHECK (end_time > start_time)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS opportunities (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  alumni_id BIGINT UNSIGNED NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  description TEXT NOT NULL,
+  organization VARCHAR(200) NOT NULL,
+  opportunity_type VARCHAR(50) NOT NULL,
+  location VARCHAR(200) NULL,
+  eligibility TEXT NULL,
+  deadline DATE NULL,
+  application_link VARCHAR(2048) NULL,
+  status ENUM('OPEN', 'CLOSED', 'CANCELLED') NOT NULL DEFAULT 'OPEN',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_opportunities_alumni FOREIGN KEY (alumni_id) REFERENCES alumni(user_id) ON DELETE RESTRICT,
+  INDEX idx_opportunities_alumni (alumni_id),
+  INDEX idx_opportunities_status_deadline (status, deadline),
+  INDEX idx_opportunities_type (opportunity_type)
+) ENGINE=InnoDB;
+
+-- =====================================================
+-- TEACHER ASSIGNMENTS & INTERNAL MARKS (System Architecture)
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS teacher_event_assignments (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  teacher_id BIGINT UNSIGNED NOT NULL,
+  event_id BIGINT UNSIGNED NOT NULL,
+  assignment_role ENUM('COORDINATOR', 'INTERNAL_EVALUATOR', 'EVENT_SUPERVISOR') NOT NULL DEFAULT 'COORDINATOR',
+  assigned_by BIGINT UNSIGNED NOT NULL,
+  assigned_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_tea_teacher FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_tea_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+  CONSTRAINT fk_tea_assigned_by FOREIGN KEY (assigned_by) REFERENCES users(id) ON DELETE RESTRICT,
+  CONSTRAINT uq_teacher_event_role UNIQUE (teacher_id, event_id, assignment_role),
+  INDEX idx_tea_event (event_id),
+  INDEX idx_tea_teacher (teacher_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS internal_marks (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  student_id BIGINT UNSIGNED NOT NULL,
+  event_id BIGINT UNSIGNED NOT NULL,
+  teacher_id BIGINT UNSIGNED NOT NULL,
+  marks DECIMAL(5,2) NOT NULL,
+  max_marks DECIMAL(5,2) NOT NULL DEFAULT 100.00,
+  remarks VARCHAR(1000) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_marks_student FOREIGN KEY (student_id) REFERENCES students(user_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_marks_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+  CONSTRAINT fk_marks_teacher FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE RESTRICT,
+  CONSTRAINT uq_marks_student_event UNIQUE (student_id, event_id),
+  CONSTRAINT chk_marks_nonnegative CHECK (marks >= 0),
+  CONSTRAINT chk_marks_max_positive CHECK (max_marks > 0),
+  CONSTRAINT chk_marks_within_max CHECK (marks <= max_marks),
+  INDEX idx_marks_student (student_id),
+  INDEX idx_marks_event (event_id),
+  INDEX idx_marks_teacher (teacher_id)
+) ENGINE=InnoDB;
+
+-- =====================================================
+-- ALUMNI SLOT BOOKINGS (System Architecture)
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS alumni_slot_bookings (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  event_id BIGINT UNSIGNED NOT NULL,
+  alumni_id BIGINT UNSIGNED NOT NULL,
+  booked_by BIGINT UNSIGNED NOT NULL,
+  slot_date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  booking_purpose ENUM('JUDGE', 'GUEST_SESSION', 'SPONSOR') NOT NULL,
+  status ENUM('BOOKED', 'CANCELLED', 'COMPLETED') NOT NULL DEFAULT 'BOOKED',
+  notes VARCHAR(1000) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_asb_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+  CONSTRAINT fk_asb_alumni FOREIGN KEY (alumni_id) REFERENCES alumni(user_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_asb_booked_by FOREIGN KEY (booked_by) REFERENCES users(id) ON DELETE RESTRICT,
+  CONSTRAINT chk_asb_valid_time CHECK (end_time > start_time),
+  CONSTRAINT uq_asb_exact_booking UNIQUE (event_id, alumni_id, slot_date, start_time, end_time),
+  INDEX idx_asb_alumni_schedule (alumni_id, slot_date, start_time, end_time, status),
+  INDEX idx_asb_event_status (event_id, status),
+  INDEX idx_asb_booked_by (booked_by)
+) ENGINE=InnoDB;
+

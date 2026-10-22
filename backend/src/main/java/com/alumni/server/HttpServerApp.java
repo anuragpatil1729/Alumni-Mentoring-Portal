@@ -1116,8 +1116,12 @@ public class HttpServerApp {
                 String password = body.optString("newPassword", "");
                 if (!token.matches("^[a-fA-F0-9]{64}$")) { HttpUtils.sendErrorResponse(exchange, 400, "Invalid or expired reset token."); return; }
                 if (!InputValidator.isValidPassword(password)) { HttpUtils.sendErrorResponse(exchange, 422, "Password does not meet the required strength rules."); return; }
-                boolean changed = dao.consumeTokenAndChangePassword(token, RegistrationDAO.hashPassword(password));
-                if (!changed) { HttpUtils.sendErrorResponse(exchange, 400, "Invalid, expired, or already used reset token."); return; }
+                String recoveredEmail = dao.consumeTokenAndChangePasswordWithEmail(token, RegistrationDAO.hashPassword(password));
+                if (recoveredEmail == null) { HttpUtils.sendErrorResponse(exchange, 400, "Invalid, expired, or already used reset token."); return; }
+                if (recoveredEmail != null && !recoveredEmail.isBlank()) {
+                    try { com.alumni.service.PasswordResetMailer.sendRecoveryNotification(recoveredEmail); }
+                    catch (Exception mailError) { System.err.println("Account recovery notification email note: " + mailError.getMessage()); }
+                }
                 HttpUtils.sendJsonResponse(exchange, 200, new JSONObject().put("success", true).put("message", "Password reset successful. Please log in again.").toString());
             } catch (Exception e) { HttpUtils.sendErrorResponse(exchange, 500, "Unable to reset password."); }
         }
