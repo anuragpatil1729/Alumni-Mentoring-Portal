@@ -8,7 +8,7 @@ ALTER TABLE users
 
 -- 2. Support safe account deactivation.
 ALTER TABLE users
-    ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE;
+    ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT TRUE;
 
 -- 3. Store hashed authentication tokens, never raw tokens.
 CREATE TABLE IF NOT EXISTS auth_tokens (
