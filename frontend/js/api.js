@@ -745,7 +745,183 @@ const ApiClient = {
     });
     const data = await response.json().catch(() => ({}));
     return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Teacher / Admin: Onboard / create new alumni mentor
+   */
+  async createTeacherMentor(payload) {
+    const response = await fetch(`${API_BASE_URL}/api/teacher/mentors`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Teacher / Admin: Get all active mentors for dropdown
+   */
+  async getTeacherMentors() {
+    const response = await fetch(`${API_BASE_URL}/api/teacher/mentors`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ([]));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Teacher / Admin: Get all active students for dropdown
+   */
+  async getTeacherStudents() {
+    const response = await fetch(`${API_BASE_URL}/api/teacher/students`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ([]));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Teacher / Admin: Schedule a 1-on-1 or Public Meet
+   */
+  async createTeacherMeet(payload) {
+    const response = await fetch(`${API_BASE_URL}/api/teacher/meets`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Teacher / Admin: Get all scheduled meets with optional filters
+   */
+  async getTeacherMeets(type = "", status = "") {
+    const params = new URLSearchParams();
+    if (type) params.append("type", type);
+    if (status) params.append("status", status);
+    const qs = params.toString() ? `?${params.toString()}` : "";
+    const response = await fetch(`${API_BASE_URL}/api/teacher/meets${qs}`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ([]));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Teacher / Admin: Update meet status (COMPLETED / CANCELLED / SCHEDULED)
+   */
+  async updateTeacherMeetStatus(meetId, status) {
+    const response = await fetch(`${API_BASE_URL}/api/teacher/meets/${meetId}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      },
+      body: JSON.stringify({ status })
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Teacher / Student / Admin: Get attendees for a public meet
+   */
+  async getMeetAttendees(meetId) {
+    const response = await fetch(`${API_BASE_URL}/api/teacher/meets/${meetId}/attendees`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ([]));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Student / Public: Get upcoming public group sessions
+   */
+  async getPublicMeets() {
+    const response = await fetch(`${API_BASE_URL}/api/meets/public`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ([]));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Student: Join / register for a public session
+   */
+  async registerPublicMeet(meetId) {
+    const response = await fetch(`${API_BASE_URL}/api/meets/${meetId}/register`, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Student: Leave / cancel registration for a public session
+   */
+  async unregisterPublicMeet(meetId) {
+    const response = await fetch(`${API_BASE_URL}/api/meets/${meetId}/unregister`, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    return { status: response.status, ok: response.ok, data };
+  },
+
+  /**
+   * Student: Get personal meets (1-on-1 meets + registered public meets)
+   */
+  async getStudentMeets() {
+    const response = await fetch(`${API_BASE_URL}/api/student/meets`, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        ...this.getAuthHeader()
+      }
+    });
+    const data = await response.json().catch(() => ([]));
+    return { status: response.status, ok: response.ok, data };
   }
 };
+
 
 
