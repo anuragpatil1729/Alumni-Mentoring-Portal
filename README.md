@@ -190,23 +190,62 @@ cd Alumni-Mentoring-Portal
 
 Ensure MySQL or MariaDB is running on your machine:
 
+#### Option A: Linux & macOS (MariaDB / MySQL)
+
 ```bash
+# Start service:
+# Linux (systemd)
+sudo systemctl start mariadb   # or: sudo systemctl start mysqld
 # macOS (Homebrew)
-brew services start mariadb   # or: brew services start mysql
+brew services start mariadb    # or: brew services start mysql
 
-# Create database and apply baseline schema
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS alumni_mentoring_portal;"
-mysql -u root -p alumni_mentoring_portal < database/schema.sql
+# 1. Create database and apply baseline schema
+mariadb -u root -p -e "CREATE DATABASE IF NOT EXISTS alumni_mentoring_portal;"
+mariadb -u root -p alumni_mentoring_portal < database/schema.sql
 
-# Run all migrations in order
+# 2. Run all migrations in order (crucial if setting up or upgrading an existing database)
 for file in database/migrations/*.sql; do
   echo "Applying $file..."
-  mysql -u root -p alumni_mentoring_portal < "$file"
+  mariadb -u root -p alumni_mentoring_portal < "$file"
 done
 
-# Seed initial accounts and demo mentors
-mysql -u root -p alumni_mentoring_portal < database/seed.sql
+# 3. Seed initial accounts and demo mentors
+mariadb -u root -p alumni_mentoring_portal < database/seed.sql
 ```
+*(Note: If using MySQL on Linux/macOS, replace `mariadb` with `mysql`. If using a dedicated user, pass `-u alumni_user -palumni_password`.)*
+
+#### Option B: Windows (MySQL / MariaDB via CMD or PowerShell)
+
+**Using Windows Command Prompt (`cmd.exe`):**
+```cmd
+:: 1. Create database and apply baseline schema
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS alumni_mentoring_portal;"
+mysql -u root -p alumni_mentoring_portal < database\schema.sql
+
+:: 2. Run all migrations in order
+for %f in (database\migrations\*.sql) do mysql -u root -p alumni_mentoring_portal < "%f"
+
+:: 3. Seed initial accounts and demo mentors
+mysql -u root -p alumni_mentoring_portal < database\seed.sql
+```
+
+**Using Windows PowerShell:**
+```powershell
+# 1. Create database and apply baseline schema
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS alumni_mentoring_portal;"
+Get-Content database\schema.sql | mysql -u root -p alumni_mentoring_portal
+
+# 2. Run all migrations in order
+Get-ChildItem database\migrations\*.sql | ForEach-Object {
+    Write-Host "Applying $($_.Name)..."
+    Get-Content $_.FullName | mysql -u root -p alumni_mentoring_portal
+}
+
+# 3. Seed initial accounts and demo mentors
+Get-Content database\seed.sql | mysql -u root -p alumni_mentoring_portal
+```
+*(Note: If using MariaDB on Windows, you can substitute `mysql` with `mariadb`.)*
+
 
 ---
 
@@ -264,20 +303,56 @@ Visit **http://localhost:5173** in your web browser.
 
 ---
 
-## Demo Accounts
+## Demo Accounts & Role-Based Login
 
-All accounts are pre-seeded via [`database/seed.sql`](database/seed.sql):
+All accounts are pre-seeded via [`database/seed.sql`](database/seed.sql). You can log in with any of the accounts below at **`http://localhost:5173/#login`** (or by clicking **"Sign In"** in the top navigation bar):
 
-| Role | Email | Password | Primary Features |
-| :--- | :--- | :--- | :--- |
-| **Student** | `rahul.student@college.edu` | `Password@123` | Search mentors, send requests, RSVP to public meets |
-| **Student** | `ananya.p@college.edu` | `Password@123` | Explore directory, submit session feedback |
-| **Alumni Mentor** | `anurag.patil@microsoft.com` | `Alumni@123` | Manage mentee requests, review session schedule |
-| **Alumni Mentor** | `rohanmali@google.com` | `Alumni@123` | Accept requests, conduct 1-on-1 guidance |
-| **Faculty Teacher** | `teacher.sharma@college.edu` | `Password@123` | Onboard mentors, schedule 1-on-1 & public meets |
-| **Administrator** | `admin@college.edu` | `Admin@123` | Governance, role filters, deactivate/delete accounts |
+| Role | Email | Password | Landing View | Key Capabilities |
+| :--- | :--- | :--- | :--- | :--- |
+| **Student** | `rahul.student@college.edu` | `Student@123` | Mentors Directory | Search mentors, send 1-on-1 requests, view booked slots, RSVP to public meets, submit feedback |
+| **Student** | `ananya.p@college.edu` | `Student@123` | Mentors Directory | Browse alumni profiles, submit session feedback, view attendance |
+| **Alumni Mentor** | `anurag.patil@microsoft.com` | `Alumni@123` | Received Requests | Accept/reject mentorship requests, schedule 1-on-1 slots, view booked students, review history |
+| **Alumni Mentor** | `rohanmali@google.com` | `Alumni@123` | Received Requests | Manage mentee requests, review session schedule, share career opportunities |
+| **Faculty Teacher** | `teacher.sharma@college.edu` | `Teacher@123` | Teacher Hub | Onboard mentors directly, schedule 1-on-1 & public meets, track internal marks, view attendances |
+| **Administrator** | `admin@college.edu` | `Admin@123` | Admin Console | Governance, approve/reject user registrations, filter/deactivate users, detect duplicates, approve events |
+
+*(Note: All other seeded alumni mentors such as `priya.sharma@amazon.com`, `aditya.kulkarni@nvidia.com`, `kunal.verma@apple.com`, etc., also use `Alumni@123`.)*
+
+### How to Log In & Navigate by Role
+
+1. **Open the Portal**: Navigate to `http://localhost:5173` in your browser.
+2. **Access the Sign In Page**: Click **"Sign In"** in the navigation header or visit `http://localhost:5173/#login`.
+3. **Select Your Role Credentials**:
+   - **As a Student (`rahul.student@college.edu` / `Student@123`)**:
+     - Automatically lands on **Explore Mentors (`#search`)**.
+     - Browse mentors by department, skills, or industry.
+     - Click **"Request Mentorship"** on any mentor card to send a personalized inquiry.
+     - Access **"My Requests"** in the navigation bar to monitor request approvals and view upcoming 1-on-1 slots.
+     - Access **"Session History"** to leave ratings and feedback for completed mentorship sessions.
+   - **As an Alumni Mentor (`anurag.patil@microsoft.com` / `Alumni@123`)**:
+     - Automatically lands on **Received Requests (`#requests`)**.
+     - Review incoming mentorship inquiries from students.
+     - Click **"Accept"** or **"Decline"** on student requests.
+     - Create and manage availability slots for students to book.
+     - Access **"Session History"** to review completed mentoring interactions.
+   - **As a Faculty Teacher (`teacher.sharma@college.edu` / `Teacher@123`)**:
+     - Click the **"Teacher Hub"** button in the top navigation bar.
+     - Directly onboard alumni mentors without waiting for self-registration.
+     - Schedule **1-on-1 Student Meets** or open **Public Masterclasses / Guest Lectures**.
+     - Record and view **Internal Marks** for students participating in institutional events.
+     - Download attendance and participants roster.
+   - **As an Administrator (`admin@college.edu` / `Admin@123`)**:
+     - Automatically lands on the **Admin Console (`#admin`)**.
+     - Filter and manage all users across roles (Student, Alumni, Teacher, Admin).
+     - Deactivate or reactivate user accounts.
+     - Review pending registrations in the approval queue.
+     - Detect duplicate accounts via fuzzy email and mobile matching.
+     - Approve or reject alumni-proposed institutional events.
+4. **Log Out / Switch Accounts**:
+   - Click the user badge/dropdown in the top-right corner and select **"Sign Out"** to end the active session and return to the login screen.
 
 ---
+
 
 ## API Reference
 
