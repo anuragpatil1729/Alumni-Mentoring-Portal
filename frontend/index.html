@@ -19,36 +19,36 @@
         <!-- Guest Navigation (When not logged in) -->
         <div id="guestNav" class="nav-group">
           <button type="button" id="navLoginBtn" class="nav-tab-btn active">
-            <span class="tab-icon">🔑</span> Sign In
+            <span class="tab-icon"></span> Sign In
           </button>
           <button type="button" id="navStudentRegBtn" class="nav-tab-btn">
-            <span class="tab-icon">🎓</span> Student Register
+            <span class="tab-icon"></span> Student Register
           </button>
           <button type="button" id="navAlumniRegBtn" class="nav-tab-btn">
-            <span class="tab-icon">💼</span> Become a Mentor
+            <span class="tab-icon"></span> Become a Mentor
           </button>
         </div>
 
         <!-- Authenticated Navigation (When logged in) -->
         <div id="authNav" class="nav-group" style="display: none;">
           <button type="button" id="tabSearchBtn" class="nav-tab-btn active">
-            <span class="tab-icon">🔍</span> Explore Mentors
+            <span class="tab-icon"></span> Explore Mentors
           </button>
           <button type="button" id="tabRequestsBtn" class="nav-tab-btn" style="display: none;">
-            <span class="tab-icon">📬</span> Received Requests
+            <span class="tab-icon"></span> Received Requests
             <span id="navRequestsBadge" class="nav-counter-badge" style="display:none;">0</span>
           </button>
           <button type="button" id="tabHistoryBtn" class="nav-tab-btn">
-            <span class="tab-icon">📜</span> Session History
+            <span class="tab-icon"></span> Session History
           </button>
           <button type="button" id="tabAdminBtn" class="nav-tab-btn" style="display: none;">
-            <span class="tab-icon">🛡️</span> Admin Console
+            <span class="tab-icon"></span> Admin Console
           </button>
           <button type="button" id="tabTeacherBtn" class="nav-tab-btn" style="display: none;">
-            <span class="tab-icon">👨‍🏫</span> Faculty Portal
+            <span class="tab-icon"></span> Faculty Portal
           </button>
           <button type="button" id="tabProfileBtn" class="nav-tab-btn">
-            <span class="tab-icon">👤</span> My Profile
+            <span class="tab-icon"></span> My Profile
           </button>
           <div id="navUserSessionPill" class="user-session-pill" role="button" tabindex="0" title="View your profile">
             <span class="user-avatar-sm" id="navUserAvatar">U</span>
@@ -56,7 +56,7 @@
             <span id="navUserRoleBadge" class="user-role-badge">Student</span>
           </div>
           <button type="button" id="logoutBtn" class="logout-btn" title="Sign out of account">
-            <span>Logout</span> 🚪
+            <span>Logout</span>
           </button>
         </div>
       </nav>
@@ -69,7 +69,7 @@
       <section id="loginView" class="view-section active">
         <div class="auth-card-container">
           <div class="form-header auth-header">
-            <div class="auth-icon-badge">🔐</div>
+            
             <h1>Welcome Back</h1>
             <p>Sign in to your Student or Alumni account to continue</p>
           </div>
@@ -144,13 +144,13 @@
                 <!-- Profile Photo Picker (MySQL BLOB Approach 2 - Compulsory) -->
                 <div class="form-avatar-picker-card" id="sreg_avatar_card">
                   <div class="form-avatar-preview" id="sreg_avatar_preview">
-                    <span>👤</span>
+                    
                   </div>
                   <div class="form-avatar-meta">
                     <label class="form-avatar-title">Profile Picture <span class="required">*</span></label>
                     <div class="form-avatar-btn-row">
                       <label for="sreg_avatar_input" class="btn-avatar-upload">
-                        <span>📷 Choose Photo</span>
+                        <span>Choose Photo</span>
                         <input type="file" id="sreg_avatar_input" accept="image/png,image/jpeg,image/webp" style="display:none;" />
                       </label>
                       <button type="button" id="sreg_avatar_remove" class="btn-avatar-remove" style="display:none;">Remove</button>
@@ -337,13 +337,13 @@
                 <!-- Profile Photo Picker (MySQL BLOB Approach 2 - Compulsory) -->
                 <div class="form-avatar-picker-card" id="reg_avatar_card">
                   <div class="form-avatar-preview" id="reg_avatar_preview">
-                    <span>👤</span>
+                    
                   </div>
                   <div class="form-avatar-meta">
                     <label class="form-avatar-title">Profile Picture <span class="required">*</span></label>
                     <div class="form-avatar-btn-row">
                       <label for="reg_avatar_input" class="btn-avatar-upload">
-                        <span>📷 Choose Photo</span>
+                        <span>Choose Photo</span>
                         <input type="file" id="reg_avatar_input" accept="image/png,image/jpeg,image/webp" style="display:none;" />
                       </label>
                       <button type="button" id="reg_avatar_remove" class="btn-avatar-remove" style="display:none;">Remove</button>
@@ -516,7 +516,7 @@
           <!-- Hero Section -->
           <div class="search-hero">
             <div class="hero-pill">
-              <span class="sparkle">✨</span> Verified Alumni Mentors
+               Verified Alumni Mentors
             </div>
             <h1 class="hero-title">Find Your Ideal Alumni Mentor</h1>
             <p class="hero-subtitle">
@@ -527,7 +527,7 @@
             <!-- Clean Search Bar -->
             <div class="search-box-wrapper">
               <div class="search-input-group">
-                <span class="search-icon" aria-hidden="true">🔍</span>
+                
                 <input
                   type="text"
                   id="searchInput"
@@ -604,11 +604,28 @@
             </div>
           </div>
 
+          <!-- Public Masterclasses & Group Meets (Open to Students) -->
+          <div id="studentPublicMeetsSection" class="public-meets-section-card" style="display: none;">
+            <div class="public-meets-header-bar">
+              <div class="public-meets-title-wrap">
+                
+                <div>
+                  <h3 class="public-meets-title">Public Alumni Masterclasses & Meets</h3>
+                  <p class="public-meets-desc">Live interactive sessions & workshops hosted by verified alumni mentors. Join to participate live!</p>
+                </div>
+              </div>
+              <button type="button" id="refreshStudentPublicMeetsBtn" class="refresh-btn">Refresh</button>
+            </div>
+            <div id="studentPublicMeetsList" class="public-meets-grid">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
           <!-- Main Results Display -->
           <div id="resultsContainer">
             <!-- Error Alert -->
             <div id="errorAlert" class="error-alert">
-              <span class="alert-icon" aria-hidden="true">⚠️</span>
+              
               <span id="errorText">Unable to connect to backend.</span>
             </div>
 
@@ -639,7 +656,7 @@
 
             <!-- Empty State -->
             <div id="emptyState" class="empty-state">
-              <div class="empty-icon" aria-hidden="true">🔍</div>
+              
               <h3>No Alumni Mentors Found</h3>
               <p>
                 We couldn't find any mentors matching your search query and filters.
@@ -662,7 +679,7 @@
               <div class="profile-avatar-wrapper">
                 <div class="profile-avatar-lg" id="profileAvatarLg">U</div>
                 <label for="avatarFileInput" class="avatar-upload-trigger" title="Upload profile picture (Stored in MySQL / MariaDB BLOB)">
-                  <span class="camera-icon">📷</span>
+                  
                   <input type="file" id="avatarFileInput" accept="image/png,image/jpeg,image/webp" style="display:none;" />
                 </label>
                 <button type="button" id="removeAvatarBtn" class="avatar-remove-btn" title="Remove profile picture" style="display:none;">✕</button>
@@ -674,15 +691,15 @@
                 </div>
                 <p id="profileHeaderEmail" class="profile-display-email">user@college.edu</p>
                 <div class="profile-meta-row">
-                  <span class="meta-item"><span class="meta-icon">📅</span> Joined <span id="profileMemberSince">2026</span></span>
-                  <span class="meta-item"><span class="meta-icon">🛡️</span> Verified Account</span>
+                  <span class="meta-item"> Joined <span id="profileMemberSince">2026</span></span>
+                  <span class="meta-item"> Verified Account</span>
                 </div>
               </div>
             </div>
 
             <div class="profile-header-actions">
               <button type="button" id="editProfileToggleBtn" class="edit-profile-btn">
-                <span class="btn-icon">✏️</span> Edit Profile
+                 Edit Profile
               </button>
             </div>
           </div>
@@ -696,7 +713,7 @@
               <!-- Card 1: Contact Details -->
               <div class="profile-card">
                 <div class="card-header">
-                  <span class="card-header-icon">📞</span>
+                  
                   <h3>Contact Information</h3>
                 </div>
                 <div class="info-list">
@@ -718,7 +735,7 @@
               <!-- Card 2: Academic Details -->
               <div class="profile-card">
                 <div class="card-header">
-                  <span class="card-header-icon">🎓</span>
+                  
                   <h3 id="pv_academicTitle">Academic Background</h3>
                 </div>
                 <div class="info-list">
@@ -740,7 +757,7 @@
               <!-- Card 3: Professional Experience (Alumni Only) -->
               <div id="pv_professionalCard" class="profile-card full-width" style="display: none;">
                 <div class="card-header">
-                  <span class="card-header-icon">💼</span>
+                  
                   <h3>Professional & Career</h3>
                 </div>
                 <div class="info-grid-two">
@@ -770,7 +787,7 @@
               <!-- Card 4: Mentorship & Skills (Alumni Only) -->
               <div id="pv_mentorshipCard" class="profile-card full-width" style="display: none;">
                 <div class="card-header">
-                  <span class="card-header-icon">🌟</span>
+                  
                   <h3>Mentorship & Expertise</h3>
                 </div>
                 <div class="info-list">
@@ -802,18 +819,18 @@
               <form id="profileEditForm" novalidate>
                 <!-- 1. Personal Info -->
                 <div class="edit-section">
-                  <h3 class="edit-section-title">👤 Personal Details</h3>
+                  <h3 class="edit-section-title">Personal Details</h3>
 
                   <!-- Profile Photo Picker (MySQL BLOB Approach 2) -->
                   <div class="form-avatar-picker-card" id="pe_avatar_card">
                     <div class="form-avatar-preview" id="pe_avatar_preview">
-                      <span>👤</span>
+                      
                     </div>
                     <div class="form-avatar-meta">
                       <label class="form-avatar-title">Profile Picture <span class="required">*</span></label>
                       <div class="form-avatar-btn-row">
                         <label for="pe_avatar_input" class="btn-avatar-upload">
-                          <span>📷 Change Photo</span>
+                          <span>Change Photo</span>
                           <input type="file" id="pe_avatar_input" accept="image/png,image/jpeg,image/webp" style="display:none;" />
                         </label>
                         <button type="button" id="pe_avatar_remove" class="btn-avatar-remove" style="display:none;">Remove</button>
@@ -845,7 +862,7 @@
 
                 <!-- 2. Student Fields -->
                 <div id="pe_studentFields" class="edit-section" style="display: none;">
-                  <h3 class="edit-section-title">🎓 Student Academic Information</h3>
+                  <h3 class="edit-section-title">Student Academic Information</h3>
 
                   <div class="form-group">
                     <label for="pe_studentId">Student ID</label>
@@ -878,7 +895,7 @@
 
                 <!-- 3. Alumni Fields -->
                 <div id="pe_alumniFields" class="edit-section" style="display: none;">
-                  <h3 class="edit-section-title">💼 Professional & Mentorship Details</h3>
+                  <h3 class="edit-section-title">Professional & Mentorship Details</h3>
 
                   <div class="form-row">
                     <div class="form-group">
@@ -968,7 +985,7 @@
         <div class="requests-container">
           <div class="requests-header-card">
             <div class="requests-header-info">
-              <div class="requests-icon-badge">📬</div>
+              
               <div>
                 <h1 id="requestsTitle">Mentorship Requests</h1>
                 <p id="requestsSubtitle">Manage, track, and respond to 1-on-1 mentorship interactions</p>
@@ -976,10 +993,10 @@
             </div>
             <div class="requests-header-actions">
               <button type="button" id="openDirectScheduleBtn" class="btn-refresh-requests" style="background: var(--primary, #3b82f6); color: #fff; border-color: var(--primary, #3b82f6);">
-                <span>📅</span> Schedule Session
+                Schedule Session
               </button>
               <button type="button" id="refreshRequestsBtn" class="btn-refresh-requests">
-                <span>🔄</span> Refresh
+                Refresh
               </button>
             </div>
           </div>
@@ -1013,7 +1030,7 @@
 
           <!-- Empty State -->
           <div id="requestsEmptyState" class="requests-empty" style="display: none;">
-            <div class="empty-icon">📭</div>
+            
             <h3 id="emptyRequestsTitle">No Mentorship Requests</h3>
             <p id="emptyRequestsMsg">You don't have any mentorship requests yet. Browse the directory to connect with mentors!</p>
           </div>
@@ -1021,7 +1038,7 @@
           <!-- Scheduled Sessions Section (Team 1) -->
           <div id="scheduledSessionsContainer" class="scheduled-sessions-container" style="display: none;">
             <div class="scheduled-sessions-header">
-              <div class="scheduled-icon-badge">📅</div>
+              
               <div>
                 <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0;">Scheduled 1-on-1 Sessions</h2>
                 <p style="font-size: 13px; color: #64748b; margin: 0;">Confirmed mentorship appointments with scheduled time slots and meeting links</p>
@@ -1041,7 +1058,7 @@
         <div class="section-container">
           <div class="section-header-box">
             <div class="section-title-wrap">
-              <div class="section-icon-badge">📜</div>
+              
               <div>
                 <h2>Mentorship Session History</h2>
                 <p>Complete lifecycle tracking with custom algorithmic sorting (chronological, duration, priority, severity)</p>
@@ -1049,7 +1066,7 @@
             </div>
             <div class="header-action-group">
               <button type="button" id="refreshHistoryBtn" class="refresh-btn" title="Refresh session history">
-                🔄 Refresh
+                Refresh
               </button>
             </div>
           </div>
@@ -1060,10 +1077,10 @@
               <div class="filter-group">
                 <label for="historySortSelect">Sort Metric (DSA Engine):</label>
                 <select id="historySortSelect" class="form-select-sm">
-                  <option value="chronological">🕒 Chronological (Started Date)</option>
-                  <option value="duration">⏱️ Duration (Minutes)</option>
-                  <option value="priority">⚡ Priority (Urgent &gt; High &gt; Medium &gt; Low)</option>
-                  <option value="severity">🚨 Severity (Failed &gt; Paused &gt; Started &gt; Done)</option>
+                  <option value="chronological">Chronological (Started Date)</option>
+                  <option value="duration">Duration (Minutes)</option>
+                  <option value="priority">Priority (Urgent &gt; High &gt; Medium &gt; Low)</option>
+                  <option value="severity">Severity (Failed &gt; Paused &gt; Started &gt; Done)</option>
                 </select>
               </div>
 
@@ -1096,7 +1113,7 @@
 
           <!-- Empty State -->
           <div id="historyEmptyState" class="requests-empty" style="display: none;">
-            <div class="empty-icon">📜</div>
+            
             <h3>No Session History Found</h3>
             <p>Completed, ongoing, or recorded mentorship sessions will appear here with state transition records.</p>
           </div>
@@ -1110,7 +1127,7 @@
         <div class="section-container">
           <div class="section-header-box">
             <div class="section-title-wrap">
-              <div class="section-icon-badge" style="background:#f3e8ff; color:#7e22ce;">🛡️</div>
+              
               <div>
                 <h2>System Administration Console</h2>
                 <p>Manage users, verify accounts, toggle active status, and audit system-wide interactions</p>
@@ -1120,30 +1137,8 @@
 
           <div id="adminAlert" class="form-status-alert" style="display: none;"></div>
 
-          <!-- Admin Sub-Navigation Tabs (Team C & A) -->
-          <div class="admin-subnav-bar">
-            <button type="button" id="adminSubtabUsersBtn" class="admin-subtab-btn active">
-              <span>👥</span> All Accounts
-            </button>
-            <button type="button" id="adminSubtabPendingBtn" class="admin-subtab-btn">
-              <span>📋</span> Registration Approvals
-              <span id="adminPendingBadge" class="admin-tab-badge">0</span>
-            </button>
-            <button type="button" id="adminSubtabDuplicatesBtn" class="admin-subtab-btn">
-              <span>🔍</span> Duplicate Detection
-              <span id="adminDuplicatesBadge" class="admin-tab-badge badge-alert" style="display:none;">0</span>
-            </button>
-            <button type="button" id="adminSubtabFeedbackBtn" class="admin-subtab-btn">
-              <span>⭐</span> Platform Feedback
-            </button>
-            <button type="button" id="adminSubtabEventsBtn" class="admin-subtab-btn">
-              <span>📅</span> Event Approvals
-              <span id="adminEventsBadge" class="admin-tab-badge" style="display:none;">0</span>
-            </button>
-          </div>
-
           <!-- PANEL 1: All Users & Account Deletion -->
-          <div id="adminPanelUsers" class="admin-panel-tab">
+          <div id="adminPanelUsers" class="admin-panel-tab" style="display: block;">
             <div class="admin-toolbar-card">
               <div class="admin-toolbar-filters">
                 <div class="filter-group">
@@ -1168,7 +1163,7 @@
               </div>
 
               <div class="admin-search-wrap">
-                <input type="text" id="adminSearchInput" class="form-input-sm" placeholder="🔍 Search name, email, or mobile..." style="min-width: 260px; padding: 7px 12px; border: 1px solid #cbd5e1; border-radius: 6px;" />
+                <input type="text" id="adminSearchInput" class="form-input-sm" placeholder="Search name, email, or mobile..." style="min-width: 260px; padding: 7px 12px; border: 1px solid #cbd5e1; border-radius: 6px;" />
               </div>
             </div>
 
@@ -1195,168 +1190,21 @@
               </div>
             </div>
           </div>
-
-          <!-- PANEL 2: Registration Approvals (Team A) -->
-          <div id="adminPanelPending" class="admin-panel-tab" style="display: none;">
-            <div class="admin-toolbar-card" style="background:#fffbeb; border-color:#fde68a;">
-              <div>
-                <h3 style="font-size:16px; font-weight:700; color:#92400e; margin-bottom:4px;">Pending User Registrations</h3>
-                <p style="font-size:13px; color:#b45309; margin:0;">Review and verify student & alumni accounts before granting portal access.</p>
-              </div>
-              <button type="button" id="refreshPendingBtn" class="refresh-btn" style="background:#ffffff;">🔄 Refresh Approvals</button>
-            </div>
-
-            <div class="admin-table-card">
-              <div class="admin-table-responsive">
-                <table class="admin-table">
-                  <thead>
-                    <tr>
-                      <th>User ID</th>
-                      <th>Candidate Details</th>
-                      <th>Role</th>
-                      <th>Mobile</th>
-                      <th>Registered</th>
-                      <th style="text-align: right;">Decision</th>
-                    </tr>
-                  </thead>
-                  <tbody id="adminPendingTableBody">
-                    <!-- Injected via JavaScript -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- PANEL 3: Duplicate Detection & Audit (Team D) -->
-          <div id="adminPanelDuplicates" class="admin-panel-tab" style="display: none;">
-            <div class="duplicate-scan-header">
-              <div>
-                <h3 style="font-size:16px; font-weight:700; color:#0f172a; margin-bottom:4px;">Automated Duplicate Detection & Manual Audit</h3>
-                <p style="font-size:13px; color:#64748b; margin:0;">Identifies duplicate accounts using phone normalization, Student ID matching, and Levenshtein name similarity.</p>
-              </div>
-              <button type="button" id="runDuplicateScanBtn" class="modal-submit-btn" style="padding:10px 18px; font-size:13px; display:inline-flex; align-items:center; gap:8px;">
-                ⚡ Run System Duplicate Audit
-              </button>
-            </div>
-
-            <!-- Manual Candidate Duplicate Checker Card -->
-            <div class="admin-toolbar-card" style="margin-bottom:20px; flex-direction:column; align-items:stretch;">
-              <h4 style="font-size:14px; font-weight:700; color:#334155; margin-bottom:10px;">🔍 Manual Candidate Duplicate Check</h4>
-              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto; gap:12px; align-items:end;">
-                <div class="form-group" style="margin:0;">
-                  <label for="manualDupName" style="font-size:11px; margin-bottom:4px;">Full Name:</label>
-                  <input type="text" id="manualDupName" class="form-input-sm" placeholder="e.g. Rahul Sharma" style="width:100%;" />
-                </div>
-                <div class="form-group" style="margin:0;">
-                  <label for="manualDupEmail" style="font-size:11px; margin-bottom:4px;">Email:</label>
-                  <input type="text" id="manualDupEmail" class="form-input-sm" placeholder="e.g. rahul@college.edu" style="width:100%;" />
-                </div>
-                <div class="form-group" style="margin:0;">
-                  <label for="manualDupMobile" style="font-size:11px; margin-bottom:4px;">Mobile:</label>
-                  <input type="text" id="manualDupMobile" class="form-input-sm" placeholder="e.g. 9876543210" style="width:100%;" />
-                </div>
-                <div class="form-group" style="margin:0;">
-                  <label for="manualDupStudentId" style="font-size:11px; margin-bottom:4px;">Student ID:</label>
-                  <input type="text" id="manualDupStudentId" class="form-input-sm" placeholder="e.g. STU-2024-001" style="width:100%;" />
-                </div>
-                <button type="button" id="checkCandidateDupBtn" class="refresh-btn" style="height:36px; padding:0 16px; background:#2563eb; color:#fff; border:none; font-weight:600;">
-                  Check
-                </button>
-              </div>
-              <div id="manualDupResultBox" style="margin-top:12px; display:none;"></div>
-            </div>
-
-            <div id="adminDuplicatesContainer">
-              <!-- Rendered via JavaScript -->
-              <div style="text-align:center; padding:32px; color:#64748b; background:#fff; border-radius:12px; border:1px solid #e2e8f0;">
-                Click <strong>"Run System Duplicate Audit"</strong> above to scan for duplicate mobile numbers, student IDs, and similar names.
-              </div>
-            </div>
-          </div>
-
-          <!-- PANEL 4: Platform Feedback & Ratings (Team C & B) -->
-          <div id="adminPanelFeedback" class="admin-panel-tab" style="display: none;">
-            <div class="feedback-metrics-grid">
-              <div class="feedback-metric-card">
-                <div style="font-size:32px;">⭐</div>
-                <div>
-                  <div id="adminAvgRatingScore" style="font-size:24px; font-weight:800; color:#0f172a;">0.0</div>
-                  <div style="font-size:13px; color:#64748b;">Average Session Rating</div>
-                </div>
-              </div>
-              <div class="feedback-metric-card">
-                <div style="font-size:32px;">💬</div>
-                <div>
-                  <div id="adminTotalFeedbackCount" style="font-size:24px; font-weight:800; color:#0f172a;">0</div>
-                  <div style="font-size:13px; color:#64748b;">Total Reviews Submitted</div>
-                </div>
-              </div>
-              <div class="feedback-metric-card">
-                <div style="font-size:32px;">🌟</div>
-                <div>
-                  <div id="adminFiveStarPercent" style="font-size:24px; font-weight:800; color:#15803d;">0%</div>
-                  <div style="font-size:13px; color:#64748b;">5-Star Ratings</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="admin-table-card">
-              <div style="padding:16px 20px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="font-size:15px; font-weight:700; color:#0f172a; margin:0;">Recent Student Reviews</h3>
-                <button type="button" id="refreshFeedbackBtn" class="refresh-btn">🔄 Refresh Reviews</button>
-              </div>
-              <div id="adminFeedbackListContainer" style="padding:20px;">
-                <!-- Rendered via JavaScript -->
-              </div>
-            </div>
-          </div>
-
-          <!-- PANEL 5: Institutional Events Approvals (System Architecture) -->
-          <div id="adminPanelEvents" class="admin-panel-tab" style="display: none;">
-            <div class="admin-toolbar-card" style="background:#f0fdf4; border-color:#bbf7d0;">
-              <div>
-                <h3 style="font-size:16px; font-weight:700; color:#166534; margin-bottom:4px;">Institutional Events & Approvals</h3>
-                <p style="font-size:13px; color:#15803d; margin:0;">Review, verify, and approve or reject campus and alumni guest sessions, judging panels, and hackathons.</p>
-              </div>
-              <button type="button" id="refreshAdminEventsBtn" class="refresh-btn" style="background:#ffffff;">🔄 Refresh Events</button>
-            </div>
-
-            <div class="admin-table-card">
-              <div class="admin-table-responsive">
-                <table class="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Event ID</th>
-                      <th>Title & Description</th>
-                      <th>Type</th>
-                      <th>Organizer Alumni</th>
-                      <th>Date & Time</th>
-                      <th>Venue</th>
-                      <th>Status</th>
-                      <th style="text-align: right;">Decision</th>
-                    </tr>
-                  </thead>
-                  <tbody id="adminEventsTableBody">
-                    <!-- Injected via JavaScript -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
       <!-- ================================================================= -->
-      <!-- 7. FACULTY & TEACHER PORTAL VIEW (System Architecture)            -->
+      <!-- ================================================================= -->
+      <!-- 7. FACULTY & TEACHER PORTAL VIEW                                  -->
       <!-- ================================================================= -->
       <section id="teacherView" class="view-section" style="display: none;">
         <div class="section-container">
           <div class="section-header-box">
             <div class="section-title-wrap">
-              <div class="section-icon-badge" style="background:#fef3c7; color:#b45309;">👨‍🏫</div>
+              
               <div>
-                <h2>Faculty & Teacher Portal</h2>
-                <p>Manage event assignments, evaluate student internal marks, oversee alumni slot bookings, and monitor mentorship</p>
+                <h2>Faculty Mentoring & Session Hub</h2>
+                <p>Onboard new industry mentors, coordinate 1-on-1 student meets, schedule public masterclasses, and manage master schedules</p>
               </div>
             </div>
           </div>
@@ -1365,72 +1213,48 @@
 
           <!-- Teacher Sub-Navigation Tabs -->
           <div class="admin-subnav-bar">
-            <button type="button" id="teacherSubtabMarksBtn" class="admin-subtab-btn active">
-              <span>📝</span> Assigned Events & Marks
+            <button type="button" id="teacherSubtabSchedulesBtn" class="admin-subtab-btn active">
+              Master Schedules
             </button>
-            <button type="button" id="teacherSubtabBookingsBtn" class="admin-subtab-btn">
-              <span>📅</span> Alumni Slot Bookings
+            <button type="button" id="teacherSubtabOneOnOneBtn" class="admin-subtab-btn">
+              Schedule 1-on-1 Meet
             </button>
-            <button type="button" id="teacherSubtabDirectoryBtn" class="admin-subtab-btn">
-              <span>👥</span> Students & Mentors Overview
+            <button type="button" id="teacherSubtabPublicMeetBtn" class="admin-subtab-btn">
+              Schedule Public Meet
+            </button>
+            <button type="button" id="teacherSubtabNewMentorBtn" class="admin-subtab-btn">
+              Onboard New Mentor
             </button>
           </div>
 
-          <!-- TEACHER PANEL 1: Assigned Events & Student Marks -->
-          <div id="teacherPanelMarks" class="admin-panel-tab">
+          <!-- TEACHER PANEL 1: Master Schedules & Timelines -->
+          <div id="teacherPanelSchedules" class="admin-panel-tab">
             <div class="admin-toolbar-card">
-              <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                <label for="teacherEventSelect" style="font-weight:600; font-size:14px; color:#1e293b;">Assigned Event:</label>
-                <select id="teacherEventSelect" class="form-select-sm" style="min-width:240px; padding:8px 12px; border-radius:6px; border:1px solid #cbd5e1;">
-                  <option value="">Loading assigned events...</option>
-                </select>
-                <button type="button" id="refreshTeacherMarksBtn" class="refresh-btn">🔄 Refresh</button>
-              </div>
-              <button type="button" id="openAddMarkModalBtn" class="modal-submit-btn" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
-                ➕ Enter Student Marks
-              </button>
-            </div>
-
-            <div id="teacherEventInfoCard" style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px 20px; margin-bottom:16px;">
-              <h3 id="assignedEventTitle" style="font-size:16px; font-weight:700; color:#0f172a; margin:0 0 6px 0;"></h3>
-              <p id="assignedEventDesc" style="font-size:13px; color:#475569; margin:0 0 8px 0;"></p>
-              <div id="assignedEventMeta" style="font-size:12px; color:#64748b; display:flex; gap:16px; flex-wrap:wrap;"></div>
-            </div>
-
-            <div class="admin-table-card">
-              <div class="admin-table-responsive">
-                <table class="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Student ID</th>
-                      <th>Student Details</th>
-                      <th>Marks</th>
-                      <th>Max Marks</th>
-                      <th>Percentage</th>
-                      <th>Remarks</th>
-                      <th>Updated At</th>
-                      <th style="text-align: right;">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody id="teacherMarksTableBody">
-                    <tr><td colspan="8" style="text-align:center; padding:24px; color:#64748b;">Select an assigned event above to load and evaluate student marks.</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- TEACHER PANEL 2: Alumni Slot Bookings -->
-          <div id="teacherPanelBookings" class="admin-panel-tab" style="display: none;">
-            <div class="admin-toolbar-card">
-              <div>
-                <h3 style="font-size:15px; font-weight:700; color:#0f172a; margin:0 0 4px 0;">Alumni Event Slot Bookings</h3>
-                <p style="font-size:13px; color:#64748b; margin:0;">Book alumni mentors for judging, guest lectures, and sponsorships with conflict detection.</p>
+              <div class="admin-toolbar-filters">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <label for="filterMeetType" style="font-weight:600; font-size:13px; color:#1e293b;">Type:</label>
+                  <select id="filterMeetType" class="form-select-sm" style="padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1;">
+                    <option value="">All Types</option>
+                    <option value="ONE_ON_ONE">1-on-1 Meets</option>
+                    <option value="PUBLIC">Public Masterclasses</option>
+                  </select>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <label for="filterMeetStatus" style="font-weight:600; font-size:13px; color:#1e293b;">Status:</label>
+                  <select id="filterMeetStatus" class="form-select-sm" style="padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1;">
+                    <option value="">All Statuses</option>
+                    <option value="SCHEDULED">Scheduled</option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                  </select>
+                </div>
               </div>
               <div style="display:flex; gap:10px;">
-                <button type="button" id="refreshTeacherBookingsBtn" class="refresh-btn">🔄 Refresh</button>
-                <button type="button" id="openNewBookingBtn" class="modal-submit-btn" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
-                  ➕ Book Alumni Slot
+                <button type="button" id="quickOneOnOneBtn" class="modal-submit-btn" style="padding:8px 14px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
+                  New 1-on-1 Meet
+                </button>
+                <button type="button" id="quickPublicMeetBtn" class="modal-submit-btn" style="padding:8px 14px; font-size:13px; display:inline-flex; align-items:center; gap:6px; background:#4338ca;">
+                  New Public Meet
                 </button>
               </div>
             </div>
@@ -1440,53 +1264,248 @@
                 <table class="admin-table">
                   <thead>
                     <tr>
-                      <th>Booking ID</th>
-                      <th>Event ID</th>
-                      <th>Alumni Mentor</th>
-                      <th>Slot Date & Time</th>
-                      <th>Purpose</th>
+                      <th>ID</th>
+                      <th>Type</th>
+                      <th>Title & Topic</th>
+                      <th>Mentor</th>
+                      <th>Student / Audience</th>
+                      <th>Schedule & Time</th>
+                      <th>Venue / Link</th>
                       <th>Status</th>
-                      <th>Notes</th>
-                      <th style="text-align: right;">Action</th>
+                      <th style="text-align: right;">Actions</th>
                     </tr>
                   </thead>
-                  <tbody id="teacherBookingsTableBody">
-                    <tr><td colspan="8" style="text-align:center; padding:24px; color:#64748b;">Loading alumni slot bookings...</td></tr>
+                  <tbody id="teacherMeetsTableBody">
+                    <tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">Loading session schedules...</td></tr>
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
 
-          <!-- TEACHER PANEL 3: Directory & Activities Overview -->
-          <div id="teacherPanelDirectory" class="admin-panel-tab" style="display: none;">
-            <div class="admin-toolbar-card">
-              <div>
-                <h3 style="font-size:15px; font-weight:700; color:#0f172a; margin:0 0 4px 0;">Students & Mentors Portal Directory</h3>
-                <p style="font-size:13px; color:#64748b; margin:0;">Monitor students and alumni participants, view profiles, and observe mentoring engagement.</p>
+          <!-- TEACHER PANEL 2: Schedule 1-on-1 Meet -->
+          <div id="teacherPanelOneOnOne" class="admin-panel-tab" style="display: none;">
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:24px; max-width:800px; margin:0 auto; box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+              <div style="margin-bottom:20px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
+                <h3 style="font-size:18px; font-weight:700; color:#0f172a; margin:0 0 6px 0;">Schedule 1-on-1 Student-Mentor Meet</h3>
+                <p style="font-size:13px; color:#64748b; margin:0;">Pair a student with a verified alumni mentor for targeted guidance with conflict-free scheduling.</p>
               </div>
-              <button type="button" id="refreshTeacherDirectoryBtn" class="refresh-btn">🔄 Refresh</button>
-            </div>
 
-            <div class="admin-table-card">
-              <div class="admin-table-responsive">
-                <table class="admin-table">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Full Name & Email</th>
-                      <th>Role</th>
-                      <th>Department / Details</th>
-                      <th>Mobile</th>
-                      <th>Approval</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody id="teacherDirectoryTableBody">
-                    <tr><td colspan="7" style="text-align:center; padding:24px; color:#64748b;">Loading portal directory...</td></tr>
-                  </tbody>
-                </table>
+              <form id="scheduleOneOnOneForm" class="hub-form">
+                <div id="scheduleOneOnOneAlert" class="form-status-alert" style="display: none;"></div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                    <label for="meetMentorSelect">Select Mentor: <span class="required">*</span></label>
+                    <select id="meetMentorSelect" class="form-select" required>
+                      <option value="">Loading mentors...</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="meetStudentSelect">Select Student: <span class="required">*</span></label>
+                    <select id="meetStudentSelect" class="form-select" required>
+                      <option value="">Loading students...</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="meetTitle">Session Topic / Title: <span class="required">*</span></label>
+                  <input type="text" id="meetTitle" class="form-input" placeholder="e.g. Mock Technical Interview & System Design Prep" required />
+                </div>
+
+                <div class="form-group">
+                  <label for="meetDescription">Agenda & Objectives:</label>
+                  <textarea id="meetDescription" class="form-textarea" rows="3" placeholder="Outline specific questions, topics, or goals for this session..."></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                    <label for="meetDate">Session Date: <span class="required">*</span></label>
+                    <input type="date" id="meetDate" class="form-input" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="meetStartTime">Start Time: <span class="required">*</span></label>
+                    <input type="time" id="meetStartTime" class="form-input" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="meetEndTime">End Time: <span class="required">*</span></label>
+                    <input type="time" id="meetEndTime" class="form-input" required />
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                    <label for="meetingLink">Meeting Link (Google Meet / Zoom / Teams):</label>
+                    <input type="url" id="meetingLink" class="form-input" placeholder="https://meet.google.com/xyz-abcd-efg" />
+                  </div>
+                  <div class="form-group">
+                    <label for="meetVenue">Campus Venue / Location:</label>
+                    <input type="text" id="meetVenue" class="form-input" placeholder="e.g. Online or Seminar Hall 1" value="Online" />
+                  </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px; padding-top:16px; border-top:1px solid #f1f5f9;">
+                  <button type="reset" class="modal-cancel-btn">Reset</button>
+                  <button type="submit" id="submitOneOnOneBtn" class="modal-submit-btn">Confirm & Schedule Meet</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- TEACHER PANEL 3: Schedule Public Meet -->
+          <div id="teacherPanelPublicMeet" class="admin-panel-tab" style="display: none;">
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:24px; max-width:800px; margin:0 auto; box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+              <div style="margin-bottom:20px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
+                <h3 style="font-size:18px; font-weight:700; color:#0f172a; margin:0 0 6px 0;">Schedule Public Masterclass / Group Meet</h3>
+                <p style="font-size:13px; color:#64748b; margin:0;">Create a group session hosted by an alumni mentor where multiple students (1-to-N) can register and join live.</p>
               </div>
+
+              <form id="schedulePublicMeetForm" class="hub-form">
+                <div id="schedulePublicMeetAlert" class="form-status-alert" style="display: none;"></div>
+
+                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                    <label for="publicMentorSelect">Select Host Mentor: <span class="required">*</span></label>
+                    <select id="publicMentorSelect" class="form-select" required>
+                      <option value="">Loading mentors...</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="publicMaxCapacity">Max Participant Capacity: <small style="color:#64748b;">(Optional)</small></label>
+                    <input type="number" id="publicMaxCapacity" class="form-input" min="1" placeholder="e.g. 50 (leave empty for unlimited)" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="publicMeetTitle">Masterclass Title: <span class="required">*</span></label>
+                  <input type="text" id="publicMeetTitle" class="form-input" placeholder="e.g. Cracking FAANG Coding Rounds & System Design Fundamentals" required />
+                </div>
+
+                <div class="form-group">
+                  <label for="publicMeetDesc">Session Description & Key Takeaways: <span class="required">*</span></label>
+                  <textarea id="publicMeetDesc" class="form-textarea" rows="3" placeholder="Describe the topics covered, who should attend, and preparation instructions..." required></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                    <label for="publicMeetDate">Date: <span class="required">*</span></label>
+                    <input type="date" id="publicMeetDate" class="form-input" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="publicStartTime">Start Time: <span class="required">*</span></label>
+                    <input type="time" id="publicStartTime" class="form-input" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="publicEndTime">End Time: <span class="required">*</span></label>
+                    <input type="time" id="publicEndTime" class="form-input" required />
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                    <label for="publicMeetingLink">Live Stream / Meeting Link (Google Meet / Zoom): <span class="required">*</span></label>
+                    <input type="url" id="publicMeetingLink" class="form-input" placeholder="https://meet.google.com/abc-defg-hij" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="publicVenue">Hall / Venue:</label>
+                    <input type="text" id="publicVenue" class="form-input" placeholder="e.g. Auditorium or Google Meet" value="Google Meet" />
+                  </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px; padding-top:16px; border-top:1px solid #f1f5f9;">
+                  <button type="reset" class="modal-cancel-btn">Reset</button>
+                  <button type="submit" id="submitPublicMeetBtn" class="modal-submit-btn" style="background:#4338ca;">Publish Public Session</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- TEACHER PANEL 4: Onboard New Mentor -->
+          <div id="teacherPanelNewMentor" class="admin-panel-tab" style="display: none;">
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:24px; max-width:820px; margin:0 auto; box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+              <div style="margin-bottom:20px; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
+                <h3 style="font-size:18px; font-weight:700; color:#0f172a; margin:0 0 6px 0;">Onboard New Alumni Mentor</h3>
+                <p style="font-size:13px; color:#64748b; margin:0;">Directly create and activate a new alumni mentor account in the platform database.</p>
+              </div>
+
+              <form id="onboardMentorForm" class="hub-form">
+                <div id="onboardMentorAlert" class="form-status-alert" style="display: none;"></div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                    <label for="newMentorName">Full Name: <span class="required">*</span></label>
+                    <input type="text" id="newMentorName" class="form-input" placeholder="e.g. Priya Sharma" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="newMentorEmail">Corporate / Personal Email: <span class="required">*</span></label>
+                    <input type="email" id="newMentorEmail" class="form-input" placeholder="e.g. priya@google.com" required />
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                    <label for="newMentorMobile">Mobile Number: <span class="required">*</span></label>
+                    <input type="tel" id="newMentorMobile" class="form-input" placeholder="e.g. 9876543210" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="newMentorPassword">Account Password: <small style="color:#64748b;">(Default: Alumni@123)</small></label>
+                    <input type="text" id="newMentorPassword" class="form-input" value="Alumni@123" required />
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                    <label for="newMentorCompany">Company / Organization: <span class="required">*</span></label>
+                    <input type="text" id="newMentorCompany" class="form-input" placeholder="e.g. Microsoft, Google, Goldman Sachs" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="newMentorDesignation">Designation / Role: <span class="required">*</span></label>
+                    <input type="text" id="newMentorDesignation" class="form-input" placeholder="e.g. Senior Software Engineer" required />
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                    <label for="newMentorDept">Department: <span class="required">*</span></label>
+                    <select id="newMentorDept" class="form-select" required>
+                      <option value="Computer Engineering">Computer Engineering</option>
+                      <option value="Information Technology">Information Technology</option>
+                      <option value="Electronics & Telecom">Electronics & Telecom</option>
+                      <option value="Mechanical Engineering">Mechanical Engineering</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="newMentorGradYear">Graduation Year: <span class="required">*</span></label>
+                    <input type="number" id="newMentorGradYear" class="form-input" min="1990" max="2026" value="2020" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="newMentorExp">Experience (Years):</label>
+                    <input type="number" id="newMentorExp" class="form-input" min="0" max="40" value="4" />
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                    <label for="newMentorSkills">Skills (Comma-separated): <span class="required">*</span></label>
+                    <input type="text" id="newMentorSkills" class="form-input" placeholder="e.g. Java, Distributed Systems, System Design, Cloud" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="newMentorCapacity">Max Mentees Capacity:</label>
+                    <input type="number" id="newMentorCapacity" class="form-input" min="1" max="50" value="5" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="newMentorBio">Mentor Bio / Introduction:</label>
+                  <textarea id="newMentorBio" class="form-textarea" rows="2" placeholder="Brief background, mentorship areas, and advice for students..."></textarea>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px; padding-top:16px; border-top:1px solid #f1f5f9;">
+                  <button type="reset" class="modal-cancel-btn">Reset</button>
+                  <button type="submit" id="submitOnboardMentorBtn" class="modal-submit-btn" style="background:#059669;">Create Mentor Account</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -1577,7 +1596,7 @@
       <div class="modal-content schedule-modal-content" onclick="event.stopPropagation()">
         <div class="modal-header">
           <div>
-            <h2 id="scheduleModalTitle">📅 Schedule Mentorship Session</h2>
+            <h2 id="scheduleModalTitle">Schedule Mentorship Session</h2>
             <p class="modal-subtitle">Select date, time, and format for your 1-on-1 mentorship session</p>
           </div>
           <button type="button" id="scheduleModalCloseBtn" class="modal-close-btn" title="Close modal">✕</button>
@@ -1669,9 +1688,9 @@
             <div class="form-group">
               <label for="scheduleMode">Session Mode <span class="required">*</span></label>
               <select id="scheduleMode" required>
-                <option value="ONLINE" selected>🌐 Online (Google Meet / Zoom)</option>
-                <option value="IN_PERSON">🏫 In-Person (Campus / Office)</option>
-                <option value="PHONE">📞 Phone Call</option>
+                <option value="ONLINE" selected>Online (Google Meet / Zoom)</option>
+                <option value="IN_PERSON">In-Person (Campus / Office)</option>
+                <option value="PHONE">Phone Call</option>
               </select>
             </div>
           </div>
@@ -1698,7 +1717,7 @@
     <div id="feedbackModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="feedbackModalTitle" style="display: none;">
       <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 520px;">
         <div class="modal-header">
-          <h2 id="feedbackModalTitle">⭐ Submit Session Feedback</h2>
+          <h2 id="feedbackModalTitle">Submit Session Feedback</h2>
           <button type="button" id="feedbackModalCloseBtn" class="modal-close-btn" title="Close modal">✕</button>
         </div>
 
@@ -1743,7 +1762,7 @@
 
           <div class="modal-actions">
             <button type="button" id="feedbackCancelBtn" class="modal-cancel-btn">Cancel</button>
-            <button type="submit" id="feedbackSubmitBtn" class="modal-submit-btn">⭐ Submit Feedback</button>
+            <button type="submit" id="feedbackSubmitBtn" class="modal-submit-btn">Submit Feedback</button>
           </div>
         </form>
       </div>
@@ -1753,7 +1772,7 @@
     <div id="deleteUserModal" class="modal-overlay" role="dialog" aria-modal="true" style="display: none;">
       <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 440px;">
         <div class="modal-header">
-          <h2 style="color: #dc2626;">🗑️ Confirm User Deletion</h2>
+          <h2 style="color: #dc2626;">Confirm User Deletion</h2>
           <button type="button" id="deleteUserModalCloseBtn" class="modal-close-btn" title="Close modal">✕</button>
         </div>
 
@@ -1765,7 +1784,7 @@
             <!-- Populated dynamically -->
           </div>
           <p style="font-size: 12px; color: #64748b; margin: 0;">
-            ⚠️ <strong>Warning:</strong> This operation will permanently delete their profile, active sessions, requests, and login tokens. This action cannot be undone.
+            <strong>Warning:</strong> This operation will permanently delete their profile, active sessions, requests, and login tokens. This action cannot be undone.
           </p>
         </div>
 
@@ -1782,7 +1801,7 @@
     <div id="teacherMarkModal" class="modal-overlay" role="dialog" aria-modal="true" style="display: none;">
       <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 480px;">
         <div class="modal-header">
-          <h2 id="teacherMarkModalTitle">📝 Evaluate Student Marks</h2>
+          <h2 id="teacherMarkModalTitle">Evaluate Student Marks</h2>
           <button type="button" id="teacherMarkModalCloseBtn" class="modal-close-btn" title="Close modal">✕</button>
         </div>
 
@@ -1818,70 +1837,41 @@
 
           <div class="modal-actions">
             <button type="button" id="teacherMarkCancelBtn" class="modal-cancel-btn">Cancel</button>
-            <button type="submit" id="saveMarkBtn" class="modal-submit-btn">💾 Save Marks</button>
+            <button type="submit" id="saveMarkBtn" class="modal-submit-btn">Save Marks</button>
           </div>
         </form>
       </div>
     </div>
 
-    <!-- 4. TEACHER BOOK ALUMNI SLOT MODAL (System Architecture) -->
-    <div id="teacherBookingModal" class="modal-overlay" role="dialog" aria-modal="true" style="display: none;">
-      <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 500px;">
+    <!-- 5. PUBLIC MEET ATTENDEES MODAL -->
+    <div id="meetAttendeesModal" class="modal-overlay" role="dialog" aria-modal="true" style="display: none;">
+      <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 620px;">
         <div class="modal-header">
-          <h2>📅 Book Alumni Mentor Slot</h2>
-          <button type="button" id="teacherBookingModalCloseBtn" class="modal-close-btn" title="Close modal">✕</button>
+          <h2 id="attendeesModalTitle">Registered Attendees</h2>
+          <button type="button" id="meetAttendeesCloseBtn" class="modal-close-btn" title="Close modal">✕</button>
         </div>
-
-        <form id="teacherBookingForm" class="modal-form">
-          <div id="teacherBookingModalAlert" class="form-status-alert" style="display: none;"></div>
-
-          <div class="form-group">
-            <label for="bookingEventId">Select Event: <span class="required">*</span></label>
-            <select id="bookingEventId" class="form-select" required>
-              <option value="">Select Event...</option>
-            </select>
+        <div style="padding: 16px 20px;">
+          <p id="attendeesModalSubtitle" style="font-size: 13px; color: #64748b; margin: 0 0 16px 0;"></p>
+          <div class="admin-table-responsive" style="max-height: 360px; overflow-y: auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Roll / ID</th>
+                  <th>Student Name</th>
+                  <th>Department</th>
+                  <th>Email</th>
+                  <th>Joined At</th>
+                </tr>
+              </thead>
+              <tbody id="attendeesTableBody">
+                <tr><td colspan="5" style="text-align:center; padding:16px;">Loading attendees...</td></tr>
+              </tbody>
+            </table>
           </div>
-
-          <div class="form-group">
-            <label for="bookingAlumniId">Alumni Mentor User ID: <span class="required">*</span></label>
-            <input type="number" id="bookingAlumniId" class="form-input" placeholder="e.g. 101" required />
-          </div>
-
-          <div class="form-group">
-            <label for="bookingDate">Slot Date: <span class="required">*</span></label>
-            <input type="date" id="bookingDate" class="form-input" required />
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="form-group">
-              <label for="bookingStartTime">Start Time: <span class="required">*</span></label>
-              <input type="time" id="bookingStartTime" class="form-input" required />
-            </div>
-            <div class="form-group">
-              <label for="bookingEndTime">End Time: <span class="required">*</span></label>
-              <input type="time" id="bookingEndTime" class="form-input" required />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="bookingPurpose">Purpose / Role: <span class="required">*</span></label>
-            <select id="bookingPurpose" class="form-select" required>
-              <option value="JUDGE">Project Judge / Evaluator</option>
-              <option value="GUEST_SESSION">Guest Lecture / Workshop</option>
-              <option value="SPONSOR">Event Sponsor / Partner</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="bookingNotes">Notes & Instructions:</label>
-            <textarea id="bookingNotes" class="form-textarea" rows="2" placeholder="Details about topic, hall, schedule..."></textarea>
-          </div>
-
-          <div class="modal-actions">
-            <button type="button" id="teacherBookingCancelBtn" class="modal-cancel-btn">Cancel</button>
-            <button type="submit" id="saveBookingBtn" class="modal-submit-btn">📅 Confirm Booking</button>
-          </div>
-        </form>
+        </div>
+        <div class="modal-actions" style="padding: 12px 20px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end;">
+          <button type="button" id="meetAttendeesDoneBtn" class="modal-cancel-btn">Close</button>
+        </div>
       </div>
     </div>
 

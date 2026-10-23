@@ -19,6 +19,9 @@ import com.alumni.dao.OpportunityDAO;
 import com.alumni.security.AuthException;
 import com.alumni.security.AuthenticatedUser;
 import com.alumni.dao.TeacherDAO;
+import com.alumni.dao.MeetDAO;
+import com.alumni.model.ScheduledMeet;
+import com.alumni.model.User;
 import java.math.BigDecimal;
 import com.alumni.dao.AlumniSlotBookingDAO;
 import com.alumni.dao.PasswordResetDAO;
@@ -74,6 +77,8 @@ public class HttpServerApp {
         server.createContext("/api/opportunities", new OpportunityHandler());
         server.createContext("/api/admin/events", new AdminEventsHandler());
         server.createContext("/api/teacher", new TeacherHandler());
+        server.createContext("/api/meets", new MeetsHandler());
+        server.createContext("/api/student/meets", new StudentMeetsHandler());
         server.createContext("/api/session-history", new SessionHistoryHandler());
         server.createContext("/api/feedback", new FeedbackHandler());
         server.createContext("/api/auth/password-strength", new PasswordStrengthHandler());
@@ -1925,6 +1930,8 @@ private static class FeedbackHandler implements HttpHandler {
 static class TeacherHandler implements HttpHandler {
     private final TeacherDAO dao = new TeacherDAO();
     private final AlumniSlotBookingDAO bookingDAO = new AlumniSlotBookingDAO();
+    private final MeetDAO meetDAO = new MeetDAO();
+    private final RegistrationDAO registrationDAO = new RegistrationDAO();
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -1945,7 +1952,151 @@ static class TeacherHandler implements HttpHandler {
             AuthenticatedUser user = auth.requireAnyRole(exchange, "TEACHER", "ADMIN");
             boolean admin = user.hasRole("ADMIN");
 
-            // Slot bookings are restricted to authenticated teachers/admins.
+            // 1. Mentors Management: Get active mentors for dropdown or list
+            if ("GET".equalsIgnoreCase(method) && path.equals("/api/teacher/mentors")) {
+                HttpUtils.sendJsonResponse(exchange, 200, meetDAO.getAllMentors().toString());
+                return;
+            }
+
+            // 2. Mentors Management: Teacher adds / creates a new mentor
+            if ("POST".equalsIgnoreCase(method) && path.equals("/api/teacher/mentors")) {
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                String email = body.getString("email").trim().toLowerCase();
+                if (registrationDAO.existsByEmail(email)) {
+                    HttpUtils.sendErrorResponse(exchange, 409, "A user with email '" + email + "' already exists.");
+                    return;
+                }
+                String fullName = body.getString("fullName").trim();
+                String mobile = body.optString("mobileNumber", "9876543210").trim();
+                String password = body.optString("password", "Alumni@123").trim();
+                if (password.isEmpty()) password = "Alumni@123";
+
+                User u = new User();
+                u.setFullName(fullName);
+                u.setEmail(email);
+                u.setMobileNumber(mobile);
+                u.setPasswordHash(RegistrationDAO.hashPassword(password));
+                u.setRole("alumni");
+
+                Alumni a = new Alumni();
+                a.setDepartment(body.optString("department", "Computer Science"));
+                a.setGraduationYear(body.optInt("graduationYear", 2020));
+                a.setCompany(body.optString("company", "Independent Mentor"));
+                a.setDesignation(body.optString("designation", "Software Engineer"));
+                a.setLinkedInProfile(body.optString("linkedinProfile", ""));
+                if (body.has("experienceYears") && !body.isNull("experienceYears")) {
+                    a.setExperienceYears(body.getInt("experienceYears"));
+                } else {
+                    a.setExperienceYears(3);
+                }
+                a.setIndustry(body.optString("industry", "Technology"));
+                a.setSkills(body.optString("skills", "Software Engineering, Mentorship"));
+                a.setBio(body.optString("bio", "Alumni Mentor onboarded by faculty."));
+                if (body.has("maxMentees") && !body.isNull("maxMentees")) {
+                    a.setMaxMentees(body.getInt("maxMentees"));
+                } else {
+                    a.setMaxMentees(5);
+                }
+
+                long mentorId = registrationDAO.registerAlumni(u, a);
+                JSONObject out = new JSONObject();
+                out.put("success", true);
+                out.put("mentorId", mentorId);
+                out.put("message", "Alumni Mentor '" + fullName + "' added successfully!");
+                HttpUtils.sendJsonResponse(exchange, 201, out.toString());
+                return;
+            }
+
+            // 3. Students list for teacher meet scheduling dropdown
+            if ("GET".equalsIgnoreCase(method) && path.equals("/api/teacher/students")) {
+                HttpUtils.sendJsonResponse(exchange, 200, meetDAO.getAllStudents().toString());
+                return;
+            }
+
+            // 4. Meets: Teacher schedules 1-on-1 or public meet
+            if ("POST".equalsIgnoreCase(method) && path.equals("/api/teacher/meets")) {
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                ScheduledMeet meet = new ScheduledMeet();
+                meet.setTitle(body.getString("title").trim());
+                meet.setDescription(body.optString("description", "").trim());
+                String type = body.getString("meetType").trim().toUpperCase();
+                if (!type.equals("ONE_ON_ONE") && !type.equals("PUBLIC")) {
+                    HttpUtils.sendErrorResponse(exchange, 400, "meetType must be ONE_ON_ONE or PUBLIC.");
+                    return;
+                }
+                meet.setMeetType(type);
+                meet.setMentorId(body.getLong("mentorId"));
+                if ("ONE_ON_ONE".equals(type)) {
+                    if (!body.has("studentId") || body.isNull("studentId")) {
+                        HttpUtils.sendErrorResponse(exchange, 400, "studentId is required for 1-on-1 meetings.");
+                        return;
+                    }
+                    meet.setStudentId(body.getLong("studentId"));
+                } else {
+                    meet.setStudentId(null);
+                }
+                meet.setCreatedByTeacherId(user.getUserId());
+                meet.setMeetDate(body.getString("meetDate").trim());
+                meet.setStartTime(body.getString("startTime").trim());
+                meet.setEndTime(body.getString("endTime").trim());
+                meet.setMeetingLink(body.optString("meetingLink", "").trim());
+                meet.setVenue(body.optString("venue", "Online").trim());
+                if (body.has("maxParticipants") && !body.isNull("maxParticipants")) {
+                    meet.setMaxParticipants(body.getInt("maxParticipants"));
+                } else {
+                    meet.setMaxParticipants(null);
+                }
+
+                try {
+                    long meetId = meetDAO.createMeet(meet);
+                    JSONObject out = new JSONObject();
+                    out.put("success", true);
+                    out.put("meetId", meetId);
+                    out.put("message", ("ONE_ON_ONE".equals(type) ? "1-on-1 Mentorship session" : "Public Masterclass session") + " scheduled successfully!");
+                    HttpUtils.sendJsonResponse(exchange, 201, out.toString());
+                } catch (MeetDAO.ConflictException ce) {
+                    HttpUtils.sendErrorResponse(exchange, 409, ce.getMessage());
+                }
+                return;
+            }
+
+            // 5. Meets: Teacher fetches all scheduled meets
+            if ("GET".equalsIgnoreCase(method) && (path.equals("/api/teacher/meets") || path.equals("/api/teacher/meets/"))) {
+                Map<String, String> qp = HttpUtils.parseQueryParams(exchange);
+                String qType = qp.get("type");
+                String qStatus = qp.get("status");
+                List<ScheduledMeet> list = meetDAO.getMeets(null, null, null, qType, qStatus, user.getUserId());
+                JSONArray arr = new JSONArray();
+                for (ScheduledMeet sm : list) {
+                    arr.put(sm.toJson());
+                }
+                HttpUtils.sendJsonResponse(exchange, 200, arr.toString());
+                return;
+            }
+
+            // 6. Meets: Teacher updates meet status ('COMPLETED' or 'CANCELLED')
+            if ("PATCH".equalsIgnoreCase(method) && path.matches("/api/teacher/meets/\\d+/status")) {
+                long meetId = Long.parseLong(path.split("/")[4]);
+                JSONObject body = HttpUtils.parseBodyAsJson(exchange);
+                String status = body.getString("status").trim().toUpperCase();
+                boolean updated = meetDAO.updateStatus(meetId, status);
+                if (!updated) {
+                    HttpUtils.sendErrorResponse(exchange, 404, "Meet not found.");
+                    return;
+                }
+                HttpUtils.sendJsonResponse(exchange, 200, "{\"success\":true,\"message\":\"Meet status updated to " + status + ".\"}");
+                return;
+            }
+
+            // 7. Meets: Teacher inspects attendees of a public meet
+            if ("GET".equalsIgnoreCase(method) && path.matches("/api/teacher/meets/\\d+/attendees")) {
+                long meetId = Long.parseLong(path.split("/")[4]);
+                JSONArray attendees = meetDAO.getMeetAttendees(meetId);
+                HttpUtils.sendJsonResponse(exchange, 200, attendees.toString());
+                return;
+            }
+
+            // Slot bookings (legacy)
             if ("POST".equalsIgnoreCase(method) && path.equals("/api/teacher/bookings")) {
                 JSONObject body = HttpUtils.parseBodyAsJson(exchange);
                 long bookingId = bookingDAO.createBooking(
@@ -1980,8 +2131,6 @@ static class TeacherHandler implements HttpHandler {
                 return;
             }
 
-            // Teachers can only access events assigned to them. Admins can inspect
-            // event details, but must have an assignment to enter/update marks.
             if ("POST".equalsIgnoreCase(method) && path.matches("/api/teacher/events/\\d+/marks")) {
                 String[] parts = path.substring(base.length() + 1).split("/");
                 long eventId = Long.parseLong(parts[0]);
@@ -2057,10 +2206,126 @@ static class TeacherHandler implements HttpHandler {
             if ("23000".equals(e.getSQLState())) {
                 HttpUtils.sendErrorResponse(exchange, 409, "A conflicting or duplicate record exists.");
             } else {
-                HttpUtils.sendErrorResponse(exchange, 500, "Database operation failed.");
+                HttpUtils.sendErrorResponse(exchange, 500, "Database operation failed: " + e.getMessage());
             }
         } catch (Exception e) {
-            HttpUtils.sendErrorResponse(exchange, 400, "Invalid request.");
+            HttpUtils.sendErrorResponse(exchange, 400, "Invalid request: " + e.getMessage());
+        }
+    }
+}
+
+static class MeetsHandler implements HttpHandler {
+    private final MeetDAO meetDAO = new MeetDAO();
+
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        HttpUtils.addCorsHeaders(exchange);
+        String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
+
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+            exchange.sendResponseHeaders(204, -1);
+            return;
+        }
+
+        try {
+            AuthService auth = new AuthService();
+            AuthenticatedUser user = null;
+            try {
+                user = auth.authenticate(exchange);
+            } catch (AuthException ignored) {}
+            Long userId = user != null ? user.getUserId() : null;
+
+            // GET /api/meets/public: list all upcoming scheduled public meets
+            if ("GET".equalsIgnoreCase(method) && (path.equals("/api/meets/public") || path.equals("/api/meets/public/"))) {
+                List<ScheduledMeet> list = meetDAO.getMeets(null, null, null, "PUBLIC", "SCHEDULED", userId);
+                JSONArray arr = new JSONArray();
+                for (ScheduledMeet sm : list) {
+                    arr.put(sm.toJson());
+                }
+                HttpUtils.sendJsonResponse(exchange, 200, arr.toString());
+                return;
+            }
+
+            // POST /api/meets/{id}/register: student joins public session
+            if ("POST".equalsIgnoreCase(method) && path.matches("/api/meets/\\d+/register")) {
+                AuthenticatedUser reqUser = auth.requireRole(exchange, "STUDENT");
+                long meetId = Long.parseLong(path.split("/")[3]);
+                try {
+                    boolean ok = meetDAO.registerStudent(meetId, reqUser.getUserId());
+                    if (ok) {
+                        HttpUtils.sendJsonResponse(exchange, 200, "{\"success\":true,\"message\":\"Successfully joined the public session!\"}");
+                    } else {
+                        HttpUtils.sendJsonResponse(exchange, 200, "{\"success\":true,\"message\":\"You are already registered for this session.\"}");
+                    }
+                } catch (MeetDAO.CapacityException ce) {
+                    HttpUtils.sendErrorResponse(exchange, 409, ce.getMessage());
+                }
+                return;
+            }
+
+            // POST /api/meets/{id}/unregister: student leaves public session
+            if ("POST".equalsIgnoreCase(method) && path.matches("/api/meets/\\d+/unregister")) {
+                AuthenticatedUser reqUser = auth.requireRole(exchange, "STUDENT");
+                long meetId = Long.parseLong(path.split("/")[3]);
+                meetDAO.unregisterStudent(meetId, reqUser.getUserId());
+                HttpUtils.sendJsonResponse(exchange, 200, "{\"success\":true,\"message\":\"Registration cancelled successfully.\"}");
+                return;
+            }
+
+            // GET /api/meets/{id}/attendees: view attendees
+            if ("GET".equalsIgnoreCase(method) && path.matches("/api/meets/\\d+/attendees")) {
+                long meetId = Long.parseLong(path.split("/")[3]);
+                JSONArray attendees = meetDAO.getMeetAttendees(meetId);
+                HttpUtils.sendJsonResponse(exchange, 200, attendees.toString());
+                return;
+            }
+
+            HttpUtils.sendErrorResponse(exchange, 404, "Endpoint not found");
+        } catch (AuthException ae) {
+            HttpUtils.sendErrorResponse(exchange, ae.getStatusCode(), ae.getMessage());
+        } catch (SQLException se) {
+            HttpUtils.sendErrorResponse(exchange, 500, "Database query failed: " + se.getMessage());
+        } catch (Exception e) {
+            HttpUtils.sendErrorResponse(exchange, 400, "Invalid request: " + e.getMessage());
+        }
+    }
+}
+
+static class StudentMeetsHandler implements HttpHandler {
+    private final MeetDAO meetDAO = new MeetDAO();
+
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        HttpUtils.addCorsHeaders(exchange);
+        String method = exchange.getRequestMethod();
+
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET, OPTIONS");
+            exchange.sendResponseHeaders(204, -1);
+            return;
+        }
+
+        try {
+            AuthService auth = new AuthService();
+            AuthenticatedUser user = auth.requireRole(exchange, "STUDENT");
+            if (!"GET".equalsIgnoreCase(method)) {
+                HttpUtils.sendErrorResponse(exchange, 405, "Method not allowed");
+                return;
+            }
+            List<ScheduledMeet> list = meetDAO.getMeets(null, null, user.getUserId(), null, null, user.getUserId());
+            JSONArray arr = new JSONArray();
+            for (ScheduledMeet sm : list) {
+                arr.put(sm.toJson());
+            }
+            HttpUtils.sendJsonResponse(exchange, 200, arr.toString());
+        } catch (AuthException ae) {
+            HttpUtils.sendErrorResponse(exchange, ae.getStatusCode(), ae.getMessage());
+        } catch (SQLException se) {
+            HttpUtils.sendErrorResponse(exchange, 500, "Database query failed: " + se.getMessage());
+        } catch (Exception e) {
+            HttpUtils.sendErrorResponse(exchange, 400, "Invalid request: " + e.getMessage());
         }
     }
 }

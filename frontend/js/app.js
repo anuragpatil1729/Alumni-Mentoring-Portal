@@ -280,58 +280,90 @@
     els.refreshAdminEventsBtn = document.getElementById("refreshAdminEventsBtn");
     els.adminEventsTableBody = document.getElementById("adminEventsTableBody");
 
-    // Teacher / Faculty Portal Elements (System Architecture)
+    // Student Public Meets Section
+    els.studentPublicMeetsSection = document.getElementById("studentPublicMeetsSection");
+    els.refreshStudentPublicMeetsBtn = document.getElementById("refreshStudentPublicMeetsBtn");
+    els.studentPublicMeetsList = document.getElementById("studentPublicMeetsList");
+
+    // Teacher / Faculty Hub Elements
     els.tabTeacherBtn = document.getElementById("tabTeacherBtn");
     els.teacherView = document.getElementById("teacherView");
     els.teacherAlert = document.getElementById("teacherAlert");
-    els.teacherSubtabMarksBtn = document.getElementById("teacherSubtabMarksBtn");
-    els.teacherSubtabBookingsBtn = document.getElementById("teacherSubtabBookingsBtn");
+    els.teacherSubtabSchedulesBtn = document.getElementById("teacherSubtabSchedulesBtn");
+    els.teacherSubtabOneOnOneBtn = document.getElementById("teacherSubtabOneOnOneBtn");
+    els.teacherSubtabPublicMeetBtn = document.getElementById("teacherSubtabPublicMeetBtn");
+    els.teacherSubtabNewMentorBtn = document.getElementById("teacherSubtabNewMentorBtn");
     els.teacherSubtabDirectoryBtn = document.getElementById("teacherSubtabDirectoryBtn");
-    els.teacherPanelMarks = document.getElementById("teacherPanelMarks");
-    els.teacherPanelBookings = document.getElementById("teacherPanelBookings");
+    els.teacherPanelSchedules = document.getElementById("teacherPanelSchedules");
+    els.teacherPanelOneOnOne = document.getElementById("teacherPanelOneOnOne");
+    els.teacherPanelPublicMeet = document.getElementById("teacherPanelPublicMeet");
+    els.teacherPanelNewMentor = document.getElementById("teacherPanelNewMentor");
     els.teacherPanelDirectory = document.getElementById("teacherPanelDirectory");
-    els.teacherEventSelect = document.getElementById("teacherEventSelect");
-    els.refreshTeacherMarksBtn = document.getElementById("refreshTeacherMarksBtn");
-    els.openAddMarkModalBtn = document.getElementById("openAddMarkModalBtn");
-    els.teacherEventInfoCard = document.getElementById("teacherEventInfoCard");
-    els.assignedEventTitle = document.getElementById("assignedEventTitle");
-    els.assignedEventDesc = document.getElementById("assignedEventDesc");
-    els.assignedEventMeta = document.getElementById("assignedEventMeta");
-    els.teacherMarksTableBody = document.getElementById("teacherMarksTableBody");
-    els.refreshTeacherBookingsBtn = document.getElementById("refreshTeacherBookingsBtn");
-    els.openNewBookingBtn = document.getElementById("openNewBookingBtn");
-    els.teacherBookingsTableBody = document.getElementById("teacherBookingsTableBody");
+
+    // Teacher Schedules Toolbar & Table
+    els.filterMeetType = document.getElementById("filterMeetType");
+    els.filterMeetStatus = document.getElementById("filterMeetStatus");
+    els.refreshTeacherMeetsBtn = document.getElementById("refreshTeacherMeetsBtn");
+    els.quickOneOnOneBtn = document.getElementById("quickOneOnOneBtn");
+    els.quickPublicMeetBtn = document.getElementById("quickPublicMeetBtn");
+    els.teacherMeetsTableBody = document.getElementById("teacherMeetsTableBody");
+
+    // Teacher 1-on-1 Meet Form
+    els.scheduleOneOnOneForm = document.getElementById("scheduleOneOnOneForm");
+    els.scheduleOneOnOneAlert = document.getElementById("scheduleOneOnOneAlert");
+    els.meetMentorSelect = document.getElementById("meetMentorSelect");
+    els.meetStudentSelect = document.getElementById("meetStudentSelect");
+    els.meetTitle = document.getElementById("meetTitle");
+    els.meetDescription = document.getElementById("meetDescription");
+    els.meetDate = document.getElementById("meetDate");
+    els.meetStartTime = document.getElementById("meetStartTime");
+    els.meetEndTime = document.getElementById("meetEndTime");
+    els.meetingLink = document.getElementById("meetingLink");
+    els.meetVenue = document.getElementById("meetVenue");
+    els.submitOneOnOneBtn = document.getElementById("submitOneOnOneBtn");
+
+    // Teacher Public Meet Form
+    els.schedulePublicMeetForm = document.getElementById("schedulePublicMeetForm");
+    els.schedulePublicMeetAlert = document.getElementById("schedulePublicMeetAlert");
+    els.publicMentorSelect = document.getElementById("publicMentorSelect");
+    els.publicMaxCapacity = document.getElementById("publicMaxCapacity");
+    els.publicMeetTitle = document.getElementById("publicMeetTitle");
+    els.publicMeetDesc = document.getElementById("publicMeetDesc");
+    els.publicMeetDate = document.getElementById("publicMeetDate");
+    els.publicStartTime = document.getElementById("publicStartTime");
+    els.publicEndTime = document.getElementById("publicEndTime");
+    els.publicMeetingLink = document.getElementById("publicMeetingLink");
+    els.publicVenue = document.getElementById("publicVenue");
+    els.submitPublicMeetBtn = document.getElementById("submitPublicMeetBtn");
+
+    // Teacher Onboard Mentor Form
+    els.onboardMentorForm = document.getElementById("onboardMentorForm");
+    els.onboardMentorAlert = document.getElementById("onboardMentorAlert");
+    els.newMentorName = document.getElementById("newMentorName");
+    els.newMentorEmail = document.getElementById("newMentorEmail");
+    els.newMentorMobile = document.getElementById("newMentorMobile");
+    els.newMentorPassword = document.getElementById("newMentorPassword");
+    els.newMentorCompany = document.getElementById("newMentorCompany");
+    els.newMentorDesignation = document.getElementById("newMentorDesignation");
+    els.newMentorDept = document.getElementById("newMentorDept");
+    els.newMentorGradYear = document.getElementById("newMentorGradYear");
+    els.newMentorExp = document.getElementById("newMentorExp");
+    els.newMentorSkills = document.getElementById("newMentorSkills");
+    els.newMentorCapacity = document.getElementById("newMentorCapacity");
+    els.newMentorBio = document.getElementById("newMentorBio");
+    els.submitOnboardMentorBtn = document.getElementById("submitOnboardMentorBtn");
+
+    // Teacher Directory
     els.refreshTeacherDirectoryBtn = document.getElementById("refreshTeacherDirectoryBtn");
     els.teacherDirectoryTableBody = document.getElementById("teacherDirectoryTableBody");
 
-    // Teacher Modals
-    els.teacherMarkModal = document.getElementById("teacherMarkModal");
-    els.teacherMarkModalTitle = document.getElementById("teacherMarkModalTitle");
-    els.teacherMarkModalCloseBtn = document.getElementById("teacherMarkModalCloseBtn");
-    els.teacherMarkCancelBtn = document.getElementById("teacherMarkCancelBtn");
-    els.teacherMarkForm = document.getElementById("teacherMarkForm");
-    els.teacherMarkModalAlert = document.getElementById("teacherMarkModalAlert");
-    els.markEventTitleDisplay = document.getElementById("markEventTitleDisplay");
-    els.markEventId = document.getElementById("markEventId");
-    els.markStudentId = document.getElementById("markStudentId");
-    els.markScore = document.getElementById("markScore");
-    els.markMaxScore = document.getElementById("markMaxScore");
-    els.markRemarks = document.getElementById("markRemarks");
-    els.saveMarkBtn = document.getElementById("saveMarkBtn");
-
-    els.teacherBookingModal = document.getElementById("teacherBookingModal");
-    els.teacherBookingModalCloseBtn = document.getElementById("teacherBookingModalCloseBtn");
-    els.teacherBookingCancelBtn = document.getElementById("teacherBookingCancelBtn");
-    els.teacherBookingForm = document.getElementById("teacherBookingForm");
-    els.teacherBookingModalAlert = document.getElementById("teacherBookingModalAlert");
-    els.bookingEventId = document.getElementById("bookingEventId");
-    els.bookingAlumniId = document.getElementById("bookingAlumniId");
-    els.bookingDate = document.getElementById("bookingDate");
-    els.bookingStartTime = document.getElementById("bookingStartTime");
-    els.bookingEndTime = document.getElementById("bookingEndTime");
-    els.bookingPurpose = document.getElementById("bookingPurpose");
-    els.bookingNotes = document.getElementById("bookingNotes");
-    els.saveBookingBtn = document.getElementById("saveBookingBtn");
+    // Public Meet Attendees Modal
+    els.meetAttendeesModal = document.getElementById("meetAttendeesModal");
+    els.attendeesModalTitle = document.getElementById("attendeesModalTitle");
+    els.meetAttendeesCloseBtn = document.getElementById("meetAttendeesCloseBtn");
+    els.meetAttendeesDoneBtn = document.getElementById("meetAttendeesDoneBtn");
+    els.attendeesModalSubtitle = document.getElementById("attendeesModalSubtitle");
+    els.attendeesTableBody = document.getElementById("attendeesTableBody");
 
     els.adminPendingBadge = document.getElementById("adminPendingBadge");
     els.adminDuplicatesBadge = document.getElementById("adminDuplicatesBadge");
@@ -594,6 +626,7 @@
       els.searchView.style.display = "block";
       els.tabSearchBtn.classList.add("active");
       performSearch();
+      loadStudentPublicMeets();
     } else if (viewName === "profile") {
       if (els.profileView) {
         els.profileView.classList.add("active");
@@ -628,8 +661,8 @@
         els.adminView.style.display = "block";
       }
       if (els.tabAdminBtn) els.tabAdminBtn.classList.add("active");
-      switchAdminSubtab("users");
-      loadAndRenderPendingUsers();
+      if (els.adminPanelUsers) els.adminPanelUsers.style.display = "block";
+      loadAndRenderAdminUsers();
     }
   }
 
@@ -813,10 +846,10 @@
     }
     if (pwd === confirmPwd) {
       matchEl.className = "password-match-msg match";
-      matchEl.textContent = "✓ Passwords match";
+      matchEl.textContent = "Passwords match";
     } else {
       matchEl.className = "password-match-msg mismatch";
-      matchEl.textContent = "✕ Passwords do not match";
+      matchEl.textContent = "Passwords do not match";
     }
   }
 
@@ -1258,7 +1291,7 @@
     } else {
       els.profileAvatarLg.textContent = name.charAt(0).toUpperCase();
       if (els.removeAvatarBtn) els.removeAvatarBtn.style.display = "none";
-      if (els.pe_avatar_preview) els.pe_avatar_preview.innerHTML = `<span>👤</span>`;
+      if (els.pe_avatar_preview) els.pe_avatar_preview.innerHTML = `<span class="default-avatar-placeholder">Photo</span>`;
       if (els.pe_avatar_remove) els.pe_avatar_remove.style.display = "none";
     }
     els.profileHeaderBadge.textContent = role === "alumni" ? "Mentor" : "Student";
@@ -1329,7 +1362,7 @@
     if (isEdit) {
       els.profileViewMode.style.display = "none";
       els.profileEditMode.style.display = "block";
-      els.editProfileToggleBtn.innerHTML = `<span class="btn-icon">👁️</span> View Profile`;
+      els.editProfileToggleBtn.innerHTML = `View Profile`;
       els.editProfileToggleBtn.classList.add("active-editing");
 
       // Prefill edit form
@@ -1366,7 +1399,7 @@
     } else {
       els.profileViewMode.style.display = "block";
       els.profileEditMode.style.display = "none";
-      els.editProfileToggleBtn.innerHTML = `<span class="btn-icon">✏️</span> Edit Profile`;
+      els.editProfileToggleBtn.innerHTML = `Edit Profile`;
       els.editProfileToggleBtn.classList.remove("active-editing");
     }
   }
@@ -1546,7 +1579,7 @@
         if (els.removeAvatarBtn) els.removeAvatarBtn.style.display = "flex";
         updateAuthHeader();
 
-        setProfileAlert("success", "✅ Profile picture saved directly in MySQL / MariaDB BLOB storage!");
+        setProfileAlert("success", "Profile picture saved directly in MySQL / MariaDB BLOB storage.");
       } else {
         setProfileAlert("error", res.data.message || "Failed to save profile picture.");
       }
@@ -1603,7 +1636,7 @@
         const name = state.currentUser.fullName || "User";
         els.profileAvatarLg.textContent = name.charAt(0).toUpperCase();
         if (els.removeAvatarBtn) els.removeAvatarBtn.style.display = "none";
-        if (els.pe_avatar_preview) els.pe_avatar_preview.innerHTML = `<span>👤</span>`;
+        if (els.pe_avatar_preview) els.pe_avatar_preview.innerHTML = `<span class="default-avatar-placeholder">Photo</span>`;
         if (els.pe_avatar_remove) els.pe_avatar_remove.style.display = "none";
         updateAuthHeader();
 
@@ -1664,7 +1697,7 @@
     if (removeBtnEl) {
       removeBtnEl.addEventListener("click", () => {
         if (previewEl) {
-          previewEl.innerHTML = `<span>👤</span>`;
+          previewEl.innerHTML = `<span class="default-avatar-placeholder">Photo</span>`;
         }
         removeBtnEl.style.display = "none";
         if (typeof onRemove === "function") {
@@ -1779,7 +1812,7 @@
       <div class="card-title-group">
         <h3 class="mentor-name" title="${escapeHtml(fullName)}">${escapeHtml(fullName)}</h3>
         <div class="mentor-role" title="${escapeHtml(designation)}">${escapeHtml(designation)}</div>
-        <div class="company-badge"><span class="building-icon">🏢</span> ${escapeHtml(company)}</div>
+        <div class="company-badge">${escapeHtml(company)}</div>
       </div>
     `;
     card.appendChild(cardTop);
@@ -1787,15 +1820,15 @@
     // Badges
     const badges = document.createElement("div");
     badges.className = "card-badges";
-    let badgesHtml = `<span class="badge badge-dept" title="Department">🎓 ${escapeHtml(department)}</span>`;
+    let badgesHtml = `<span class="badge badge-dept" title="Department">${escapeHtml(department)}</span>`;
     if (gradYear) {
       badgesHtml += `<span class="badge badge-year" title="Graduation Year">Class of '${String(gradYear).slice(-2)}</span>`;
     }
     if (exp !== null && exp !== undefined) {
-      badgesHtml += `<span class="badge badge-exp" title="Experience">⏱ ${exp} yrs exp</span>`;
+      badgesHtml += `<span class="badge badge-exp" title="Experience">${exp} yrs exp</span>`;
     }
     if (industry) {
-      badgesHtml += `<span class="badge badge-industry" title="Industry">🌐 ${escapeHtml(industry)}</span>`;
+      badgesHtml += `<span class="badge badge-industry" title="Industry">${escapeHtml(industry)}</span>`;
     }
     badges.innerHTML = badgesHtml;
     card.appendChild(badges);
@@ -1851,11 +1884,11 @@
       const statusPill = document.createElement("div");
       statusPill.className = `req-status-pill ${latestReq.status.toLowerCase()}`;
       if (latestReq.status === "PENDING") {
-        statusPill.innerHTML = `<span>⏳</span> Request Pending`;
+        statusPill.innerHTML = `Request Pending`;
       } else if (latestReq.status === "ACCEPTED") {
-        statusPill.innerHTML = `<span>✅</span> Approved · Connected`;
+        statusPill.innerHTML = `Approved · Connected`;
       } else if (latestReq.status === "REJECTED") {
-        statusPill.innerHTML = `<span>❌</span> Request Declined`;
+        statusPill.innerHTML = `Request Declined`;
       }
       card.appendChild(statusPill);
     }
@@ -1938,7 +1971,7 @@
 
         if (latestReq.status === "PENDING") {
           els.connectPreviousStatus.innerHTML = `
-            <div class="modal-status-title">⏳ Mentorship Request Under Review</div>
+            <div class="modal-status-title">Mentorship Request Under Review</div>
             <div>Your previous request sent on <strong>${escapeHtml(latestReq.createdAt || "recently")}</strong> is currently waiting for <strong>${escapeHtml(mentor.fullName)}</strong> to review and respond.</div>
           `;
           if (els.modalSubmitBtn) {
@@ -1947,10 +1980,10 @@
           }
         } else if (latestReq.status === "ACCEPTED") {
           els.connectPreviousStatus.innerHTML = `
-            <div class="modal-status-title">✅ Previous Request Approved!</div>
+            <div class="modal-status-title">Previous Request Approved</div>
             <div><strong>${escapeHtml(mentor.fullName)}</strong> accepted your mentorship connection!</div>
-            ${latestReq.mentorResponse ? `<div class="modal-status-note">💬 <strong>Mentor's Response:</strong> "${escapeHtml(latestReq.mentorResponse)}"</div>` : ""}
-            <div style="margin-top: 8px; font-size: 12px; opacity: 0.9;">✨ You can submit another request below to schedule your next session or discuss a new topic.</div>
+            ${latestReq.mentorResponse ? `<div class="modal-status-note"><strong>Mentor's Response:</strong> "${escapeHtml(latestReq.mentorResponse)}"</div>` : ""}
+            <div style="margin-top: 8px; font-size: 12px; opacity: 0.9;">You can submit another request below to schedule your next session or discuss a new topic.</div>
           `;
           if (els.modalSubmitBtn) {
             els.modalSubmitBtn.disabled = false;
@@ -1958,10 +1991,10 @@
           }
         } else if (latestReq.status === "REJECTED") {
           els.connectPreviousStatus.innerHTML = `
-            <div class="modal-status-title">❌ Previous Request Declined</div>
+            <div class="modal-status-title">Previous Request Declined</div>
             <div><strong>${escapeHtml(mentor.fullName)}</strong> was unable to accept your previous request.</div>
-            ${latestReq.mentorResponse ? `<div class="modal-status-note">💬 <strong>Mentor's Note:</strong> "${escapeHtml(latestReq.mentorResponse)}"</div>` : ""}
-            <div style="margin-top: 8px; font-size: 12px; opacity: 0.9;">💡 You are welcome to submit a revised request below with an updated topic or questions.</div>
+            ${latestReq.mentorResponse ? `<div class="modal-status-note"><strong>Mentor's Note:</strong> "${escapeHtml(latestReq.mentorResponse)}"</div>` : ""}
+            <div style="margin-top: 8px; font-size: 12px; opacity: 0.9;">You are welcome to submit a revised request below with an updated topic or questions.</div>
           `;
           if (els.modalSubmitBtn) {
             els.modalSubmitBtn.disabled = false;
@@ -2051,7 +2084,7 @@
         if (els.connectPreviousStatus) els.connectPreviousStatus.style.display = "none";
         const mentorName = state.selectedMentor ? state.selectedMentor.fullName : "your mentor";
         els.connectSuccess.innerHTML = `
-          ✅ Mentorship request sent successfully!
+          Mentorship request sent successfully!
           <br/><br/>
           <small><strong>${escapeHtml(mentorName)}</strong> will review your request and connect with you once accepted.</small>
         `;
@@ -2279,10 +2312,10 @@
     const st = (req.status || "PENDING").toUpperCase();
     statusBadge.className = `req-status-badge status-badge-${st.toLowerCase()}`;
     const statusIcons = {
-      PENDING: "⏳ Pending",
-      ACCEPTED: "✅ Accepted",
-      REJECTED: "❌ Declined",
-      CANCELLED: "🚫 Cancelled"
+      PENDING: "Pending",
+      ACCEPTED: "Accepted",
+      REJECTED: "Declined",
+      CANCELLED: "Cancelled"
     };
     statusBadge.textContent = statusIcons[st] || st;
 
@@ -2296,7 +2329,7 @@
     // Session Goal Pill
     const goalPill = document.createElement("div");
     goalPill.className = "request-goal-pill";
-    goalPill.innerHTML = `<span>🎯</span> <span>${escapeHtml(req.sessionGoal || "Mentorship")}</span>`;
+    goalPill.innerHTML = `<span>${escapeHtml(req.sessionGoal || "Mentorship")}</span>`;
     card.appendChild(goalPill);
 
     // Message Body
@@ -2365,7 +2398,7 @@
       const scheduleBtn = document.createElement("button");
       scheduleBtn.type = "button";
       scheduleBtn.className = "btn-req-schedule";
-      scheduleBtn.innerHTML = "<span>📅</span> Schedule Session";
+      scheduleBtn.innerHTML = "Schedule Session";
       scheduleBtn.addEventListener("click", () => openScheduleModal(req, isMentor));
       actionBtns.appendChild(scheduleBtn);
     }
@@ -2609,7 +2642,7 @@
               if (els.removeAvatarBtn) els.removeAvatarBtn.style.display = "flex";
               if (els.pe_avatar_remove) els.pe_avatar_remove.style.display = "inline-flex";
               updateAuthHeader();
-              setProfileAlert("success", "✅ Profile picture saved in MySQL / MariaDB database!");
+              setProfileAlert("success", "Profile picture saved in MySQL / MariaDB database.");
             }
           } catch (e) {
             setProfileAlert("error", "Error saving image: " + e.message);
@@ -2957,69 +2990,70 @@
       els.refreshAdminEventsBtn.addEventListener("click", () => loadAndRenderAdminEvents());
     }
 
-    // Teacher / Faculty Portal Subtabs & Actions
+    // Student Public Meets Actions
+    if (els.refreshStudentPublicMeetsBtn) {
+      els.refreshStudentPublicMeetsBtn.addEventListener("click", loadStudentPublicMeets);
+    }
+
+    // Teacher / Faculty Hub Subtabs & Actions
     if (els.tabTeacherBtn) {
       els.tabTeacherBtn.addEventListener("click", () => switchView("teacher"));
     }
-    if (els.teacherSubtabMarksBtn) {
-      els.teacherSubtabMarksBtn.addEventListener("click", () => switchTeacherSubtab("marks"));
+    if (els.teacherSubtabSchedulesBtn) {
+      els.teacherSubtabSchedulesBtn.addEventListener("click", () => switchTeacherSubtab("schedules"));
     }
-    if (els.teacherSubtabBookingsBtn) {
-      els.teacherSubtabBookingsBtn.addEventListener("click", () => switchTeacherSubtab("bookings"));
+    if (els.teacherSubtabOneOnOneBtn) {
+      els.teacherSubtabOneOnOneBtn.addEventListener("click", () => switchTeacherSubtab("oneOnOne"));
+    }
+    if (els.teacherSubtabPublicMeetBtn) {
+      els.teacherSubtabPublicMeetBtn.addEventListener("click", () => switchTeacherSubtab("publicMeet"));
+    }
+    if (els.teacherSubtabNewMentorBtn) {
+      els.teacherSubtabNewMentorBtn.addEventListener("click", () => switchTeacherSubtab("newMentor"));
     }
     if (els.teacherSubtabDirectoryBtn) {
       els.teacherSubtabDirectoryBtn.addEventListener("click", () => switchTeacherSubtab("directory"));
     }
-    if (els.refreshTeacherMarksBtn) {
-      els.refreshTeacherMarksBtn.addEventListener("click", () => {
-        const evId = els.teacherEventSelect ? els.teacherEventSelect.value : null;
-        if (evId) loadTeacherMarks(evId);
-      });
+
+    if (els.filterMeetType) {
+      els.filterMeetType.addEventListener("change", loadTeacherMeets);
     }
-    if (els.teacherEventSelect) {
-      els.teacherEventSelect.addEventListener("change", (e) => {
-        if (e.target.value) loadTeacherMarks(e.target.value);
-      });
+    if (els.filterMeetStatus) {
+      els.filterMeetStatus.addEventListener("change", loadTeacherMeets);
     }
-    if (els.openAddMarkModalBtn) {
-      els.openAddMarkModalBtn.addEventListener("click", () => openTeacherMarkModal());
+    if (els.refreshTeacherMeetsBtn) {
+      els.refreshTeacherMeetsBtn.addEventListener("click", loadTeacherMeets);
     }
-    if (els.teacherMarkModalCloseBtn) {
-      els.teacherMarkModalCloseBtn.addEventListener("click", closeTeacherMarkModal);
+    if (els.quickOneOnOneBtn) {
+      els.quickOneOnOneBtn.addEventListener("click", () => switchTeacherSubtab("oneOnOne"));
     }
-    if (els.teacherMarkCancelBtn) {
-      els.teacherMarkCancelBtn.addEventListener("click", closeTeacherMarkModal);
+    if (els.quickPublicMeetBtn) {
+      els.quickPublicMeetBtn.addEventListener("click", () => switchTeacherSubtab("publicMeet"));
     }
-    if (els.teacherMarkModal) {
-      els.teacherMarkModal.addEventListener("click", (e) => {
-        if (e.target === els.teacherMarkModal) closeTeacherMarkModal();
-      });
+
+    if (els.scheduleOneOnOneForm) {
+      els.scheduleOneOnOneForm.addEventListener("submit", handleScheduleOneOnOneSubmit);
     }
-    if (els.teacherMarkForm) {
-      els.teacherMarkForm.addEventListener("submit", handleTeacherMarkSubmit);
+    if (els.schedulePublicMeetForm) {
+      els.schedulePublicMeetForm.addEventListener("submit", handleSchedulePublicMeetSubmit);
     }
-    if (els.refreshTeacherBookingsBtn) {
-      els.refreshTeacherBookingsBtn.addEventListener("click", loadTeacherBookings);
-    }
-    if (els.openNewBookingBtn) {
-      els.openNewBookingBtn.addEventListener("click", openTeacherBookingModal);
-    }
-    if (els.teacherBookingModalCloseBtn) {
-      els.teacherBookingModalCloseBtn.addEventListener("click", closeTeacherBookingModal);
-    }
-    if (els.teacherBookingCancelBtn) {
-      els.teacherBookingCancelBtn.addEventListener("click", closeTeacherBookingModal);
-    }
-    if (els.teacherBookingModal) {
-      els.teacherBookingModal.addEventListener("click", (e) => {
-        if (e.target === els.teacherBookingModal) closeTeacherBookingModal();
-      });
-    }
-    if (els.teacherBookingForm) {
-      els.teacherBookingForm.addEventListener("submit", handleTeacherBookingSubmit);
+    if (els.onboardMentorForm) {
+      els.onboardMentorForm.addEventListener("submit", handleOnboardMentorSubmit);
     }
     if (els.refreshTeacherDirectoryBtn) {
       els.refreshTeacherDirectoryBtn.addEventListener("click", loadTeacherDirectory);
+    }
+
+    if (els.meetAttendeesCloseBtn) {
+      els.meetAttendeesCloseBtn.addEventListener("click", closeMeetAttendeesModal);
+    }
+    if (els.meetAttendeesDoneBtn) {
+      els.meetAttendeesDoneBtn.addEventListener("click", closeMeetAttendeesModal);
+    }
+    if (els.meetAttendeesModal) {
+      els.meetAttendeesModal.addEventListener("click", (e) => {
+        if (e.target === els.meetAttendeesModal) closeMeetAttendeesModal();
+      });
     }
 
     if (els.refreshPendingBtn) {
@@ -3314,7 +3348,7 @@
       stored.unshift(newSession);
       localStorage.setItem("alumniConnectSessions", JSON.stringify(stored));
 
-      setScheduleAlert("success", "✅ Mentoring session scheduled successfully!");
+      setScheduleAlert("success", "Mentoring session scheduled successfully.");
 
       setTimeout(() => {
         closeScheduleModal();
@@ -3350,20 +3384,20 @@
       card.innerHTML = `
         <div class="session-card-header">
           <div class="session-date-badge">
-            <span>📅</span> ${escapeHtml(sess.date)} at ${escapeHtml(sess.time)}
+            <strong>Date:</strong> ${escapeHtml(sess.date)} at ${escapeHtml(sess.time)}
           </div>
           <span class="session-status-badge">Confirmed</span>
         </div>
         <div class="session-meta-row">
-          <span>👤</span> <strong>${escapeHtml(sess.mentorName || "Mentor")}</strong> (${escapeHtml(sess.mentorCompany || "")})
+          <strong>Mentor:</strong> ${escapeHtml(sess.mentorName || "Mentor")} (${escapeHtml(sess.mentorCompany || "")})
         </div>
         <div class="session-meta-row">
-          <span>⏱️</span> Duration: ${sess.duration} mins · Mode: ${escapeHtml(sess.mode || "Online")}
+          Duration: ${sess.duration} mins · Mode: ${escapeHtml(sess.mode || "Online")}
         </div>
         ${sess.notes ? `<div style="font-size:12px;color:#64748b;font-style:italic;">"${escapeHtml(sess.notes)}"</div>` : ""}
         ${sess.meetingLink ? `
           <a href="${escapeHtml(sess.meetingLink)}" target="_blank" rel="noopener noreferrer" class="session-link-btn">
-            <span>🔗</span> Join Meeting Room
+            Join Meeting Room
           </a>
         ` : ""}
       `;
@@ -3449,9 +3483,9 @@
         </div>
         ${isCompleted ? `
           <div style="margin-top:12px; padding-top:10px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:12px; color:#64748b;">✨ Session completed</span>
+            <span style="font-size:12px; color:#64748b;">Session completed</span>
             <button type="button" class="btn-give-feedback" data-sessionid="${it.id}">
-              ⭐ Rate & Review Session
+              Rate & Review Session
             </button>
           </div>
         ` : ""}
@@ -3475,13 +3509,13 @@
     if (els.feedbackSessionId) els.feedbackSessionId.value = session.id;
     if (els.feedbackSessionInfo) {
       els.feedbackSessionInfo.innerHTML = `
-        <span>🎯 <strong>Session #${session.id}</strong> with Mentor #${session.alumniId} · Completed Duration: ${session.durationMinutes || 0}m</span>
+        <span><strong>Session #${session.id}</strong> with Mentor #${session.alumniId} · Completed Duration: ${session.durationMinutes || 0}m</span>
       `;
     }
 
     // Default to 5 stars
     if (els.feedbackRatingValue) els.feedbackRatingValue.value = "5";
-    if (els.starRatingLabel) els.starRatingLabel.textContent = "★★★★★ Outstanding / Exceptional (5/5)";
+    if (els.starRatingLabel) els.starRatingLabel.textContent = "Outstanding / Exceptional (5/5)";
     if (els.starRatingWidget) {
       els.starRatingWidget.querySelectorAll(".star-rating-btn").forEach(btn => btn.classList.add("active"));
     }
@@ -3533,7 +3567,7 @@
       const res = await ApiClient.submitFeedback({ sessionId, rating, comments });
       if (res.ok) {
         closeFeedbackModal();
-        setHistoryAlert("success", "⭐ Thank you! Your feedback has been recorded successfully.");
+        setHistoryAlert("success", "Thank you! Your feedback has been recorded successfully.");
         loadAndRenderHistory();
       } else {
         setFeedbackAlert("error", res.data?.message || "Failed to submit feedback.");
@@ -3543,7 +3577,7 @@
     } finally {
       if (btn) {
         btn.disabled = false;
-        btn.textContent = "⭐ Submit Feedback";
+        btn.textContent = "Submit Feedback";
       }
     }
   }
@@ -3626,27 +3660,9 @@
   // Admin Subtabs & Panels Controller (Team C & A)
   // =========================================================================
   function switchAdminSubtab(tab) {
-    state.activeAdminSubtab = tab;
-
-    const tabs = [
-      { id: "users", btn: els.adminSubtabUsersBtn, panel: els.adminPanelUsers },
-      { id: "pending", btn: els.adminSubtabPendingBtn, panel: els.adminPanelPending },
-      { id: "duplicates", btn: els.adminSubtabDuplicatesBtn, panel: els.adminPanelDuplicates },
-      { id: "feedback", btn: els.adminSubtabFeedbackBtn, panel: els.adminPanelFeedback },
-      { id: "events", btn: els.adminSubtabEventsBtn, panel: els.adminPanelEvents }
-    ];
-
-    tabs.forEach(t => {
-      const isActive = (t.id === tab);
-      if (t.btn) t.btn.classList.toggle("active", isActive);
-      if (t.panel) t.panel.style.display = isActive ? "block" : "none";
-    });
-
-    if (tab === "users") loadAndRenderAdminUsers();
-    else if (tab === "pending") loadAndRenderPendingUsers();
-    else if (tab === "duplicates") loadAndRenderDuplicates();
-    else if (tab === "feedback") loadAndRenderAdminFeedback();
-    else if (tab === "events") loadAndRenderAdminEvents();
+    state.activeAdminSubtab = "users";
+    if (els.adminPanelUsers) els.adminPanelUsers.style.display = "block";
+    loadAndRenderAdminUsers();
   }
 
   function renderAdminUsers(users) {
@@ -3676,7 +3692,7 @@
         <td>${escapeHtml(u.mobileNumber || "—")}</td>
         <td>
           <span class="approval-badge approval-${escapeHtml(approval)}">
-            ${approval === 'APPROVED' ? '✓' : approval === 'PENDING' ? '⏳' : '✕'} ${escapeHtml(approval)}
+            ${escapeHtml(approval)}
           </span>
         </td>
         <td>
@@ -3691,10 +3707,10 @@
             ? '<span style="font-size:11px; color:#94a3b8; font-weight:600;">Current Admin</span>'
             : `<div class="admin-action-btn-group">
                 <button type="button" class="btn-toggle-status ${isActive ? 'btn-deactivate' : 'btn-activate'}" data-userid="${u.id}">
-                  ${isActive ? '🚫 Deactivate' : '✓ Activate'}
+                  ${isActive ? 'Deactivate' : 'Activate'}
                 </button>
                 <button type="button" class="btn-delete-user" data-userid="${u.id}" title="Permanently delete user">
-                  🗑️
+                  Delete
                 </button>
               </div>`
           }
@@ -3809,7 +3825,7 @@
       els.adminPendingTableBody.innerHTML = `
         <tr>
           <td colspan="6" style="text-align:center;padding:32px;color:#64748b;">
-            ✨ No pending registrations! All user accounts are approved and verified.
+            No pending registrations. All user accounts are approved and verified.
           </td>
         </tr>
       `;
@@ -3840,7 +3856,7 @@
               ✕ Reject
             </button>
             <button type="button" class="btn-toggle-status" data-userid="${u.id}" style="background:#f3e8ff; color:#7e22ce; border-color:#e9d5ff;" title="Check if candidate is duplicate">
-              🔍 Audit
+              Audit
             </button>
           </div>
         </td>
@@ -3913,7 +3929,7 @@
     const btn = els.runDuplicateScanBtn;
     if (btn) {
       btn.disabled = true;
-      btn.textContent = "⚡ Auditing Duplicates...";
+      btn.textContent = "Auditing Duplicates...";
     }
 
     try {
@@ -3934,7 +3950,7 @@
     } finally {
       if (btn) {
         btn.disabled = false;
-        btn.textContent = "⚡ Run System Duplicate Audit";
+        btn.textContent = "Run System Duplicate Audit";
       }
     }
   }
@@ -3946,7 +3962,7 @@
     if (!clusters || clusters.length === 0) {
       els.adminDuplicatesContainer.innerHTML = `
         <div style="text-align:center; padding:32px; color:#15803d; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px;">
-          <div style="font-size:24px; margin-bottom:8px;">✅</div>
+          
           <div style="font-weight:700; font-size:15px;">Zero Duplicate Records Detected!</div>
           <div style="font-size:13px; color:#166534; margin-top:4px;">All phone numbers, student IDs, and user names are strictly unique.</div>
         </div>
@@ -3968,13 +3984,13 @@
               <span>#${u.id} · ${escapeHtml(u.fullName || "User")}</span>
               <span class="role-badge role-${escapeHtml((u.role || "student").toLowerCase())}">${escapeHtml(u.role || "student")}</span>
             </div>
-            <div>📧 ${escapeHtml(u.email || "—")}</div>
-            <div>📱 ${escapeHtml(u.mobileNumber || "—")}</div>
-            ${u.studentId ? `<div>🎓 ID: ${escapeHtml(u.studentId)}</div>` : ""}
+            <div>Email: ${escapeHtml(u.email || "—")}</div>
+            <div>Mobile: ${escapeHtml(u.mobileNumber || "—")}</div>
+            ${u.studentId ? `<div>ID: ${escapeHtml(u.studentId)}</div>` : ""}
             <div style="font-size:11px; color:#64748b; margin-top:4px;">Joined: ${escapeHtml(u.createdAt ? u.createdAt.split(" ")[0] : "—")}</div>
             <div style="margin-top:6px; display:flex; gap:6px;">
               <button type="button" class="btn-delete-user" data-userid="${u.id}" style="padding:4px 8px; font-size:11px;">
-                🗑️ Delete
+                Delete
               </button>
             </div>
           </div>
@@ -3984,7 +4000,7 @@
       card.innerHTML = `
         <div class="duplicate-cluster-header">
           <div class="duplicate-type-title">
-            <span>⚠️ Cluster #${idx + 1}: ${escapeHtml(g.duplicateType || "Duplicate Detected")}</span>
+            <span>Cluster #${idx + 1}: ${escapeHtml(g.duplicateType || "Duplicate Detected")}</span>
           </div>
           <span class="confidence-badge confidence-${escapeHtml(conf)}">${escapeHtml(conf)} Confidence</span>
         </div>
@@ -4032,7 +4048,7 @@
         if (!res.data.hasDuplicates) {
           els.manualDupResultBox.innerHTML = `
             <div style="padding:12px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; color:#15803d; font-size:13px;">
-              ✅ <strong>No Duplicates Found:</strong> No matching or conflicting accounts exist with this name, email, or mobile.
+              <strong>No Duplicates Found:</strong> No matching or conflicting accounts exist with this name, email, or mobile.
             </div>
           `;
         } else {
@@ -4041,7 +4057,7 @@
             const reasons = (m.matchReasons || []).join(", ");
             matchesHtml += `
               <div style="background:#fff; border:1px solid #fecaca; border-radius:6px; padding:10px; margin-top:8px;">
-                <div style="font-weight:700; color:#991b1b;">⚠️ #${m.id} — ${escapeHtml(m.fullName)} (${escapeHtml(m.email)})</div>
+                <div style="font-weight:700; color:#991b1b;">#${m.id} — ${escapeHtml(m.fullName)} (${escapeHtml(m.email)})</div>
                 <div style="font-size:12px; color:#475569; margin:4px 0;"><strong>Match Trigger:</strong> ${escapeHtml(reasons)}</div>
                 <div style="font-size:11px; color:#64748b;">Role: ${escapeHtml(m.role)} · Mobile: ${escapeHtml(m.mobileNumber)}</div>
               </div>
@@ -4049,7 +4065,7 @@
           });
           els.manualDupResultBox.innerHTML = `
             <div style="padding:12px; background:#fef2f2; border:1px solid #fecaca; border-radius:6px; color:#991b1b; font-size:13px;">
-              <strong>⚠️ ${res.data.duplicateCount} Potential Duplicate(s) Found:</strong>
+              <strong>${res.data.duplicateCount} Potential Duplicate(s) Found:</strong>
               ${matchesHtml}
             </div>
           `;
@@ -4210,13 +4226,13 @@
           <td><span class="role-badge role-alumni">${escapeHtml(ev.eventType || ev.event_type || "GENERAL")}</span></td>
           <td><span style="font-size:12px; font-weight:600; color:#334155;">Mentor #${ev.organizerAlumniId || ev.organizer_alumni_id || "—"}</span></td>
           <td>
-            <div style="font-weight:600; color:#0f172a; font-size:12px;">📅 ${escapeHtml(ev.date || "")}</div>
-            <div style="font-size:11px; color:#64748b;">⏰ ${escapeHtml(ev.startTime || ev.start_time || "")} - ${escapeHtml(ev.endTime || ev.end_time || "")}</div>
+            <div style="font-weight:600; color:#0f172a; font-size:12px;">${escapeHtml(ev.date || "")}</div>
+            <div style="font-size:11px; color:#64748b;">${escapeHtml(ev.startTime || ev.start_time || "")} - ${escapeHtml(ev.endTime || ev.end_time || "")}</div>
           </td>
           <td style="font-size:12px; color:#64748b;">${escapeHtml(ev.venue || "Campus")}</td>
           <td>
             <span class="approval-badge approval-${escapeHtml(st)}">
-              ${isApproved ? '✓ APPROVED' : isPending ? '⏳ PENDING' : '✕ REJECTED'}
+              ${isApproved ? 'APPROVED' : isPending ? 'PENDING' : 'REJECTED'}
             </span>
           </td>
           <td style="text-align:right;">
@@ -4265,10 +4281,10 @@
   }
 
   // =========================================================================
-  // Teacher / Faculty Portal Controller (System Architecture)
+  // Teacher / Faculty Hub Controller
   // =========================================================================
-  let currentTeacherEvents = [];
-  let selectedTeacherEvent = null;
+  let cachedMentorsList = [];
+  let cachedStudentsList = [];
 
   function setTeacherAlert(type, msg) {
     if (!els.teacherAlert) return;
@@ -4281,13 +4297,28 @@
     els.teacherAlert.className = `form-status-alert alert-${type}`;
     els.teacherAlert.textContent = msg;
     els.teacherAlert.style.display = "block";
+    els.teacherAlert.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function setHubAlert(alertEl, type, msg) {
+    if (!alertEl) return;
+    if (!type || !msg) {
+      alertEl.style.display = "none";
+      alertEl.textContent = "";
+      alertEl.className = "form-status-alert";
+      return;
+    }
+    alertEl.className = `form-status-alert alert-${type}`;
+    alertEl.textContent = msg;
+    alertEl.style.display = "block";
   }
 
   function switchTeacherSubtab(tab) {
     const tabs = [
-      { id: "marks", btn: els.teacherSubtabMarksBtn, panel: els.teacherPanelMarks },
-      { id: "bookings", btn: els.teacherSubtabBookingsBtn, panel: els.teacherPanelBookings },
-      { id: "directory", btn: els.teacherSubtabDirectoryBtn, panel: els.teacherPanelDirectory }
+      { id: "schedules", btn: els.teacherSubtabSchedulesBtn, panel: els.teacherPanelSchedules },
+      { id: "oneOnOne", btn: els.teacherSubtabOneOnOneBtn, panel: els.teacherPanelOneOnOne },
+      { id: "publicMeet", btn: els.teacherSubtabPublicMeetBtn, panel: els.teacherPanelPublicMeet },
+      { id: "newMentor", btn: els.teacherSubtabNewMentorBtn, panel: els.teacherPanelNewMentor }
     ];
 
     tabs.forEach(t => {
@@ -4296,395 +4327,399 @@
       if (t.panel) t.panel.style.display = isActive ? "block" : "none";
     });
 
-    if (tab === "marks") {
-      loadTeacherEvents();
-    } else if (tab === "bookings") {
-      loadTeacherBookings();
-    } else if (tab === "directory") {
-      loadTeacherDirectory();
+    if (tab === "schedules") {
+      loadTeacherMeets();
+    } else if (tab === "oneOnOne") {
+      loadTeacherMeetDropdowns();
+      if (els.scheduleOneOnOneForm) els.scheduleOneOnOneForm.reset();
+      setHubAlert(els.scheduleOneOnOneAlert, null, "");
+      // default date to tomorrow
+      if (els.meetDate) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        els.meetDate.value = tomorrow.toISOString().split("T")[0];
+      }
+      if (els.meetStartTime) els.meetStartTime.value = "10:00";
+      if (els.meetEndTime) els.meetEndTime.value = "11:00";
+    } else if (tab === "publicMeet") {
+      loadTeacherMeetDropdowns();
+      if (els.schedulePublicMeetForm) els.schedulePublicMeetForm.reset();
+      setHubAlert(els.schedulePublicMeetAlert, null, "");
+      if (els.publicMeetDate) {
+        const nextWeek = new Date();
+        nextWeek.setDate(nextWeek.getDate() + 3);
+        els.publicMeetDate.value = nextWeek.toISOString().split("T")[0];
+      }
+      if (els.publicStartTime) els.publicStartTime.value = "14:00";
+      if (els.publicEndTime) els.publicEndTime.value = "15:30";
+      if (els.publicVenue) els.publicVenue.value = "Google Meet";
+    } else if (tab === "newMentor") {
+      if (els.onboardMentorForm) els.onboardMentorForm.reset();
+      setHubAlert(els.onboardMentorAlert, null, "");
+      if (els.newMentorPassword) els.newMentorPassword.value = "Alumni@123";
+      if (els.newMentorGradYear) els.newMentorGradYear.value = "2020";
+      if (els.newMentorExp) els.newMentorExp.value = "4";
+      if (els.newMentorCapacity) els.newMentorCapacity.value = "5";
     }
   }
 
   async function loadTeacherPortal() {
-    switchTeacherSubtab("marks");
+    switchTeacherSubtab("schedules");
   }
 
-  async function loadTeacherEvents() {
-    if (!els.teacherEventSelect) return;
-    els.teacherEventSelect.innerHTML = `<option value="">Loading assigned events...</option>`;
-
+  async function loadTeacherMeetDropdowns() {
     try {
-      const res = await ApiClient.getTeacherEvents();
-      if (!res.ok || !Array.isArray(res.data)) {
-        els.teacherEventSelect.innerHTML = `<option value="">No assigned events available</option>`;
-        return;
-      }
+      const [mentorsRes, studentsRes] = await Promise.all([
+        ApiClient.getTeacherMentors(),
+        ApiClient.getTeacherStudents()
+      ]);
 
-      currentTeacherEvents = res.data;
-      if (currentTeacherEvents.length === 0) {
-        els.teacherEventSelect.innerHTML = `<option value="">No events assigned to you yet</option>`;
-        if (els.teacherMarksTableBody) {
-          els.teacherMarksTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">No events currently assigned to your faculty profile.</td></tr>`;
-        }
-        return;
-      }
-
-      els.teacherEventSelect.innerHTML = currentTeacherEvents.map(e => 
-        `<option value="${e.id}">${escapeHtml(e.title)} (${e.assignmentRole || e.assignment_role || 'Assigned'})</option>`
-      ).join("");
-
-      // Also populate bookingEventId select
-      if (els.bookingEventId) {
-        els.bookingEventId.innerHTML = `<option value="">Select Event...</option>` + currentTeacherEvents.map(e =>
-          `<option value="${e.id}">${escapeHtml(e.title)}</option>`
+      if (mentorsRes.ok && Array.isArray(mentorsRes.data)) {
+        cachedMentorsList = mentorsRes.data;
+        const optionsHtml = `<option value="">Select Mentor...</option>` + cachedMentorsList.map(m => 
+          `<option value="${m.id}">${escapeHtml(m.fullName)} — ${escapeHtml(m.company || 'Alumni')} (${escapeHtml(m.designation || m.department || 'Mentor')})</option>`
         ).join("");
+
+        if (els.meetMentorSelect) els.meetMentorSelect.innerHTML = optionsHtml;
+        if (els.publicMentorSelect) els.publicMentorSelect.innerHTML = optionsHtml;
       }
 
-      const firstId = currentTeacherEvents[0].id;
-      loadTeacherMarks(firstId);
+      if (studentsRes.ok && Array.isArray(studentsRes.data)) {
+        cachedStudentsList = studentsRes.data;
+        const studentsHtml = `<option value="">Select Student...</option>` + cachedStudentsList.map(s => 
+          `<option value="${s.id}">${escapeHtml(s.fullName)} (${s.rollNumber ? s.rollNumber + ' · ' : ''}${escapeHtml(s.department || 'Student')})</option>`
+        ).join("");
+
+        if (els.meetStudentSelect) els.meetStudentSelect.innerHTML = studentsHtml;
+      }
     } catch (err) {
-      els.teacherEventSelect.innerHTML = `<option value="">Error loading events</option>`;
-      setTeacherAlert("error", "Unable to load assigned events: " + err.message);
+      console.error("Failed to load mentor/student dropdowns:", err);
     }
   }
 
-  async function loadTeacherMarks(eventId) {
-    if (!eventId) {
-      if (els.teacherMarksTableBody) {
-        els.teacherMarksTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">Select an event above to view internal marks.</td></tr>`;
-      }
-      return;
-    }
+  async function loadTeacherMeets() {
+    if (!els.teacherMeetsTableBody) return;
+    els.teacherMeetsTableBody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;color:#64748b;">Loading session schedules...</td></tr>`;
 
-    selectedTeacherEvent = currentTeacherEvents.find(e => String(e.id) === String(eventId)) || null;
-
-    if (els.teacherEventInfoCard && selectedTeacherEvent) {
-      els.assignedEventTitle.textContent = selectedTeacherEvent.title || "Event Details";
-      els.assignedEventDesc.textContent = selectedTeacherEvent.description || "";
-      els.assignedEventMeta.innerHTML = `
-        <span>📅 Date: <strong>${escapeHtml(selectedTeacherEvent.date || 'TBD')}</strong></span>
-        <span>⏰ Time: <strong>${escapeHtml(selectedTeacherEvent.startTime || '')} - ${escapeHtml(selectedTeacherEvent.endTime || '')}</strong></span>
-        <span>📍 Venue: <strong>${escapeHtml(selectedTeacherEvent.venue || 'Campus')}</strong></span>
-        <span>🛡️ Your Role: <strong>${escapeHtml(selectedTeacherEvent.assignmentRole || selectedTeacherEvent.assignment_role || 'Faculty Coordinator')}</strong></span>
-      `;
-      els.teacherEventInfoCard.style.display = "block";
-    }
-
-    if (!els.teacherMarksTableBody) return;
-    els.teacherMarksTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">Loading marks for event #${eventId}...</td></tr>`;
+    const type = els.filterMeetType ? els.filterMeetType.value : "";
+    const status = els.filterMeetStatus ? els.filterMeetStatus.value : "";
 
     try {
-      const res = await ApiClient.getTeacherEventMarks(eventId);
+      const res = await ApiClient.getTeacherMeets(type, status);
       if (!res.ok || !Array.isArray(res.data)) {
-        throw new Error(res.data?.message || "Failed to load marks.");
+        throw new Error(res.data?.message || "Failed to load schedules.");
       }
 
-      const marks = res.data;
-      if (marks.length === 0) {
-        els.teacherMarksTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">No internal marks recorded for this event yet. Click "Enter Student Marks" above to evaluate students.</td></tr>`;
+      const meets = res.data;
+      if (meets.length === 0) {
+        els.teacherMeetsTableBody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:28px;color:#64748b;">No scheduled meets found matching criteria. Click <strong>"New 1-on-1 Meet"</strong> or <strong>"New Public Meet"</strong> to schedule one.</td></tr>`;
         return;
       }
 
-      els.teacherMarksTableBody.innerHTML = "";
-      marks.forEach(m => {
+      els.teacherMeetsTableBody.innerHTML = "";
+      meets.forEach(m => {
         const tr = document.createElement("tr");
-        const score = Number(m.marks || 0);
-        const maxScore = Number(m.maxMarks || m.max_marks || 100);
-        const pct = maxScore > 0 ? ((score / maxScore) * 100).toFixed(1) : "0.0";
+        const isPublic = m.meetType === "PUBLIC";
+        const st = (m.status || "SCHEDULED").toUpperCase();
+        const isScheduled = st === "SCHEDULED";
 
         tr.innerHTML = `
-          <td style="font-weight:700; color:#64748b;">STU #${m.studentId || m.student_id}</td>
+          <td style="font-weight:700; color:#64748b;">#${m.id}</td>
           <td>
-            <div style="font-weight:700; color:#0f172a;">${escapeHtml(m.studentName || m.student_name || `Student #${m.studentId || m.student_id}`)}</div>
-            <div style="font-size:12px; color:#64748b;">${escapeHtml(m.studentDepartment || m.department || "")}</div>
-          </td>
-          <td style="font-weight:800; color:#1e293b; font-size:14px;">${score.toFixed(2)}</td>
-          <td style="color:#64748b;">${maxScore.toFixed(2)}</td>
-          <td>
-            <span style="display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; background:${pct >= 75 ? '#dcfce7;color:#15803d;' : pct >= 50 ? '#fef3c7;color:#b45309;' : '#fee2e2;color:#b91c1c;'}">
-              ${pct}%
+            <span class="meet-type-badge ${isPublic ? 'type-public' : 'type-one-on-one'}">
+              ${isPublic ? 'Public' : '1-on-1'}
             </span>
           </td>
-          <td style="font-size:12px; color:#475569; max-width:240px;">${escapeHtml(m.remarks || "—")}</td>
-          <td style="font-size:12px; color:#64748b;">${escapeHtml(m.updatedAt ? m.updatedAt.split(" ")[0] : "—")}</td>
-          <td style="text-align:right;">
-            <button type="button" class="btn-edit-mark" style="padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; cursor:pointer;">
-              ✏️ Edit
-            </button>
-          </td>
-        `;
-
-        const editBtn = tr.querySelector(".btn-edit-mark");
-        if (editBtn) {
-          editBtn.addEventListener("click", () => {
-            openTeacherMarkModal({
-              eventId: eventId,
-              studentId: m.studentId || m.student_id,
-              marks: score,
-              maxMarks: maxScore,
-              remarks: m.remarks || "",
-              isUpdate: true
-            });
-          });
-        }
-
-        els.teacherMarksTableBody.appendChild(tr);
-      });
-    } catch (err) {
-      els.teacherMarksTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#dc2626;">Error loading marks: ${escapeHtml(err.message)}</td></tr>`;
-    }
-  }
-
-  function openTeacherMarkModal(markData) {
-    if (!els.teacherMarkModal) return;
-    if (els.teacherMarkModalAlert) els.teacherMarkModalAlert.style.display = "none";
-
-    const evId = markData?.eventId || (els.teacherEventSelect ? els.teacherEventSelect.value : null);
-    if (!evId) {
-      alert("Please select an assigned event first.");
-      return;
-    }
-
-    const eventObj = currentTeacherEvents.find(e => String(e.id) === String(evId));
-    if (els.markEventTitleDisplay) {
-      els.markEventTitleDisplay.value = eventObj ? eventObj.title : `Event #${evId}`;
-    }
-    if (els.markEventId) els.markEventId.value = evId;
-
-    if (markData) {
-      if (els.markStudentId) {
-        els.markStudentId.value = markData.studentId;
-        els.markStudentId.readOnly = !!markData.isUpdate;
-      }
-      if (els.markScore) els.markScore.value = markData.marks;
-      if (els.markMaxScore) els.markMaxScore.value = markData.maxMarks || 100;
-      if (els.markRemarks) els.markRemarks.value = markData.remarks || "";
-      state.isUpdatingTeacherMark = !!markData.isUpdate;
-      if (els.teacherMarkModalTitle) {
-        els.teacherMarkModalTitle.textContent = markData.isUpdate ? "✏️ Edit Student Internal Marks" : "📝 Enter Student Internal Marks";
-      }
-    } else {
-      if (els.markStudentId) {
-        els.markStudentId.value = "";
-        els.markStudentId.readOnly = false;
-      }
-      if (els.markScore) els.markScore.value = "";
-      if (els.markMaxScore) els.markMaxScore.value = "100.00";
-      if (els.markRemarks) els.markRemarks.value = "";
-      state.isUpdatingTeacherMark = false;
-      if (els.teacherMarkModalTitle) {
-        els.teacherMarkModalTitle.textContent = "📝 Enter Student Internal Marks";
-      }
-    }
-
-    els.teacherMarkModal.style.display = "flex";
-  }
-
-  function closeTeacherMarkModal() {
-    if (els.teacherMarkModal) els.teacherMarkModal.style.display = "none";
-  }
-
-  async function handleTeacherMarkSubmit(e) {
-    e.preventDefault();
-    const eventId = els.markEventId.value;
-    const studentId = els.markStudentId.value.trim();
-    const marks = els.markScore.value.trim();
-    const maxMarks = els.markMaxScore.value.trim() || "100.00";
-    const remarks = els.markRemarks.value.trim();
-
-    if (!eventId || !studentId || marks === "") {
-      if (els.teacherMarkModalAlert) {
-        els.teacherMarkModalAlert.className = "form-status-alert alert-error";
-        els.teacherMarkModalAlert.textContent = "Event, Student ID, and Marks are required.";
-        els.teacherMarkModalAlert.style.display = "block";
-      }
-      return;
-    }
-
-    try {
-      if (els.saveMarkBtn) els.saveMarkBtn.disabled = true;
-
-      const payload = {
-        studentId: Number(studentId),
-        marks: Number(marks),
-        maxMarks: Number(maxMarks),
-        remarks: remarks || null
-      };
-
-      const res = state.isUpdatingTeacherMark
-        ? await ApiClient.updateInternalMark(eventId, studentId, payload)
-        : await ApiClient.submitInternalMark(eventId, payload);
-
-      if (res.ok) {
-        closeTeacherMarkModal();
-        setTeacherAlert("success", "Student internal marks saved successfully.");
-        loadTeacherMarks(eventId);
-      } else {
-        if (els.teacherMarkModalAlert) {
-          els.teacherMarkModalAlert.className = "form-status-alert alert-error";
-          els.teacherMarkModalAlert.textContent = res.data?.message || "Failed to record marks.";
-          els.teacherMarkModalAlert.style.display = "block";
-        }
-      }
-    } catch (err) {
-      if (els.teacherMarkModalAlert) {
-        els.teacherMarkModalAlert.className = "form-status-alert alert-error";
-        els.teacherMarkModalAlert.textContent = err.message || "Failed to save marks.";
-        els.teacherMarkModalAlert.style.display = "block";
-      }
-    } finally {
-      if (els.saveMarkBtn) els.saveMarkBtn.disabled = false;
-    }
-  }
-
-  async function loadTeacherBookings() {
-    if (!els.teacherBookingsTableBody) return;
-    els.teacherBookingsTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">Loading alumni slot bookings...</td></tr>`;
-
-    try {
-      const res = await ApiClient.getTeacherBookings();
-      if (!res.ok || !Array.isArray(res.data)) {
-        throw new Error(res.data?.message || "Failed to fetch bookings.");
-      }
-
-      const bookings = res.data;
-      if (bookings.length === 0) {
-        els.teacherBookingsTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#64748b;">No alumni slot bookings found. Click "Book Alumni Slot" above to coordinate an alumni visit.</td></tr>`;
-        return;
-      }
-
-      els.teacherBookingsTableBody.innerHTML = "";
-      bookings.forEach(b => {
-        const tr = document.createElement("tr");
-        const st = (b.status || "BOOKED").toUpperCase();
-        const isBooked = st === "BOOKED";
-
-        tr.innerHTML = `
-          <td style="font-weight:700; color:#64748b;">#${b.id}</td>
-          <td><span style="font-weight:600; color:#0f172a;">Event #${b.eventId || b.event_id}</span></td>
           <td>
-            <div style="font-weight:700; color:#0f172a;">${escapeHtml(b.alumniName || b.alumni_name || `Alumni #${b.alumniId || b.alumni_id}`)}</div>
-            <div style="font-size:12px; color:#64748b;">${escapeHtml(b.company || "")}</div>
+            <div style="font-weight:700; color:#0f172a; max-width:220px; line-height:1.3;">${escapeHtml(m.title)}</div>
+            ${m.description ? `<div style="font-size:12px; color:#64748b; max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(m.description)}</div>` : ''}
           </td>
           <td>
-            <div style="font-weight:600; color:#0f172a; font-size:12px;">📅 ${escapeHtml(b.slotDate || b.slot_date || "")}</div>
-            <div style="font-size:11px; color:#64748b;">⏰ ${escapeHtml(b.startTime || b.start_time || "")} - ${escapeHtml(b.endTime || b.end_time || "")}</div>
+            <div style="font-weight:700; color:#0f172a;">${escapeHtml(m.mentorName || `Mentor #${m.mentorId}`)}</div>
+            <div style="font-size:11px; color:#64748b;">${escapeHtml(m.mentorCompany ? m.mentorCompany + (m.mentorDesignation ? ' · ' + m.mentorDesignation : '') : '')}</div>
           </td>
-          <td><span class="role-badge role-teacher">${escapeHtml(b.purpose || b.booking_purpose || "GUEST_SESSION")}</span></td>
           <td>
-            <span class="approval-badge approval-${escapeHtml(st)}">
-              ${st === 'COMPLETED' ? '✓ COMPLETED' : st === 'BOOKED' ? '📅 BOOKED' : '✕ CANCELLED'}
-            </span>
-          </td>
-          <td style="font-size:12px; color:#475569; max-width:200px;">${escapeHtml(b.notes || "—")}</td>
-          <td style="text-align:right;">
-            ${isBooked ? `
-              <div class="admin-action-btn-group" style="justify-content:flex-end;">
-                <button type="button" class="btn-complete-booking" data-bookingid="${b.id}" style="background:#15803d; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">
-                  ✓ Done
-                </button>
-                <button type="button" class="btn-cancel-booking" data-bookingid="${b.id}" style="background:#dc2626; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">
-                  ✕ Cancel
-                </button>
+            ${isPublic ? `
+              <div>
+                <span style="font-weight:700; color:#4338ca; font-size:13px;">${m.attendeeCount || 0} enrolled</span>
+                ${m.maxParticipants ? `<span style="font-size:11px; color:#64748b;"> / max ${m.maxParticipants}</span>` : ''}
               </div>
-            ` : `<span style="font-size:11px; color:#94a3b8; font-weight:600;">${st}</span>`}
+              <button type="button" class="btn-view-attendees" data-meetid="${m.id}" data-meettitle="${escapeHtml(m.title)}" style="font-size:11px; padding:2px 8px; margin-top:4px; border-radius:4px; border:1px solid #cbd5e1; background:#f8fafc; color:#1e293b; cursor:pointer;">
+                View Attendees
+              </button>
+            ` : `
+              <div style="font-weight:700; color:#0f172a;">${escapeHtml(m.studentName || (m.studentId ? `Student #${m.studentId}` : '—'))}</div>
+              <div style="font-size:11px; color:#64748b;">${escapeHtml(m.studentDepartment || '')}</div>
+            `}
+          </td>
+          <td>
+            <div style="font-weight:600; color:#0f172a; font-size:12px;">${escapeHtml(m.meetDate || '')}</div>
+            <div style="font-size:11px; color:#64748b;">${escapeHtml(m.startTime || '')} - ${escapeHtml(m.endTime || '')}</div>
+          </td>
+          <td>
+            <div style="font-size:12px; font-weight:600; color:#1e293b;">${escapeHtml(m.venue || 'Online')}</div>
+            ${m.meetingLink ? `
+              <a href="${escapeHtml(m.meetingLink)}" target="_blank" rel="noopener noreferrer" style="font-size:11px; color:#2563eb; text-decoration:none; display:inline-flex; align-items:center; gap:3px;">
+                Join Link
+              </a>
+            ` : ''}
+          </td>
+          <td>
+            <span class="meet-status-badge status-${st.toLowerCase()}">
+              ${st === 'SCHEDULED' ? 'SCHEDULED' : st === 'COMPLETED' ? 'COMPLETED' : 'CANCELLED'}
+            </span>
+          </td>
+          <td style="text-align:right;">
+            <div style="display:flex; justify-content:flex-end; gap:6px;">
+              ${isScheduled ? `
+                <button type="button" class="btn-meet-done" data-meetid="${m.id}" title="Mark Session Completed" style="background:#15803d; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">
+                  Done
+                </button>
+                <button type="button" class="btn-meet-cancel" data-meetid="${m.id}" title="Cancel Session" style="background:#dc2626; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">
+                  Cancel
+                </button>
+              ` : `
+                <span style="font-size:11px; color:#94a3b8; font-weight:600;">${st}</span>
+              `}
+            </div>
           </td>
         `;
 
-        const completeBtn = tr.querySelector(".btn-complete-booking");
-        if (completeBtn) {
-          completeBtn.addEventListener("click", () => handleTeacherBookingStatus(b.id, "COMPLETED"));
-        }
-        const cancelBtn = tr.querySelector(".btn-cancel-booking");
-        if (cancelBtn) {
-          cancelBtn.addEventListener("click", () => handleTeacherBookingStatus(b.id, "CANCELLED"));
+        const viewAttBtn = tr.querySelector(".btn-view-attendees");
+        if (viewAttBtn) {
+          viewAttBtn.addEventListener("click", () => openMeetAttendeesModal(m.id, m.title));
         }
 
-        els.teacherBookingsTableBody.appendChild(tr);
+        const doneBtn = tr.querySelector(".btn-meet-done");
+        if (doneBtn) {
+          doneBtn.addEventListener("click", () => handleTeacherMeetStatus(m.id, "COMPLETED"));
+        }
+
+        const cancelBtn = tr.querySelector(".btn-meet-cancel");
+        if (cancelBtn) {
+          cancelBtn.addEventListener("click", () => handleTeacherMeetStatus(m.id, "CANCELLED"));
+        }
+
+        els.teacherMeetsTableBody.appendChild(tr);
       });
     } catch (err) {
-      els.teacherBookingsTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#dc2626;">Error: ${escapeHtml(err.message)}</td></tr>`;
+      els.teacherMeetsTableBody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;color:#dc2626;">Error: ${escapeHtml(err.message)}</td></tr>`;
     }
   }
 
-  function openTeacherBookingModal() {
-    if (!els.teacherBookingModal) return;
-    if (els.teacherBookingModalAlert) els.teacherBookingModalAlert.style.display = "none";
-    if (els.teacherBookingForm) els.teacherBookingForm.reset();
-    els.teacherBookingModal.style.display = "flex";
-  }
-
-  function closeTeacherBookingModal() {
-    if (els.teacherBookingModal) els.teacherBookingModal.style.display = "none";
-  }
-
-  async function handleTeacherBookingSubmit(e) {
+  async function handleScheduleOneOnOneSubmit(e) {
     e.preventDefault();
-    const eventId = els.bookingEventId.value;
-    const alumniId = els.bookingAlumniId.value.trim();
-    const slotDate = els.bookingDate.value;
-    const startTime = els.bookingStartTime.value;
-    const endTime = els.bookingEndTime.value;
-    const purpose = els.bookingPurpose.value;
-    const notes = els.bookingNotes.value.trim();
+    const mentorId = els.meetMentorSelect.value;
+    const studentId = els.meetStudentSelect.value;
+    const title = els.meetTitle.value.trim();
+    const description = els.meetDescription.value.trim();
+    const meetDate = els.meetDate.value;
+    const startTime = els.meetStartTime.value;
+    const endTime = els.meetEndTime.value;
+    const meetingLink = els.meetingLink.value.trim();
+    const venue = els.meetVenue.value.trim();
 
-    if (!eventId || !alumniId || !slotDate || !startTime || !endTime) {
-      if (els.teacherBookingModalAlert) {
-        els.teacherBookingModalAlert.className = "form-status-alert alert-error";
-        els.teacherBookingModalAlert.textContent = "Please fill in all required booking fields.";
-        els.teacherBookingModalAlert.style.display = "block";
-      }
+    if (!mentorId || !studentId || !title || !meetDate || !startTime || !endTime) {
+      setHubAlert(els.scheduleOneOnOneAlert, "error", "Please fill in all required fields marked with *.");
+      return;
+    }
+
+    if (endTime <= startTime) {
+      setHubAlert(els.scheduleOneOnOneAlert, "error", "End time must be after start time.");
       return;
     }
 
     try {
-      if (els.saveBookingBtn) els.saveBookingBtn.disabled = true;
+      if (els.submitOneOnOneBtn) els.submitOneOnOneBtn.disabled = true;
 
       const payload = {
-        eventId: Number(eventId),
-        alumniId: Number(alumniId),
-        slotDate: slotDate,
-        startTime: startTime,
-        endTime: endTime,
-        purpose: purpose,
-        notes: notes || null
+        title,
+        description: description || null,
+        meetType: "ONE_ON_ONE",
+        mentorId: Number(mentorId),
+        studentId: Number(studentId),
+        meetDate,
+        startTime,
+        endTime,
+        meetingLink: meetingLink || null,
+        venue: venue || "Online"
       };
 
-      const res = await ApiClient.createTeacherBooking(payload);
+      const res = await ApiClient.createTeacherMeet(payload);
       if (res.ok) {
-        closeTeacherBookingModal();
-        setTeacherAlert("success", "Alumni slot booked successfully!");
-        loadTeacherBookings();
+        setTeacherAlert("success", "1-on-1 Mentorship meet scheduled successfully!");
+        switchTeacherSubtab("schedules");
       } else {
-        if (els.teacherBookingModalAlert) {
-          els.teacherBookingModalAlert.className = "form-status-alert alert-error";
-          els.teacherBookingModalAlert.textContent = res.data?.message || "Booking failed or conflicting slot exists.";
-          els.teacherBookingModalAlert.style.display = "block";
-        }
+        setHubAlert(els.scheduleOneOnOneAlert, "error", res.data?.message || "Failed to schedule meet.");
       }
     } catch (err) {
-      if (els.teacherBookingModalAlert) {
-        els.teacherBookingModalAlert.className = "form-status-alert alert-error";
-        els.teacherBookingModalAlert.textContent = err.message || "Failed to book slot.";
-        els.teacherBookingModalAlert.style.display = "block";
-      }
+      setHubAlert(els.scheduleOneOnOneAlert, "error", err.message || "Failed to schedule meet.");
     } finally {
-      if (els.saveBookingBtn) els.saveBookingBtn.disabled = false;
+      if (els.submitOneOnOneBtn) els.submitOneOnOneBtn.disabled = false;
     }
   }
 
-  async function handleTeacherBookingStatus(bookingId, status) {
-    if (!confirm(`Are you sure you want to change booking #${bookingId} to ${status}?`)) return;
+  async function handleSchedulePublicMeetSubmit(e) {
+    e.preventDefault();
+    const mentorId = els.publicMentorSelect.value;
+    const title = els.publicMeetTitle.value.trim();
+    const description = els.publicMeetDesc.value.trim();
+    const maxCapacity = els.publicMaxCapacity.value ? Number(els.publicMaxCapacity.value) : null;
+    const meetDate = els.publicMeetDate.value;
+    const startTime = els.publicStartTime.value;
+    const endTime = els.publicEndTime.value;
+    const meetingLink = els.publicMeetingLink.value.trim();
+    const venue = els.publicVenue.value.trim();
+
+    if (!mentorId || !title || !description || !meetDate || !startTime || !endTime || !meetingLink) {
+      setHubAlert(els.schedulePublicMeetAlert, "error", "Please fill in all required fields marked with *.");
+      return;
+    }
+
+    if (endTime <= startTime) {
+      setHubAlert(els.schedulePublicMeetAlert, "error", "End time must be after start time.");
+      return;
+    }
+
     try {
-      const res = await ApiClient.updateTeacherBookingStatus(bookingId, status);
+      if (els.submitPublicMeetBtn) els.submitPublicMeetBtn.disabled = true;
+
+      const payload = {
+        title,
+        description,
+        meetType: "PUBLIC",
+        mentorId: Number(mentorId),
+        meetDate,
+        startTime,
+        endTime,
+        meetingLink,
+        venue: venue || "Online",
+        maxParticipants: maxCapacity
+      };
+
+      const res = await ApiClient.createTeacherMeet(payload);
       if (res.ok) {
-        setTeacherAlert("success", `Booking #${bookingId} status updated to ${status}.`);
-        loadTeacherBookings();
+        setTeacherAlert("success", "Public Masterclass session published! Students can now view and join.");
+        switchTeacherSubtab("schedules");
       } else {
-        setTeacherAlert("error", res.data?.message || "Failed to update booking status.");
+        setHubAlert(els.schedulePublicMeetAlert, "error", res.data?.message || "Failed to publish public session.");
       }
     } catch (err) {
-      setTeacherAlert("error", err.message || "Failed to update booking status.");
+      setHubAlert(els.schedulePublicMeetAlert, "error", err.message || "Failed to publish public session.");
+    } finally {
+      if (els.submitPublicMeetBtn) els.submitPublicMeetBtn.disabled = false;
+    }
+  }
+
+  async function handleOnboardMentorSubmit(e) {
+    e.preventDefault();
+    const fullName = els.newMentorName.value.trim();
+    const email = els.newMentorEmail.value.trim();
+    const mobileNumber = els.newMentorMobile.value.trim();
+    const password = els.newMentorPassword.value.trim() || "Alumni@123";
+    const company = els.newMentorCompany.value.trim();
+    const designation = els.newMentorDesignation.value.trim();
+    const department = els.newMentorDept.value;
+    const graduationYear = els.newMentorGradYear.value ? Number(els.newMentorGradYear.value) : 2020;
+    const experienceYears = els.newMentorExp.value ? Number(els.newMentorExp.value) : 4;
+    const skills = els.newMentorSkills.value.trim();
+    const maxMentees = els.newMentorCapacity.value ? Number(els.newMentorCapacity.value) : 5;
+    const bio = els.newMentorBio.value.trim();
+
+    if (!fullName || !email || !mobileNumber || !company || !designation || !skills) {
+      setHubAlert(els.onboardMentorAlert, "error", "Please provide all required mentor details.");
+      return;
+    }
+
+    try {
+      if (els.submitOnboardMentorBtn) els.submitOnboardMentorBtn.disabled = true;
+
+      const payload = {
+        fullName,
+        email,
+        mobileNumber,
+        password,
+        company,
+        designation,
+        department,
+        graduationYear,
+        experienceYears,
+        skills,
+        maxMentees,
+        bio: bio || `Alumni mentor at ${company}`
+      };
+
+      const res = await ApiClient.createTeacherMentor(payload);
+      if (res.ok) {
+        setTeacherAlert("success", `Mentor ${fullName} onboarded successfully! They can log in with ${email} / ${password}.`);
+        els.onboardMentorForm.reset();
+        setHubAlert(els.onboardMentorAlert, "success", `Mentor account created! ID: #${res.data?.mentorId}`);
+        loadTeacherMeetDropdowns();
+      } else {
+        setHubAlert(els.onboardMentorAlert, "error", res.data?.message || "Failed to onboard mentor.");
+      }
+    } catch (err) {
+      setHubAlert(els.onboardMentorAlert, "error", err.message || "Failed to onboard mentor.");
+    } finally {
+      if (els.submitOnboardMentorBtn) els.submitOnboardMentorBtn.disabled = false;
+    }
+  }
+
+  async function openMeetAttendeesModal(meetId, title) {
+    if (!els.meetAttendeesModal) return;
+    if (els.attendeesModalTitle) els.attendeesModalTitle.textContent = `Attendees: ${title}`;
+    if (els.attendeesModalSubtitle) els.attendeesModalSubtitle.textContent = `Registered students for Meet #${meetId}`;
+    if (els.attendeesTableBody) {
+      els.attendeesTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:16px;">Loading attendees list...</td></tr>`;
+    }
+
+    els.meetAttendeesModal.style.display = "flex";
+
+    try {
+      const res = await ApiClient.getMeetAttendees(meetId);
+      if (!res.ok || !Array.isArray(res.data)) {
+        throw new Error(res.data?.message || "Failed to load attendees.");
+      }
+
+      const attendees = res.data;
+      if (attendees.length === 0) {
+        els.attendeesTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;color:#64748b;">No students have registered for this session yet.</td></tr>`;
+        return;
+      }
+
+      els.attendeesTableBody.innerHTML = "";
+      attendees.forEach(a => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td style="font-weight:700; color:#64748b;">${escapeHtml(a.rollNumber || `STU #${a.studentId}`)}</td>
+          <td style="font-weight:700; color:#0f172a;">${escapeHtml(a.fullName)}</td>
+          <td>${escapeHtml(a.department || '—')}</td>
+          <td><a href="mailto:${escapeHtml(a.email)}" style="color:#2563eb; text-decoration:none;">${escapeHtml(a.email)}</a></td>
+          <td style="font-size:12px; color:#64748b;">${escapeHtml(a.registeredAt ? a.registeredAt.split(" ")[0] : '—')}</td>
+        `;
+        els.attendeesTableBody.appendChild(tr);
+      });
+    } catch (err) {
+      els.attendeesTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:16px;color:#dc2626;">Error loading attendees: ${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  function closeMeetAttendeesModal() {
+    if (els.meetAttendeesModal) els.meetAttendeesModal.style.display = "none";
+  }
+
+  async function handleTeacherMeetStatus(meetId, status) {
+    if (!confirm(`Are you sure you want to mark Meet #${meetId} as ${status}?`)) return;
+    try {
+      const res = await ApiClient.updateTeacherMeetStatus(meetId, status);
+      if (res.ok) {
+        setTeacherAlert("success", `Meet #${meetId} marked as ${status}.`);
+        loadTeacherMeets();
+      } else {
+        setTeacherAlert("error", res.data?.message || "Failed to update meet status.");
+      }
+    } catch (err) {
+      setTeacherAlert("error", err.message || "Failed to update meet status.");
     }
   }
 
@@ -4726,7 +4761,7 @@
           <td>${escapeHtml(u.mobileNumber || "—")}</td>
           <td>
             <span class="approval-badge approval-${escapeHtml(approval)}">
-              ${approval === 'APPROVED' ? '✓' : approval === 'PENDING' ? '⏳' : '✕'} ${escapeHtml(approval)}
+              ${escapeHtml(approval)}
             </span>
           </td>
           <td>
@@ -4741,6 +4776,155 @@
       });
     } catch (err) {
       els.teacherDirectoryTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:#dc2626;">Error loading directory: ${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  // =========================================================================
+  // Student Public Meets Integration
+  // =========================================================================
+  async function loadStudentPublicMeets() {
+    if (!els.studentPublicMeetsSection || !els.studentPublicMeetsList) return;
+
+    // Show public meets section for students or logged in users
+    els.studentPublicMeetsSection.style.display = "block";
+    els.studentPublicMeetsList.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:18px; color:#64748b;">Loading upcoming masterclasses...</div>`;
+
+    try {
+      const res = await ApiClient.getPublicMeets();
+      if (!res.ok || !Array.isArray(res.data)) {
+        els.studentPublicMeetsSection.style.display = "none";
+        return;
+      }
+
+      const meets = res.data;
+      if (meets.length === 0) {
+        els.studentPublicMeetsList.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:18px; color:#64748b; font-size:13px;">No public masterclasses scheduled right now. Check back soon!</div>`;
+        return;
+      }
+
+      els.studentPublicMeetsList.innerHTML = "";
+      meets.forEach(m => {
+        const card = document.createElement("div");
+        card.className = "public-meet-card";
+
+        const isRegistered = !!m.isRegistered;
+        const capacityReached = m.maxParticipants && (m.attendeeCount >= m.maxParticipants);
+        const isStudent = state.currentUser && (state.currentUser.role || "").toLowerCase() === "student";
+
+        card.innerHTML = `
+          <div>
+            <div class="public-meet-card-header">
+              <span class="meet-type-badge type-public">Public Masterclass</span>
+              <span style="font-size:11px; font-weight:700; color:#4338ca; background:#e0e7ff; padding:2px 8px; border-radius:999px;">
+                ${m.attendeeCount || 0} Attending ${m.maxParticipants ? `(Max ${m.maxParticipants})` : ''}
+              </span>
+            </div>
+
+            <h4 class="public-meet-card-title">${escapeHtml(m.title)}</h4>
+
+            <div class="public-meet-mentor-info">
+              <div class="user-avatar-sm" style="width:28px; height:28px; font-size:12px;">${escapeHtml((m.mentorName || 'M').charAt(0))}</div>
+              <div>
+                <strong>${escapeHtml(m.mentorName)}</strong>
+                <span style="font-size:11px; color:#64748b; display:block;">${escapeHtml(m.mentorCompany ? m.mentorCompany + (m.mentorDesignation ? ' · ' + m.mentorDesignation : '') : 'Alumni Mentor')}</span>
+              </div>
+            </div>
+
+            ${m.description ? `<p style="font-size:12px; color:#475569; margin:0 0 12px 0; line-height:1.4;">${escapeHtml(m.description)}</p>` : ''}
+
+            <div class="public-meet-meta-list">
+              <div class="public-meet-meta-item">
+                <strong>Date:</strong> ${escapeHtml(m.meetDate)} &nbsp;•&nbsp; <strong>Time:</strong> ${escapeHtml(m.startTime)} - ${escapeHtml(m.endTime)}
+              </div>
+              <div class="public-meet-meta-item">
+                <span>${escapeHtml(m.venue || 'Online Platform')}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="public-meet-actions">
+            ${isStudent ? `
+              ${isRegistered ? `
+                <div style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:8px;">
+                  <span style="font-size:12px; font-weight:700; color:#15803d; display:flex; align-items:center; gap:4px;">
+                    Enrolled
+                  </span>
+                  <div style="display:flex; gap:6px;">
+                    ${m.meetingLink ? `
+                      <a href="${escapeHtml(m.meetingLink)}" target="_blank" rel="noopener noreferrer" class="modal-submit-btn" style="padding:6px 12px; font-size:12px; text-decoration:none;">
+                        Join Live
+                      </a>
+                    ` : ''}
+                    <button type="button" class="btn-leave-public-meet modal-cancel-btn" data-meetid="${m.id}" style="padding:6px 10px; font-size:11px;">
+                      Cancel RSVP
+                    </button>
+                  </div>
+                </div>
+              ` : `
+                <div style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:8px;">
+                  <span style="font-size:12px; color:#64748b;">
+                    ${capacityReached ? 'Capacity full' : 'Free admission for students'}
+                  </span>
+                  <button type="button" class="btn-join-public-meet modal-submit-btn" data-meetid="${m.id}" ${capacityReached ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : 'style="padding:7px 16px; font-size:12px; background:#4338ca;"'}>
+                    ${capacityReached ? 'Full' : 'RSVP & Join'}
+                  </button>
+                </div>
+              `}
+            ` : `
+              <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                <span style="font-size:12px; color:#64748b;">Open to all students</span>
+                ${m.meetingLink ? `
+                  <a href="${escapeHtml(m.meetingLink)}" target="_blank" rel="noopener noreferrer" style="font-size:12px; color:#2563eb; font-weight:600; text-decoration:none;">
+                    Meeting Link
+                  </a>
+                ` : ''}
+              </div>
+            `}
+          </div>
+        `;
+
+        const joinBtn = card.querySelector(".btn-join-public-meet");
+        if (joinBtn) {
+          joinBtn.addEventListener("click", () => handleJoinPublicMeet(m.id));
+        }
+
+        const leaveBtn = card.querySelector(".btn-leave-public-meet");
+        if (leaveBtn) {
+          leaveBtn.addEventListener("click", () => handleLeavePublicMeet(m.id));
+        }
+
+        els.studentPublicMeetsList.appendChild(card);
+      });
+    } catch (err) {
+      els.studentPublicMeetsList.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:18px; color:#dc2626;">Error: ${escapeHtml(err.message)}</div>`;
+    }
+  }
+
+  async function handleJoinPublicMeet(meetId) {
+    try {
+      const res = await ApiClient.registerPublicMeet(meetId);
+      if (res.ok) {
+        alert("You have successfully registered for this public masterclass session.");
+        loadStudentPublicMeets();
+      } else {
+        alert(res.data?.message || "Failed to register for session.");
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  }
+
+  async function handleLeavePublicMeet(meetId) {
+    if (!confirm("Are you sure you want to cancel your registration for this session?")) return;
+    try {
+      const res = await ApiClient.unregisterPublicMeet(meetId);
+      if (res.ok) {
+        loadStudentPublicMeets();
+      } else {
+        alert(res.data?.message || "Failed to cancel registration.");
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
     }
   }
 

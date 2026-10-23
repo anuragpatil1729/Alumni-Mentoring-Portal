@@ -64,10 +64,10 @@ public class DBConnection {
             jdbcUrl = String.format("jdbc:mysql://%s:%s/%s?%s", host, port, dbName, params);
 
         } catch (ClassNotFoundException e) {
-            System.err.println("❌ MySQL JDBC Driver not found in classpath: " + e.getMessage());
+            System.err.println("Error: MySQL JDBC Driver not found in classpath: " + e.getMessage());
             throw new RuntimeException("MySQL JDBC Driver missing", e);
         } catch (Exception e) {
-            System.err.println("❌ Failed to initialize DBConnection: " + e.getMessage());
+            System.err.println("Error: Failed to initialize DBConnection: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }

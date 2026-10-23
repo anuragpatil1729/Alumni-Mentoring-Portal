@@ -3564,5 +3564,188 @@ input.is-valid, select.is-valid, textarea.is-valid {
   font-style: italic;
 }
 
+/* ========================================================================= */
+/* TEACHER HUB & PUBLIC MASTERCLASSES STYLES                                  */
+/* ========================================================================= */
+
+.public-meets-section-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+  border: 1px solid #c7d2fe;
+  border-radius: var(--radius-lg, 12px);
+  padding: 22px 24px;
+  margin: 24px 0 28px 0;
+  box-shadow: 0 4px 14px -2px rgba(99, 102, 241, 0.08);
+}
+
+.public-meets-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.public-meets-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.public-meets-icon {
+  font-size: 26px;
+  background: #e0e7ff;
+  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.public-meets-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1e1b4b;
+  margin: 0 0 3px 0;
+}
+
+.public-meets-desc {
+  font-size: 13px;
+  color: #4f46e5;
+  margin: 0;
+}
+
+.public-meets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.public-meet-card {
+  background: #ffffff;
+  border: 1px solid #e0e7ff;
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.public-meet-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.1);
+  border-color: #a5b4fc;
+}
+
+.public-meet-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.public-meet-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.35;
+  margin: 0 0 6px 0;
+}
+
+.public-meet-mentor-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #334155;
+}
+
+.public-meet-meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 14px;
+}
+
+.public-meet-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.public-meet-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.meet-type-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.meet-type-badge.type-one-on-one {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.meet-type-badge.type-public {
+  background: #f5f3ff;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+}
+
+.meet-status-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.meet-status-badge.status-scheduled {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.meet-status-badge.status-completed {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.meet-status-badge.status-cancelled {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.hub-form .form-group {
+  margin-bottom: 16px;
+}
+
+.hub-form label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 6px;
+}
+
+
 
 

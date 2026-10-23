@@ -108,7 +108,7 @@ public class RegistrationDAO {
             return generatedUserId;
 
         } catch (SQLException e) {
-            System.err.println("❌ Transaction failed in registerStudent: " + e.getMessage());
+            System.err.println("Error: Transaction failed in registerStudent: " + e.getMessage());
             throw e;
         }
     }
@@ -179,7 +179,7 @@ public class RegistrationDAO {
             return generatedUserId;
 
         } catch (SQLException e) {
-            System.err.println("❌ Transaction failed in registerAlumni: " + e.getMessage());
+            System.err.println("Error: Transaction failed in registerAlumni: " + e.getMessage());
             throw e;
         }
     }
@@ -487,7 +487,7 @@ public class RegistrationDAO {
             conn.commit();
             return true;
         } catch (SQLException e) {
-            System.err.println("❌ Transaction failed in updateStudentProfile: " + e.getMessage());
+            System.err.println("Error: Transaction failed in updateStudentProfile: " + e.getMessage());
             throw e;
         }
     }
@@ -548,7 +548,7 @@ public class RegistrationDAO {
             conn.commit();
             return true;
         } catch (SQLException e) {
-            System.err.println("❌ Transaction failed in updateAlumniProfile: " + e.getMessage());
+            System.err.println("Error: Transaction failed in updateAlumniProfile: " + e.getMessage());
             throw e;
         }
     }

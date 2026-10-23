@@ -25,10 +25,10 @@ public class Main {
         boolean connected = DBConnection.testConnection();
 
         if (!connected) {
-            System.err.println("⚠️ Warning: Could not connect to local MySQL database.");
+            System.err.println("Warning: Could not connect to local MySQL database.");
             System.err.println("Please check DB_HOST, DB_PORT, DB_USER, DB_PASSWORD settings.");
         } else {
-            System.out.println("✅ JDBC Driver loaded & MySQL connected successfully!");
+            System.out.println("JDBC Driver loaded & MySQL connected successfully!");
             try (Connection conn = DBConnection.getConnection()) {
                 DatabaseMetaData metaData = conn.getMetaData();
                 System.out.println("   Driver Name   : " + metaData.getDriverName());
@@ -48,7 +48,7 @@ public class Main {
             HttpServerApp httpServer = new HttpServerApp(httpPort);
             httpServer.start();
         } catch (Exception e) {
-            System.err.println("❌ Failed to start HTTP server on port " + httpPort + ": " + e.getMessage());
+            System.err.println("Error: Failed to start HTTP server on port " + httpPort + ": " + e.getMessage());
         }
 
         // 3. Start Socket Server on port 5002
@@ -57,7 +57,7 @@ public class Main {
             SocketServer socketServer = new SocketServer(socketPort);
             socketServer.start();
         } catch (Exception e) {
-            System.err.println("❌ Failed to start socket server on port " + socketPort + ": " + e.getMessage());
+            System.err.println("Error: Failed to start socket server on port " + socketPort + ": " + e.getMessage());
         }
 
         System.out.println("\nBackend is fully active and ready for requests!");
