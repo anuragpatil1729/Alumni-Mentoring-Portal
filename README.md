@@ -195,24 +195,23 @@ Ensure MySQL or MariaDB is running on your machine:
 ```bash
 # Start service:
 # Linux (systemd)
-sudo systemctl start mariadb   # or: sudo systemctl start mysqld
+sudo systemctl start mysql   # or: sudo systemctl start mariadb
 # macOS (Homebrew)
-brew services start mariadb    # or: brew services start mysql
+brew services start mysql    # or: brew services start mariadb
 
 # 1. Create database and apply baseline schema
-mariadb -u root -p -e "CREATE DATABASE IF NOT EXISTS alumni_mentoring_portal;"
-mariadb -u root -p alumni_mentoring_portal < database/schema.sql
+mysql -u alumni_user -p alumni_password -e "CREATE DATABASE IF NOT EXISTS alumni_mentoring_portal;"
+mysql -u alumni_user -p alumni_password alumni_mentoring_portal < database/schema.sql
 
 # 2. Run all migrations in order (crucial if setting up or upgrading an existing database)
 for file in database/migrations/*.sql; do
   echo "Applying $file..."
-  mariadb -u root -p alumni_mentoring_portal < "$file"
+  mysql -u alumni_user -p alumni_password alumni_mentoring_portal < "$file"
 done
 
 # 3. Seed initial accounts and demo mentors
-mariadb -u root -p alumni_mentoring_portal < database/seed.sql
+mysql -u alumni_user -p alumni_password alumni_mentoring_portal < database/seed.sql
 ```
-*(Note: If using MySQL on Linux/macOS, replace `mariadb` with `mysql`. If using a dedicated user, pass `-u alumni_user -palumni_password`.)*
 
 #### Option B: Windows (MySQL / MariaDB via CMD or PowerShell)
 
@@ -220,33 +219,30 @@ mariadb -u root -p alumni_mentoring_portal < database/seed.sql
 ```cmd
 :: 1. Create database and apply baseline schema
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS alumni_mentoring_portal;"
-mysql -u root -p alumni_mentoring_portal < database\schema.sql
+mysql -u alumni_user -p alumni_password alumni_mentoring_portal < database\schema.sql
 
 :: 2. Run all migrations in order
-for %f in (database\migrations\*.sql) do mysql -u root -p alumni_mentoring_portal < "%f"
+for %f in (database\migrations\*.sql) do mysql -u alumni_user -p alumni_password alumni_mentoring_portal < "%f"
 
 :: 3. Seed initial accounts and demo mentors
-mysql -u root -p alumni_mentoring_portal < database\seed.sql
+mysql -u alumni_user -p alumni_password alumni_mentoring_portal < database\seed.sql
 ```
 
 **Using Windows PowerShell:**
 ```powershell
 # 1. Create database and apply baseline schema
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS alumni_mentoring_portal;"
-Get-Content database\schema.sql | mysql -u root -p alumni_mentoring_portal
+mysql -u alumni_user -p alumni_password -e "CREATE DATABASE IF NOT EXISTS alumni_mentoring_portal;"
+Get-Content database\schema.sql | mysql -u alumni_user -p alumni_password alumni_mentoring_portal
 
 # 2. Run all migrations in order
 Get-ChildItem database\migrations\*.sql | ForEach-Object {
     Write-Host "Applying $($_.Name)..."
-    Get-Content $_.FullName | mysql -u root -p alumni_mentoring_portal
+    Get-Content $_.FullName | mysql -u alumni_user -p alumni_password alumni_mentoring_portal
 }
 
 # 3. Seed initial accounts and demo mentors
-Get-Content database\seed.sql | mysql -u root -p alumni_mentoring_portal
+Get-Content database\seed.sql | mysql -u alumni_user -p alumni_password alumni_mentoring_portal
 ```
-*(Note: If using MariaDB on Windows, you can substitute `mysql` with `mariadb`.)*
-
-
 ---
 
 ### Step 3: Configure Backend Environment
